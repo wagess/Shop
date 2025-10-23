@@ -331,6 +331,9 @@
                 Chargement des galeries...
             </div>
         </div>
+
+        <!-- LIENS VERS LES FOLDERS (affichés en fin de page) -->
+        <div id="foldersContainer" style="margin-top: 30px; text-align: center;"></div>
     </div>
 
     <!-- Modal photos -->
@@ -346,7 +349,7 @@
         const API_BASE = 'https://www.photographie.stephanewagner.com/wp-json/wplr/v1';
         const BEARER_TOKEN = 'njMh4lWVFQUz';
         
-        let allGalleries = [];
+        let allGalleries = []; // ici on stockera uniquement les collections (vue principale)
         let hierarchyData = null;
 
         // Charger au démarrage
@@ -372,24 +375,123 @@
                 hierarchyData = await response.json();
                 console.log('Hiérarchie reçue:', hierarchyData);
 
-                // Extraire tous les IDs possibles
-                allGalleries = extractGalleryIds(hierarchyData);
-                console.log('Galeries trouvées:', allGalleries);
+                // Extraire tous les noeuds
+                const nodes = extractGalleryIds(hierarchyData);
 
-                if (allGalleries.length === 0) {
-                    container.innerHTML = '<div class="error-message">Aucune galerie trouvée dans la hiérarchie</div>';
+                // Collections pour l'affichage principal
+                const collections = nodes.filter(n => n.type === 'collection');
+
+                // Folders (liens en fin de page)
+                const folders = nodes.filter(n => n.type === 'folder');
+
+                allGalleries = collections; // recherche + filtrage se font sur les collections principales
+
+                if (collections.length === 0) {
+                    container.innerHTML = '<div class="error-message">Aucune collection trouvée</div>';
                     return;
                 }
 
                 document.getElementById('stats').textContent = 
-                    `${allGalleries.length} galerie${allGalleries.length > 1 ? 's' : ''} disponible${allGalleries.length > 1 ? 's' : ''}`;
+                    `${collections.length} collection${collections.length > 1 ? 's' : ''} disponible${collections.length > 1 ? 's' : ''}`;
 
-                displayGalleries(allGalleries);
+                displayGalleries(collections);
+                renderFolders(folders);
 
             } catch (error) {
                 console.error('Erreur:', error);
                 container.innerHTML = `<div class="error-message">❌ Erreur: ${error.message}</div>`;
             }
+        }
+
+        // Renders links for folders at the end of the page
+        function renderFolders(folders) {
+            const container = document.getElementById('foldersContainer');
+            if (!folders || folders.length === 0) {
+                container.innerHTML = '';
+                return;
+            }
+
+            container.innerHTML = `
+                <div style="color: white; margin-bottom: 8px; font-weight: bold;">Dossiers (ouvrir pour voir leurs galeries) :</div>
+                <div id="foldersList" style="display:flex; justify-content:center; flex-wrap:wrap; gap:10px;">
+                    ${folders.map(f => `<button type="button" class="folder-link" data-id="${f.id}" data-name="${(f.name||'').replace(/"/g,'&quot;')}" style="background: rgba(255,255,255,0.06); color: white; padding:8px 12px; border-radius:8px; border:none; cursor:pointer;">📂 ${f.name}</button>`).join('')}
+                </div>
+            `;
+
+            // Attacher les écouteurs de clic de façon sûre (évite les problèmes d'échappement)
+            document.querySelectorAll('#foldersList .folder-link').forEach(btn => {
+                btn.addEventListener('click', function (e) {
+                    const id = this.getAttribute('data-id');
+                    const name = this.getAttribute('data-name') || '';
+                    showFolder(id, name);
+                });
+            });
+        }
+
+        // Trouver un noeud dans la hiérarchie par id (récursif) — utilisation de == pour tolérer string/number
+        function findNodeById(node, id) {
+            if (!node) return null;
+            if (node.id != null && node.id == id) return node;
+
+            const childKeys = ['children', 'items', 'galleries', 'collections'];
+            for (const key of childKeys) {
+                if (node[key] && Array.isArray(node[key])) {
+                    for (const child of node[key]) {
+                        const found = findNodeById(child, id);
+                        if (found) return found;
+                    }
+                }
+            }
+
+            if (Array.isArray(node)) {
+                for (const item of node) {
+                    const found = findNodeById(item, id);
+                    if (found) return found;
+                }
+            }
+
+            return null;
+        }
+
+        // Affiche la vue d'un folder : filtre la grille principale pour ne montrer que les collections du dossier
+        function showFolder(folderId, folderName) {
+            // supprimer ancien lien "Retour" s'il existe
+            const oldBack = document.getElementById('backToAll');
+            if (oldBack) oldBack.remove();
+
+            const node = findNodeById(hierarchyData, folderId);
+            if (!node) {
+                alert('Dossier introuvable dans la hiérarchie.');
+                return;
+            }
+
+            // Extraire tous les descendants et ne garder que les collections
+            const descendants = extractGalleryIds(node).filter(n => n.type === 'collection');
+
+            if (descendants.length === 0) {
+                displayGalleries([]); // vide la grille
+                document.getElementById('stats').textContent = `0 collection dans "${folderName}"`;
+            } else {
+                displayGalleries(descendants);
+                document.getElementById('stats').textContent = `${descendants.length} collection${descendants.length > 1 ? 's' : ''} dans "${folderName}"`;
+            }
+
+            // Afficher un lien de retour vers la vue collections principales (uniquement un "Voir toutes")
+            const foldersDiv = document.getElementById('foldersContainer');
+            const backHtml = `<div id="backToAll" style="margin-top:12px;"><a href="#" onclick="displayCollectionsView();return false;" style="color:white; text-decoration:underline;">← Voir toutes les collections</a></div>`;
+            foldersDiv.insertAdjacentHTML('afterend', backHtml);
+
+            // remonter en haut pour voir la grille filtrée
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        // Restaure la vue principale (collections)
+        function displayCollectionsView() {
+            displayGalleries(allGalleries);
+            document.getElementById('stats').textContent = `${allGalleries.length} collection${allGalleries.length > 1 ? 's' : ''} disponible${allGalleries.length > 1 ? 's' : ''}`;
+            // retirer le lien "Retour" s'il existe
+            const maybeBack = document.getElementById('backToAll');
+            if (maybeBack) maybeBack.remove();
         }
 
         // Extraire récursivement tous les IDs de la hiérarchie
