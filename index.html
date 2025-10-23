@@ -5,6 +5,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Shop Stéphane Wagner</title>
     <style>
+        :root {
+            --border-radius: 5px;
+            --gap: 15px;
+        }
+
         * {
             margin: 0;
             padding: 0;
@@ -72,13 +77,13 @@
         .galleries-grid {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
-            gap: 25px;
+            gap: var(--gap);
             margin-bottom: 40px;
         }
 
         .gallery-card {
             background: white;
-            border-radius: 20px;
+            border-radius: var(--border-radius);
             overflow: hidden;
             box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
             transition: all 0.3s;
@@ -86,8 +91,8 @@
         }
 
         .gallery-card:hover {
-            transform: translateY(-10px);
-            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.3);
+            transform: translateY(-5px);
+            box-shadow: 0 5px 10px rgba(0, 0, 0, 0.3);
         }
 
         .gallery-cover {
@@ -215,7 +220,7 @@
 
         .photo-card:hover {
             transform: translateY(-5px);
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+            box-shadow: 0 10px 10px rgba(0, 0, 0, 0.4);
         }
 
         .photo-img {
@@ -505,7 +510,7 @@
             const grid = document.getElementById('photosGrid');
 
             grid.innerHTML = photos.map(photo => {
-                const imgUrl = photo.thumbnail || photo.url || photo.guid || photo.source_url || '';
+                const imgUrl = photo.full_size || photo.url || photo.guid || photo.source_url || '';
                 const title = photo.title || photo.post_title || photo.name || `Photo ${photo.id}`;
                 
                 // Chercher les mots-clés dans différents endroits
