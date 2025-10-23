@@ -26,6 +26,7 @@
         .container {
             max-width: 1400px;
             margin: 0 auto;
+            vertical-align: middle;
         }
 
         .header {
@@ -537,7 +538,7 @@
                             <div class="photo-title">${title}</div>
                             <div class="photo-id">ID: ${photo.id}</div>
                             ${keywordsHTML}
-                            <button class="order-btn" onclick="orderPrint('${title.replace(/'/g, "\\'")}', '${imgUrl}', ${photo.id})">
+                            <button class="order-btn" onclick="orderPrint('${title.replace(/'/g, "\\'")}', '${imgUrl}', ${photo.id}, event)">
                                 🖨️ Commander l'impression
                             </button>
                         </div>
@@ -629,9 +630,29 @@
         }
 
         // Commander une impression
-        function orderPrint(title, imageUrl, photoId) {
-            event.stopPropagation();
-            alert(`📸 Commander l'impression\n\nTitre: ${title}\nID: ${photoId}\nImage: ${imageUrl}\n\n💡 Intégrez votre système de paiement ici`);
+        function orderPrint(title, imageUrl, photoId, evt) {
+            if (evt && evt.stopPropagation) evt.stopPropagation();
+
+            const to = 'wagess@gmail.com';
+            const subject = `Commande impression: ${title}`;
+            const body = `Bonjour,
+
+                            Je souhaite commander une impression.
+
+                            Titre: ${title}
+                            ID: ${photoId}
+                            Image: ${imageUrl}
+
+                            Merci,
+                            [Votre nom]`;
+
+            const mailto = `mailto:${to}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+
+            // Ouvre le client mail avec le message pré-rempli
+            window.location.href = mailto;
+
+            // Message de confirmation côté UI (optionnel)
+            alert('Email préparé vers ' + to + '. Vérifiez votre client mail pour l\'envoyer.');
         }
 
         // Recherche avec Entrée
