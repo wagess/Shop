@@ -323,6 +323,9 @@
             <button class="search-btn" onclick="filterGalleries()">🔍</button>
         </div>
 
+        <!-- LIENS VERS LES FOLDERS (affichés en fin de page) -->
+        <div id="foldersContainerTop" style="margin-top: 30px; margin-bottom: 30px; text-align: center;"></div>
+
         <div class="stats" id="stats"></div>
 
         <div id="galleriesContainer" class="galleries-grid">
@@ -333,7 +336,7 @@
         </div>
 
         <!-- LIENS VERS LES FOLDERS (affichés en fin de page) -->
-        <div id="foldersContainer" style="margin-top: 30px; text-align: center;"></div>
+        <div id="foldersContainerBottom" style="margin-top: 30px; text-align: center;"></div>
     </div>
 
     <!-- Modal photos -->
@@ -405,16 +408,23 @@
 
         // Renders links for folders at the end of the page
         function renderFolders(folders) {
-            const container = document.getElementById('foldersContainer');
+            const containerBottom = document.getElementById('foldersContainerBottom');
+            const containerTop = document.getElementById('foldersContainerTop');
             if (!folders || folders.length === 0) {
                 container.innerHTML = '';
                 return;
             }
 
-            container.innerHTML = `
+            containerBottom.innerHTML = `
                 <div style="color: white; margin-bottom: 8px; font-weight: bold;">Dossiers (ouvrir pour voir leurs galeries) :</div>
                 <div id="foldersList" style="display:flex; justify-content:center; flex-wrap:wrap; gap:10px;">
                     ${folders.map(f => `<button type="button" class="folder-link" data-id="${f.id}" data-name="${(f.name||'').replace(/"/g,'&quot;')}" style="background: rgba(255,255,255,0.06); color: white; padding:8px 12px; border-radius:8px; border:none; cursor:pointer;">📂 ${f.name}</button>`).join('')}
+                </div>
+            `;
+
+            containerTop.innerHTML = `
+                <div id="foldersList" style="display:flex; justify-content:center; flex-wrap:wrap; gap:10px;">
+                    ${folders.map(f => `<button type="button" class="folder-link" data-id="${f.id}" data-name="${(f.name||'').replace(/"/g,'&quot;')}" style=" font-size:1.2rem; background: rgba(255,255,255,0.06); color: white; padding:8px 12px; border-radius:8px; border:none; cursor:pointer;">📂 ${f.name}</button>`).join('')}
                 </div>
             `;
 
