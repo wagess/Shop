@@ -188,32 +188,72 @@ function displayGalleries(galleries) {
 }
 
 function filterGalleries() {
-    const keyword = document.getElementById('searchInput').value.toLowerCase().trim();
+    const raw = document.getElementById('searchInput');
+    const keyword = raw ? String(raw.value).toLowerCase().trim() : '';
     
     if (!keyword) {
         displayGalleries(allGalleries);
+        document.getElementById('stats').textContent = `${allGalleries.length} collection${allGalleries.length > 1 ? 's' : ''} disponible`;
         return;
     }
 
-    const searchMode = document.querySelector('input[name="searchMode"]:checked').value;
+    const searchMode = document.querySelector('input[name="searchMode"]:checked') ?
+        document.querySelector('input[name="searchMode"]:checked').value : 'collections';
 
-    let filtered = allGalleries.filter(g => 
-        g.name.toLowerCase().includes(keyword) ||
-        g.id.toString().includes(keyword)
-    );
-
-    // Recherche avancée par mots-clés (si activée)
-    if (searchMode === 'keywords') {
-        filtered = filtered.filter(gallery => {
-            const keywords = gallery.keywords || [];
-            return keywords.some(kw => kw.toLowerCase().includes(keyword));
-        });
+    if (searchMode === 'collections') {
+        const filtered = allGalleries.filter(g =>
+            (g.name || '').toLowerCase().includes(keyword) ||
+            g.id.toString().includes(keyword)
+        );
+        displayGalleries(filtered);
+        document.getElementById('stats').textContent =
+            `${filtered.length} résultat${filtered.length > 1 ? 's' : ''} pour "${keyword}"`;
+        return;
     }
 
-    displayGalleries(filtered);
-    
-    document.getElementById('stats').textContent = 
-        `${filtered.length} résultat${filtered.length > 1 ? 's' : ''} pour "${keyword}"`;
+    // ----- mode "keywords" : chercher les PHOTOS dans l'index et les afficher -----
+    const matchedPhotos = [];
+    // si l'indexation n'a pas encore commencé / est en cours, on informe l'utilisateur
+    if (Object.keys(galleryIndex).length === 0 && keywordsIndexing.running) {
+        const container = document.getElementById('galleriesContainer');
+        container.innerHTML = '<div class="loading"><div class="spinner"></div>Indexation des mots-clés en cours...</div>';
+        document.getElementById('stats').textContent = `Indexation en cours…`;
+        return;
+    }
+
+    for (const gid of Object.keys(galleryIndex)) {
+        const entries = galleryIndex[gid] || [];
+        for (const entry of entries) {
+            const kws = Array.isArray(entry.keywords) ? entry.keywords : [];
+            const title = (entry.photo && (entry.photo.title || entry.photo.name || entry.photo.post_title)) ? String(entry.photo.title || entry.photo.name || entry.photo.post_title).toLowerCase() : '';
+            const matchKeyword = kws.some(k => k.includes(keyword));
+            const matchTitle = title && title.includes(keyword);
+            if (matchKeyword || matchTitle) {
+                matchedPhotos.push(entry.photo);
+            }
+        }
+    }
+
+    if (matchedPhotos.length === 0) {
+        const container = document.getElementById('galleriesContainer');
+        container.innerHTML = '<div class="loading">Aucune photo trouvée pour cette recherche</div>';
+        document.getElementById('stats').textContent = `0 résultat pour "${keyword}"`;
+        return;
+    }
+
+    // affichage des photos correspondantes
+    displayPhotos(matchedPhotos);
+    document.getElementById('stats').textContent = `${matchedPhotos.length} photo${matchedPhotos.length > 1 ? 's' : ''} trouvée${matchedPhotos.length > 1 ? 's' : ''} pour "${keyword}"`;
+
+    // ouvrir la modal de photos pour afficher les résultats de la recherche
+    const modal = document.getElementById('photosModal');
+    const titleEl = document.getElementById('modalTitle');
+    if (modal) {
+        if (titleEl) titleEl.textContent = `Résultats pour "${keyword}"`;
+        modal.style.display = 'block';
+        // positionne en haut pour que la modal soit visible
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
 }
 
 async function openGallery(galleryId, galleryName) {
