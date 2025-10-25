@@ -401,7 +401,9 @@
 
                 displayGalleries(collections);
                 renderFolders(folders);
-
+                // démarre l'indexation basique des mots-clés (sans IPTC) en tâche de fond
+                startIndexingKeywords(collections);
+ 
             } catch (error) {
                 console.error('Erreur:', error);
                 container.innerHTML = `<div class="error-message">❌ Erreur: ${error.message}</div>`;
@@ -765,6 +767,121 @@ Merci,
                 closeModal();
             }
         });
+
+        // index mémoire: galleryId -> [{ photo, keywords: [..] }, ...]
+        const galleryIndex = {};
+        let keywordsIndexing = { running: false, done: false, processed: 0, total: 0 };
+
+        // met à jour le petit indicateur dans l'UI
+        function updateIndexStatus() {
+            const el = document.getElementById('keywordsIndexStatus');
+            if (!el) return;
+            if (keywordsIndexing.done) el.textContent = 'Indexation mots-clés terminée';
+            else if (keywordsIndexing.running) el.textContent = `Indexation: ${keywordsIndexing.processed}/${keywordsIndexing.total}`;
+            else el.textContent = '';
+        }
+
+        // normalise et déduplique un tableau de valeurs en lowercase
+        function normalizeKeywords(values) {
+            const set = new Set();
+            if (!values) return [];
+            for (const v of values) {
+                if (!v) continue;
+                const s = String(v).trim().toLowerCase();
+                if (s.length) set.add(s);
+            }
+            return Array.from(set);
+        }
+
+        // démarre l'indexation en arrière-plan (concurrence limitée)
+        async function startIndexingKeywords(galleries) {
+            if (!galleries || galleries.length === 0) return;
+            if (keywordsIndexing.running) return;
+            keywordsIndexing.running = true;
+            keywordsIndexing.done = false;
+            keywordsIndexing.total = galleries.length;
+            keywordsIndexing.processed = 0;
+            updateIndexStatus();
+
+            console.info('Démarrage indexation mots-clés pour', galleries.length, 'galeries');
+
+            const concurrency = 3;
+            const queue = galleries.slice();
+
+            const workers = new Array(concurrency).fill(null).map(() => (async () => {
+                while (queue.length > 0) {
+                    const g = queue.shift();
+                    try {
+                        const entries = await buildGalleryKeywords(g.id);
+                        galleryIndex[g.id] = entries; // [{photo, keywords}]
+                        console.debug(`Indexed gallery ${g.id}: ${entries.length} photos`);
+                    } catch (e) {
+                        console.warn('Indexation keywords galerie', g.id, e);
+                    } finally {
+                        keywordsIndexing.processed++;
+                        updateIndexStatus();
+                    }
+                }
+            })());
+
+            await Promise.all(workers);
+            keywordsIndexing.running = false;
+            keywordsIndexing.done = true;
+            updateIndexStatus();
+            console.info('Indexation mots-clés terminée');
+        }
+
+        // construit un index simple par photo pour une galerie (sans appeler IPTC)
+        async function buildGalleryKeywords(galleryId) {
+            if (galleryIndex[galleryId]) return galleryIndex[galleryId];
+            const entries = [];
+            try {
+                const resp = await fetch(`${API_BASE}/gallery/${galleryId}`, { headers: { 'Authorization': `Bearer ${BEARER_TOKEN}` } });
+                if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
+                const photos = await resp.json();
+
+                for (const p of photos) {
+                    // collecte brut des sources présentes dans la réponse
+                    const raw = [];
+
+                    if (p.keywords) raw.push(p.keywords);
+                    if (p.iptc_keywords) raw.push(p.iptc_keywords);
+                    if (p.meta && p.meta.keywords) raw.push(p.meta.keywords);
+                    if (p.terms) {
+                        Object.values(p.terms).forEach(group => {
+                            if (Array.isArray(group)) group.forEach(t => raw.push(t.name || t));
+                        });
+                    }
+                    if (p.tags) raw.push(p.tags);
+
+                    // aplatir raw en tableau de strings
+                    const flat = [];
+                    raw.forEach(item => {
+                        if (!item) return;
+                        if (Array.isArray(item)) item.forEach(x => flat.push(x));
+                        else if (typeof item === 'object') {
+                            if (item.name) flat.push(item.name);
+                        } else flat.push(item);
+                    });
+
+                    let kws = normalizeKeywords(flat);
+
+                    // fallback : quelques tokens du titre si aucun mot trouvé
+                    if (kws.length === 0) {
+                        const fallback = [];
+                        if (p.title) fallback.push(...String(p.title).split(/\s+/));
+                        if (p.name) fallback.push(...String(p.name).split(/\s+/));
+                        kws = normalizeKeywords(fallback);
+                    }
+
+                    entries.push({ photo: p, keywords: kws });
+                }
+            } catch (e) {
+                console.warn('Erreur buildGalleryKeywords', galleryId, e);
+            }
+            galleryIndex[galleryId] = entries;
+            return entries;
+        }
     </script>
 </body>
 </html>
