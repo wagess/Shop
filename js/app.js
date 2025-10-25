@@ -26,11 +26,14 @@ async function loadHierarchy() {
         console.log('Hiérarchie reçue:', hierarchyData);
 
         const nodes = extractGalleryIds(hierarchyData);
-        const collections = nodes.filter(n => n.type === 'collection');
+        // indexer TOUT node qui possède un id (ne pas se limiter au champ type)
+        const collections = nodes.filter(n => n.id != null);
         const folders = nodes.filter(n => n.type === 'folder');
 
+        console.info(`Total nodes=${nodes.length}, indexed collections=${collections.length}, folders=${folders.length}`);
+ 
         allGalleries = collections;
-
+ 
         if (collections.length === 0) {
             container.innerHTML = '<div class="error-message">Aucune collection trouvée</div>';
             return;
@@ -111,8 +114,9 @@ function showFolder(folderId, folderName) {
         return;
     }
 
-    const descendants = extractGalleryIds(node).filter(n => n.type === 'collection');
-
+    // ne pas se baser sur type uniquement : prendre tous les noeuds avec un id
+    const descendants = extractGalleryIds(node).filter(n => n.id != null);
+ 
     if (descendants.length === 0) {
         displayGalleries([]);
         document.getElementById('stats').textContent = `0 collection dans "${folderName}"`;
