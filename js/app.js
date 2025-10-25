@@ -1,6 +1,7 @@
 const API_BASE = 'https://www.photographie.stephanewagner.com/wp-json/wplr/v1';
-const IPTC_API = 'https://www.photographie.stephanewagner.com/wp-json/wplr-iptc/v1'; // endpoint IPTC
-const BEARER_TOKEN = 'njMh4lWVFQUz';
+// use API_BASE to derive the IPTC API host/path so it stays correct in dev/production
+const IPTC_API = API_BASE.replace('/wplr/v1', '/wplr-iptc/v1');
+const BEARER_TOKEN = 'EDNusnA0Q8TW';
 
 let allGalleries = [];
 let hierarchyData = null;
@@ -214,32 +215,57 @@ async function displayPhotos(photos) {
 
         try {
             const url = `${IPTC_API}/media/${photo.id}/keywords?profile=aiptc`;
-            console.debug('IPTC fetch', url);
-            const resp = await fetch(url, { headers: { 'Authorization': `Bearer ${BEARER_TOKEN}` } });
+            const headers = {};
+            if (typeof BEARER_TOKEN === 'string' && BEARER_TOKEN.length) {
+                headers['Authorization'] = `Bearer ${BEARER_TOKEN}`;
+            }
+            const resp = await fetch(url, { headers });
             if (resp.ok) {
                 const data = await resp.json();
-                // l'API aiptc doit renvoyer soit { keywords: [...] } soit un tableau [...]
+                // LOG DEBUG TEMPORAIRE
+                console.log('🔍 Photo', photo.id, '- data brute:', JSON.stringify(data, null, 2));
+                
+                // Extraction simplifiée et sûre
                 let kws = [];
-                if (Array.isArray(data)) kws = data.map(k => String(k).trim());
-                else if (data && Array.isArray(data.keywords)) kws = data.keywords.map(k => String(k).trim());
-                else if (data && Array.isArray(data.items)) kws = data.items.map(k => String(k).trim());
-                // fallback: garder les mots déjà extraits de l'objet photo
-                if (!kws || kws.length === 0) kws = collectKeywords(photo);
+                
+                if (data && Array.isArray(data.keywords)) {
+                    kws = data.keywords
+                        .filter(k => k != null && k !== '')
+                        .map(k => String(k).trim())
+                        .filter(k => k.length > 0);
+                } else if (Array.isArray(data)) {
+                    kws = data
+                        .filter(k => k != null && k !== '')
+                        .map(k => String(k).trim())
+                        .filter(k => k.length > 0);
+                } else if (data && Array.isArray(data.items)) {
+                    kws = data.items
+                        .filter(k => k != null && k !== '')
+                        .map(k => String(k).trim())
+                        .filter(k => k.length > 0);
+                }
+                
+                console.log('🏷️  Photo', photo.id, '- keywords extraits:', kws);
+                
+                if (!kws || kws.length === 0) {
+                    kws = collectKeywords(photo);
+                    console.log('⚠️  Photo', photo.id, '- fallback collectKeywords:', kws);
+                }
 
                 if (kws && kws.length > 0) {
                     container.innerHTML = kws.map(k => `<span class="keyword-tag">${escapeHtml(k)}</span>`).join(' ');
                 } else {
                     container.innerHTML = `<span style="color:#999; font-size:12px;">Aucun mot-clé</span>`;
                 }
-                console.debug(`IPTC keywords for ${photo.id}:`, kws);
             } else {
-                console.warn(`IPTC API ${resp.status} for photo ${photo.id}`);
+                const text = await resp.text().catch(() => '[no body]');
+                console.warn(`⚠️  IPTC API ${resp.status} pour photo ${photo.id}`, text);
                 // afficher fallback
                 const kws = collectKeywords(photo);
                 container.innerHTML = kws.length ? kws.map(k => `<span class="keyword-tag">${escapeHtml(k)}</span>`).join(' ') : `<span style="color:#999; font-size:12px;">Aucun mot-clé</span>`;
             }
         } catch (err) {
-            console.warn('IPTC fetch error', err);
+            console.error('❌ IPTC fetch error pour photo', photo.id, ':', err);
             const kws = collectKeywords(photo);
             container.innerHTML = kws.length ? kws.map(k => `<span class="keyword-tag">${escapeHtml(k)}</span>`).join(' ') : `<span style="color:#999; font-size:12px;">Aucun mot-clé</span>`;
         }
