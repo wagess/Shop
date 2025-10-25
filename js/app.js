@@ -420,12 +420,11 @@ document.addEventListener('keydown', function(e) {
 const galleryIndex = {};
 let keywordsIndexing = { running: false, done: false, processed: 0, total: 0 };
 
-// met à jour le petit indicateur dans l'UI
+// met à jour l'indicateur d'indexation et active/désactive le radio "Mots-clés"
 function updateIndexStatus() {
     const el = document.getElementById('keywordsIndexStatus');
     const modeKeywords = document.getElementById('modeKeywords');
     if (modeKeywords) {
-        // désactive le radio "Mots-clés" pendant l'indexation
         modeKeywords.disabled = !!keywordsIndexing.running;
         modeKeywords.title = keywordsIndexing.running ? 'Indexation des mots-clés en cours...' : '';
     }
@@ -443,19 +442,7 @@ function updateIndexStatus() {
     }
 }
 
-// normalise et déduplique un tableau de valeurs en lowercase
-function normalizeKeywords(values) {
-    const set = new Set();
-    if (!values) return [];
-    for (const v of values) {
-        if (!v) continue;
-        const s = String(v).trim().toLowerCase();
-        if (s.length) set.add(s);
-    }
-    return Array.from(set);
-}
-
-// démarre l'indexation en arrière-plan (concurrence limitée)
+// démarre l'indexation basique par galerie (concurrence limitée)
 async function startIndexingKeywords(galleries) {
     if (!galleries || galleries.length === 0) return;
     if (keywordsIndexing.running) return;
@@ -475,7 +462,7 @@ async function startIndexingKeywords(galleries) {
             const g = queue.shift();
             try {
                 const entries = await buildGalleryKeywords(g.id);
-                galleryIndex[g.id] = entries; // [{photo, keywords}]
+                galleryIndex[g.id] = entries;
                 console.debug(`Indexed gallery ${g.id}: ${entries.length} photos`);
             } catch (e) {
                 console.warn('Indexation keywords galerie', g.id, e);
@@ -493,7 +480,101 @@ async function startIndexingKeywords(galleries) {
     console.info('Indexation mots-clés terminée');
 }
 
-// construit un index simple par photo pour une galerie (sans appeler IPTC)
+// ensure extractKeywordsWithIPTC returns normalized keywords
+async function extractKeywordsWithIPTC(photo) {
+    const keywords = new Set();
+
+    // 1. APPEL À L'API IPTC
+    try {
+        const iptcResponse = await fetch(
+            `${IPTC_API}/media/${photo.id}/keywords`,
+            {
+                headers: { 'Authorization': `Bearer ${BEARER_TOKEN}` }
+            }
+        );
+
+        if (iptcResponse.ok) {
+            const iptcData = await iptcResponse.json();
+            if (iptcData.keywords && Array.isArray(iptcData.keywords)) {
+                iptcData.keywords.forEach(k => {
+                    if (k && k.trim().length > 0) keywords.add(k.trim());
+                });
+            }
+        }
+    } catch (error) {
+        // ignore IPTC errors, fallback to embedded metadata below
+    }
+
+    // 2. Fallback : autres sources (collect raw values)
+    if (photo.keywords) {
+        if (Array.isArray(photo.keywords)) photo.keywords.forEach(k => keywords.add(k));
+        else if (typeof photo.keywords === 'string') photo.keywords.split(/[,;]/).forEach(k => keywords.add(k.trim()));
+    }
+
+    if (photo.iptc_keywords && Array.isArray(photo.iptc_keywords)) {
+        photo.iptc_keywords.forEach(k => keywords.add(k));
+    }
+
+    if (photo.meta && photo.meta.keywords && Array.isArray(photo.meta.keywords)) {
+        photo.meta.keywords.forEach(k => keywords.add(k));
+    }
+
+    if (photo.terms) {
+        Object.values(photo.terms).forEach(termGroup => {
+            if (Array.isArray(termGroup)) {
+                termGroup.forEach(term => {
+                    if (term && (term.name || term)) keywords.add(term.name || term);
+                });
+            }
+        });
+    }
+
+    if (photo.tags && Array.isArray(photo.tags)) {
+        photo.tags.forEach(tag => {
+            if (typeof tag === 'string') keywords.add(tag);
+            else if (tag && tag.name) keywords.add(tag.name);
+        });
+    }
+
+    // return normalized, deduped, lowercase keywords
+    return normalizeKeywords(Array.from(keywords));
+}
+
+// normalize and dedupe keywords: accepts string/array/set/object and returns array of lowercase trimmed unique strings
+function normalizeKeywords(input) {
+    const set = new Set();
+    if (!input) return [];
+    const arr = [];
+
+    if (typeof input === 'string') {
+        arr.push(...input.split(/[,;|\/]+/));
+    } else if (input instanceof Set) {
+        arr.push(...Array.from(input));
+    } else if (Array.isArray(input)) {
+        arr.push(...input);
+    } else if (typeof input === 'object') {
+        // try common fields
+        if (input.name) arr.push(input.name);
+        else if (input.title) arr.push(input.title);
+        else arr.push(String(input));
+    } else {
+        arr.push(String(input));
+    }
+
+    for (let v of arr) {
+        if (v === null || v === undefined) continue;
+        if (typeof v === 'object') {
+            if (v.name) v = v.name;
+            else v = JSON.stringify(v);
+        }
+        const s = String(v).trim().toLowerCase();
+        if (s.length) set.add(s);
+    }
+
+    return Array.from(set);
+}
+
+// when building gallery-level index, store normalized keywords
 async function buildGalleryKeywords(galleryId) {
     if (galleryIndex[galleryId]) return galleryIndex[galleryId];
     const entries = [];
@@ -503,7 +584,7 @@ async function buildGalleryKeywords(galleryId) {
         const photos = await resp.json();
 
         for (const p of photos) {
-            // collecte brut des sources présentes dans la réponse
+            // collect raw sources
             const raw = [];
 
             if (p.keywords) raw.push(p.keywords);
@@ -515,8 +596,10 @@ async function buildGalleryKeywords(galleryId) {
                 });
             }
             if (p.tags) raw.push(p.tags);
+            if (p.title) raw.push(p.title);
+            if (p.name) raw.push(p.name);
 
-            // aplatir raw en tableau de strings
+            // flatten raw into strings and normalize
             const flat = [];
             raw.forEach(item => {
                 if (!item) return;
@@ -527,8 +610,7 @@ async function buildGalleryKeywords(galleryId) {
             });
 
             let kws = normalizeKeywords(flat);
-
-            // fallback : quelques tokens du titre si aucun mot trouvé
+            // fallback: split title/name tokens if still empty
             if (kws.length === 0) {
                 const fallback = [];
                 if (p.title) fallback.push(...String(p.title).split(/\s+/));
