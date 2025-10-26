@@ -1,4 +1,3 @@
-
 /* ==================== Variables ==================== */
 :root {
     /* Espacements */
@@ -17,15 +16,15 @@
     --border-radius-pill: 16px;
     
     /* Couleurs */
-    --primary-color: #231d26;
-    --primary-dark: #764ba2;
-    --success-color: #4CAF50;
-    --success-hover: #45a049;
-    --error-color: #f44336;
-    --error-dark: #d32f2f;
-    --text-primary: #333;
-    --text-secondary: #666;
-    --text-muted: #999;
+    --primary-color: #1a1a1a;
+    --primary-dark: #000000;
+    --success-color: #2d2d2d;
+    --success-hover: #1f1f1f;
+    --error-color: #404040;
+    --error-dark: #2d2d2d;
+    --text-primary: #434343;
+    --text-secondary: #b0b0b0;
+    --text-muted: #808080;
     --white: #ffffff;
     
     /* Backgrounds */

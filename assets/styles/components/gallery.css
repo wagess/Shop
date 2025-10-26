@@ -2,8 +2,8 @@
 .galleries-grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(var(--gallery-min-width), 1fr));
-    gap: var(--gap);
-    margin-bottom: var(--gap-large);
+    gap: var(--gap-medium);
+    margin-bottom: var(--gap-medium);
 }
 
 .gallery-card {
@@ -50,7 +50,7 @@
 .gallery-meta {
     color: var(--text-secondary);
     font-size: 0.9em;
-    margin-bottom: var(--gap);
+    margin-bottom: var(--gap-medium);
 }
 
 .gallery-count {
