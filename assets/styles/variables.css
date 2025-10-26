@@ -1,0 +1,57 @@
+/* ==================== Variables ==================== */
+:root {
+    /* Espacements */
+    --gap: 15px;
+    --gap-small: 5px;
+    --gap-medium: 20px;
+    --gap-large: 40px;
+    --padding-small: 12px 20px;
+    --padding-medium: 20px;
+    --padding-large: 25px;
+    
+    /* Bordures */
+    --border-radius: 2px;
+    --border-radius-medium: 4px;
+    --border-radius-large: 8px;
+    --border-radius-pill: 16px;
+    
+    /* Couleurs */
+    --primary-color: #1a1a1a;
+    --primary-dark: #000000;
+    --success-color: #2d2d2d;
+    --success-hover: #1f1f1f;
+    --error-color: #404040;
+    --error-dark: #2d2d2d;
+    --text-primary: #434343;
+    --text-secondary: #b0b0b0;
+    --text-muted: #808080;
+    --white: #ffffff;
+    
+    /* Backgrounds */
+    --bg-gradient: linear-gradient(135deg, #282323 0%, #404245 100%);
+    --bg-gradient-purple: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    --bg-gradient-success: linear-gradient(45deg, #4CAF50, #45a049);
+    --bg-modal: rgba(0, 0, 0, 0.95);
+    --bg-modal-header: rgba(0, 0, 0, 0.9);
+    --bg-suggestion: rgba(30, 30, 30, 0.95);
+    --bg-white-transparent: rgba(255, 255, 255, 0.1);
+    --bg-white-transparent-hover: rgba(255, 255, 255, 0.15);
+    
+    /* Ombres */
+    --shadow-small: 0 5px 10px rgba(0, 0, 0, 0.3);
+    --shadow-medium: 0 10px 30px rgba(0, 0, 0, 0.2);
+    --shadow-large: 0 5px 20px rgba(0, 0, 0, 0.3);
+    --shadow-hover: 0 10px 10px rgba(0, 0, 0, 0.4);
+    --shadow-button: 0 5px 15px rgba(76, 175, 80, 0.4);
+    
+    /* Transitions */
+    --transition-fast: all 0.2s ease;
+    --transition-normal: all 0.3s ease;
+    
+    /* Tailles */
+    --container-max-width: 1400px;
+    --search-max-width: 600px;
+    --img-height: 250px;
+    --gallery-min-width: 320px;
+    --photo-min-width: 300px;
+}
