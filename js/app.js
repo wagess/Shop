@@ -5,6 +5,8 @@ const BEARER_TOKEN = 'EDNusnA0Q8TW';
 
 let allGalleries = [];
 let hierarchyData = null;
+let filteredGalleries = [];
+let allSearchableItems = [];
 
 function el(id) {
     const e = document.getElementById(id);
@@ -40,17 +42,36 @@ async function loadHierarchy() {
         if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
 
         hierarchyData = await resp.json();
+        
+        // LOG DEBUG - Afficher la structure brute
+        console.log('🔍 Hierarchy brute:', JSON.stringify(hierarchyData, null, 2));
+        
         const nodes = extractGalleryIds(hierarchyData);
-        const collections = nodes.filter(n => n.id != null);
+        
+        // LOG DEBUG - Afficher les nodes extraits
+        console.log('📋 Tous les nodes:', nodes);
+        console.log('📂 Folders:', nodes.filter(n => n.type === 'folder'));
+        console.log('📁 Collections:', nodes.filter(n => n.type === 'collection'));
+        
+        // Séparer collections et folders
+        const collections = nodes.filter(n => n.id != null && n.type !== 'folder');
         const folders = nodes.filter(n => n.type === 'folder');
 
+        // Pour l'affichage de la grille : uniquement collections
         allGalleries = collections;
+        
+        // Pour la recherche : collections + folders
+        allSearchableItems = nodes.filter(n => n.id != null);
 
         const statsEl = el('stats');
         if (statsEl) statsEl.textContent = `${collections.length} collection${collections.length > 1 ? 's' : ''}`;
 
         displayGalleries(collections);
+        // Afficher les liens de navigation vers les folders
         renderFolders(folders);
+        
+        // Initialiser la recherche
+        initSearchAutocomplete();
     } catch (err) {
         console.error('loadHierarchy error', err);
         if (container) container.innerHTML = `<div class="error-message">Erreur: ${escapeHtml(err.message)}</div>`;
@@ -82,13 +103,18 @@ function renderFolders(folders) {
 function extractGalleryIds(node, result = []) {
     if (!node) return result;
     if (node.id) {
-        result.push({
+        const item = {
             id: node.id,
             name: node.name || node.title || `Galerie ${node.id}`,
             type: node.type || 'gallery',
             count: node.count || node.length || 0,
             path: node.path || ''
-        });
+        };
+        
+        // LOG DEBUG
+        console.log('📦 Extrait:', item.name, '- Type:', item.type, '- Count:', item.count);
+        
+        result.push(item);
     }
     const childKeys = ['children', 'items', 'galleries', 'collections'];
     for (const key of childKeys) {
@@ -106,27 +132,49 @@ function displayGalleries(galleries) {
         return;
     }
 
-    container.innerHTML = galleries.map(g => `
-        <div class="gallery-card" onclick="openGallery(${g.id}, '${escapeJs(g.name)}')">
-            <div class="gallery-cover">${g.type === 'collection' ? '📁' : g.type === 'folder' ? '📂' : '🖼️'}</div>
-            <div class="gallery-info">
-                <div class="gallery-name">${escapeHtml(g.name)}</div>
-                <div class="gallery-meta">ID: ${g.id} • Type: ${escapeHtml(g.type)}</div>
-                <div class="gallery-count">${g.count} photo${g.count > 1 ? 's' : ''}</div>
+    container.innerHTML = galleries.map(g => {
+        // Déterminer l'icône en fonction du type
+        let icon = '🖼️'; // Par défaut
+        if (g.type === 'collection') {
+            icon = '📸'; // Appareil photo pour collection
+        } else if (g.type === 'folder') {
+            icon = '📂';
+        } else if (g.type === 'gallery') {
+            icon = '🎨';
+        } else if (g.type === 'album') {
+            icon = '📔';
+        }
+        
+        return `
+            <div class="gallery-card" onclick="openGallery(${g.id}, '${escapeJs(g.name)}')">
+                <div class="gallery-cover">${icon}</div>
+                <div class="gallery-info">
+                    <div class="gallery-name">${escapeHtml(g.name)}</div>
+                    <div class="gallery-meta">ID: ${g.id} • Type: ${escapeHtml(g.type)}</div>
+                    <div class="gallery-count">${g.count} photo${g.count > 1 ? 's' : ''}</div>
+                </div>
             </div>
-        </div>
-    `).join('');
+        `;
+    }).join('');
 }
 
 function showFolder(folderId, folderName) {
     const node = findNodeById(hierarchyData, folderId);
     if (!node) return alert('Dossier introuvable');
-    const descendants = extractGalleryIds(node).filter(n => n.id != null);
+    // Extraire uniquement les collections du dossier (pas les sous-dossiers)
+    const descendants = extractGalleryIds(node).filter(n => n.id != null && n.type !== 'folder');
     displayGalleries(descendants);
     const statsEl = el('stats');
     if (statsEl) statsEl.textContent = `${descendants.length} collection${descendants.length > 1 ? 's' : ''} dans "${folderName}"`;
-    const bc = el('foldersContainerBottom');
-    if (bc) bc.insertAdjacentHTML('afterend', `<div id="backToAll" style="margin-top:12px;"><a href="#" onclick="displayCollectionsView();return false;" style="color:white;text-decoration:underline">← Voir toutes les collections</a></div>`);
+    
+    // Ajouter le lien retour
+    const existing = el('backToAll');
+    if (existing) existing.remove();
+    const container = el('galleriesContainer');
+    if (container) {
+        container.insertAdjacentHTML('beforebegin', `<div id="backToAll" style="margin:20px 0; text-align:center;"><a href="#" onclick="displayCollectionsView();return false;" style="color:white; text-decoration:underline; font-size:16px;">← Voir toutes les collections</a></div>`);
+    }
+    
     window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
@@ -155,6 +203,10 @@ function displayCollectionsView() {
     if (statsEl) statsEl.textContent = `${allGalleries.length} collection${allGalleries.length > 1 ? 's' : ''}`;
     const back = el('backToAll');
     if (back) back.remove();
+    
+    // Effacer le champ de recherche
+    const searchInput = el('searchInput');
+    if (searchInput) searchInput.value = '';
 }
 
 async function openGallery(galleryId, galleryName) {
@@ -321,3 +373,104 @@ Merci,
 const closeBtn = el('closeModalBtn');
 if (closeBtn) closeBtn.addEventListener('click', closeModal);
 document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal(); });
+
+
+// Fonction de recherche avec autocomplétion
+function initSearchAutocomplete() {
+    const searchInput = el('searchInput');
+    const suggestionsBox = el('searchSuggestions');
+    
+    if (!searchInput) return;
+
+    searchInput.addEventListener('input', (e) => {
+        const query = e.target.value.trim().toLowerCase();
+        
+        if (!query || query.length < 2) {
+            if (suggestionsBox) suggestionsBox.style.display = 'none';
+            displayGalleries(allGalleries);
+            updateStats(allGalleries.length);
+            return;
+        }
+
+        // Filtrer TOUS les items (collections + folders) pour l'autocomplétion
+        const filteredItems = allSearchableItems.filter(g => 
+            g.name.toLowerCase().includes(query) ||
+            (g.path && g.path.toLowerCase().includes(query)) ||
+            String(g.id).includes(query)
+        );
+
+        // Afficher suggestions (collections + folders) avec icônes distinctives
+        if (suggestionsBox && filteredItems.length > 0) {
+            suggestionsBox.innerHTML = filteredItems.slice(0, 8).map(g => {
+                // Déterminer l'icône en fonction du type - ICÔNES DISTINCTES
+                let icon = '🖼️'; // Par défaut
+                if (g.type === 'folder') {
+                    icon = '📂'; // Dossier ouvert
+                } else if (g.type === 'collection') {
+                    icon = '📸'; // Appareil photo pour collection
+                } else if (g.type === 'gallery') {
+                    icon = '🎨';
+                } else if (g.type === 'album') {
+                    icon = '📔';
+                }
+                
+                const action = g.type === 'folder' 
+                    ? `showFolder('${g.id}', '${escapeJs(g.name)}')` 
+                    : `selectGallery(${g.id}, '${escapeJs(g.name)}')`;
+                
+                return `
+                    <div class="suggestion-item" onclick="${action}">
+                        <span class="suggestion-icon">${icon}</span>
+                        <span class="suggestion-name">${escapeHtml(g.name)}</span>
+                        <span class="suggestion-count">${g.count} photo${g.count > 1 ? 's' : ''}</span>
+                    </div>
+                `;
+            }).join('');
+            suggestionsBox.style.display = 'block';
+        } else if (suggestionsBox) {
+            suggestionsBox.innerHTML = '<div class="suggestion-item" style="color:#999;">Aucun résultat trouvé</div>';
+            suggestionsBox.style.display = 'block';
+        }
+
+        // Dans la grille, afficher uniquement les collections filtrées
+        filteredGalleries = filteredItems.filter(g => g.type !== 'folder');
+        displayGalleries(filteredGalleries);
+        updateStats(filteredGalleries.length, query);
+    });
+
+    // Fermer suggestions en cliquant ailleurs
+    document.addEventListener('click', (e) => {
+        if (suggestionsBox && !searchInput.contains(e.target) && !suggestionsBox.contains(e.target)) {
+            suggestionsBox.style.display = 'none';
+        }
+    });
+
+    // Navigation au clavier
+    searchInput.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape') {
+            searchInput.value = '';
+            if (suggestionsBox) suggestionsBox.style.display = 'none';
+            displayGalleries(allGalleries);
+            updateStats(allGalleries.length);
+        }
+    });
+}
+
+function selectGallery(galleryId, galleryName) {
+    const suggestionsBox = el('searchSuggestions');
+    if (suggestionsBox) suggestionsBox.style.display = 'none';
+    const searchInput = el('searchInput');
+    if (searchInput) searchInput.value = '';
+    openGallery(galleryId, galleryName);
+}
+
+function updateStats(count, query = null) {
+    const statsEl = el('stats');
+    if (!statsEl) return;
+    
+    if (query) {
+        statsEl.innerHTML = `${count} collection${count > 1 ? 's' : ''} trouvée${count > 1 ? 's' : ''} pour "<strong>${escapeHtml(query)}</strong>"`;
+    } else {
+        statsEl.textContent = `${count} collection${count > 1 ? 's' : ''}`;
+    }
+}

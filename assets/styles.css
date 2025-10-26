@@ -33,39 +33,80 @@ body {
     margin-bottom: 10px;
 }
 
-.search-bar {
-    max-width: 600px;
-    margin: 0 auto 40px;
+/* Styles pour la recherche */
+.search-container {
     position: relative;
+    margin: 20px auto;
+    max-width: 600px;
 }
 
-.search-input {
+#searchInput {
     width: 100%;
-    padding: 18px 50px 18px 20px;
-    font-size: 18px;
-    border: none;
-    border-radius: 50px;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
-}
-
-.search-input:focus {
-    outline: none;
-    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
-}
-
-.search-btn {
-    position: absolute;
-    right: 10px;
-    top: 30%;
-    transform: translateY(-50%);
-    background: linear-gradient(45deg, #667eea, #764ba2);
-    border: none;
-    width: 45px;
-    height: 45px;
-    border-radius: 50%;
+    padding: 12px 20px;
+    font-size: 16px;
+    border: 2px solid rgba(255, 255, 255, 0.2);
+    border-radius: 25px;
+    background: rgba(255, 255, 255, 0.1);
     color: white;
-    font-size: 20px;
+    outline: none;
+    transition: all 0.3s ease;
+}
+
+#searchInput:focus {
+    border-color: rgba(255, 255, 255, 0.4);
+    background: rgba(255, 255, 255, 0.15);
+}
+
+#searchInput::placeholder {
+    color: rgba(255, 255, 255, 0.5);
+}
+
+#searchSuggestions {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    background: rgba(30, 30, 30, 0.95);
+    border-radius: 10px;
+    margin-top: 5px;
+    max-height: 300px;
+    overflow-y: auto;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+    z-index: 1000;
+    display: none;
+}
+
+.suggestion-item {
+    padding: 12px 20px;
     cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    transition: background 0.2s ease;
+}
+
+.suggestion-item:hover {
+    background: rgba(255, 255, 255, 0.1);
+}
+
+.suggestion-item:last-child {
+    border-bottom: none;
+}
+
+.suggestion-icon {
+    font-size: 20px;
+}
+
+.suggestion-name {
+    flex: 1;
+    color: white;
+    font-weight: 500;
+}
+
+.suggestion-count {
+    color: rgba(255, 255, 255, 0.6);
+    font-size: 12px;
 }
 
 .galleries-grid {
