@@ -71,10 +71,8 @@ export function displayGalleries(galleries) {
 
 export function renderFolders(folders) {
     const containerTop = el('foldersContainerTop');
-    const containerBottom = el('foldersContainerBottom');
     if (!folders || folders.length === 0) {
         if (containerTop) containerTop.innerHTML = '';
-        if (containerBottom) containerBottom.innerHTML = '';
         return;
     }
 
@@ -84,7 +82,6 @@ export function renderFolders(folders) {
         </div>
     `;
     if (containerTop) containerTop.innerHTML = html;
-    if (containerBottom) containerBottom.innerHTML = `<div style="color:white; margin-bottom:8px; font-weight:bold;">Dossiers :</div>${html}`;
 
     document.querySelectorAll('#foldersList .folder-link').forEach(btn => {
         btn.addEventListener('click', () => showFolder(btn.getAttribute('data-id'), btn.getAttribute('data-name') || ''));
