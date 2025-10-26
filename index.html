@@ -13,17 +13,13 @@
             <p>Explorez vos collections photo</p>
         </div>
 
-        <div class="search-bar">
-            <input 
-                type="text" 
-                class="search-input" 
-                id="searchInput" 
-                placeholder="Rechercher une galerie..."
-            >
-            <button class="search-btn" id="searchBtn">🔍</button>
+        <div class="search-container">
+            <input type="text" id="searchInput" placeholder="🔍 Rechercher une collection..." autocomplete="off">
+            <div id="searchSuggestions"></div>
         </div>
 
-        <div id="foldersContainerTop" style="margin-top: 30px; margin-bottom: 30px; text-align: center;"></div>
+        <!-- Liens de navigation vers les dossiers -->
+        <div id="foldersContainerTop" style="margin-top: 20px; margin-bottom: 20px; text-align: center;"></div>
 
         <div class="stats" id="stats"></div>
 
@@ -33,8 +29,6 @@
                 Chargement des galeries...
             </div>
         </div>
-
-        <div id="foldersContainerBottom" style="margin-top: 30px; text-align: center;"></div>
     </div>
 
     <div id="photosModal" class="photos-modal">
