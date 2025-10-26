@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Shop Stéphane Wagner</title>
     <link rel="stylesheet" href="assets/styles.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/photoswipe@5.4.4/dist/photoswipe.css">
 </head>
 <body>
     <div class="container">
@@ -18,7 +19,7 @@
             <div id="searchSuggestions"></div>
         </div>
 
-        <!-- Liens de navigation vers les dossiers -->
+        <!-- Liens de navigation vers les dossiers (en haut) -->
         <div id="foldersContainerTop" style="margin-top: 20px; margin-bottom: 20px; text-align: center;"></div>
 
         <div class="stats" id="stats"></div>
@@ -29,6 +30,9 @@
                 Chargement des galeries...
             </div>
         </div>
+
+        <!-- Liens de navigation vers les dossiers (en bas) -->
+        <div id="foldersContainerBottom" style="margin-top: 20px; margin-bottom: 20px; text-align: center;"></div>
     </div>
 
     <div id="photosModal" class="photos-modal">
