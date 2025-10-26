@@ -1,0 +1,18 @@
+/* ==================== Buttons ==================== */
+.order-btn {
+    width: 100%;
+    padding: var(--padding-small);
+    background: var(--bg-gradient-success);
+    color: var(--white);
+    border: none;
+    border-radius: var(--border-radius-medium);
+    font-size: 16px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: var(--transition-normal);
+}
+
+.order-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-button);
+}

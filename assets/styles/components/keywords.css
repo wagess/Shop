@@ -1,0 +1,17 @@
+/* ==================== Keywords ==================== */
+.keyword-tag {
+    background: #e3f2fd;
+    color: #1976d2;
+    padding: 4px 10px;
+    border-radius: 12px;
+    font-size: 12px;
+    display: inline-block;
+    margin: 2px;
+}
+
+.keywords-container {
+    margin: 10px 0;
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--gap-small);
+}

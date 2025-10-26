@@ -1,0 +1,94 @@
+/* ==================== Modal ==================== */
+.photos-modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: var(--bg-modal);
+    z-index: 1000;
+    overflow-y: auto;
+}
+
+.modal-header {
+    position: sticky;
+    top: 0;
+    background: var(--bg-modal-header);
+    backdrop-filter: blur(10px);
+    padding: var(--gap-medium) var(--gap-large);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    z-index: 1001;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
+}
+
+.modal-title {
+    color: var(--white);
+    font-size: 2em;
+    font-weight: bold;
+}
+
+.close-modal {
+    background: var(--error-color);
+    color: var(--white);
+    border: none;
+    padding: var(--padding-small);
+    border-radius: var(--border-radius-medium);
+    font-size: 16px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: var(--transition-normal);
+}
+
+.close-modal:hover {
+    background: var(--error-dark);
+    transform: scale(1.05);
+}
+
+/* ==================== Photos Grid ==================== */
+.photos-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(var(--photo-min-width), 1fr));
+    gap: var(--gap-medium);
+    padding: var(--gap-large);
+}
+
+.photo-card {
+    background: var(--white);
+    border-radius: var(--border-radius-medium);
+    overflow: hidden;
+    box-shadow: var(--shadow-large);
+    transition: var(--transition-normal);
+}
+
+.photo-card:hover {
+    transform: translateY(-5px);
+    box-shadow: var(--shadow-hover);
+}
+
+.photo-img {
+    width: 100%;
+    height: var(--img-height);
+    object-fit: cover;
+    background: linear-gradient(45deg, #f0f0f0, #e0e0e0);
+    display: block;
+}
+
+.photo-info {
+    padding: var(--gap-medium);
+}
+
+.photo-title {
+    font-size: 1.1em;
+    font-weight: bold;
+    color: var(--text-primary);
+    margin-bottom: 10px;
+}
+
+.photo-id {
+    color: var(--text-muted);
+    font-size: 0.85em;
+    margin-bottom: var(--gap);
+}

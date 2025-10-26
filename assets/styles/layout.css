@@ -1,0 +1,18 @@
+/* ==================== Layout ==================== */
+.container {
+    max-width: var(--container-max-width);
+    margin: 0 auto;
+    vertical-align: middle;
+}
+
+/* ==================== Header ==================== */
+.header {
+    text-align: center;
+    color: var(--white);
+    margin-bottom: var(--gap-large);
+}
+
+.header h1 {
+    font-size: 3em;
+    margin-bottom: 10px;
+}
