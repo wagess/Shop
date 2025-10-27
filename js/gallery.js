@@ -56,9 +56,24 @@ export function displayGalleries(galleries) {
         else if (g.type === 'gallery') icon = '🎨';
         else if (g.type === 'album') icon = '📔';
         
+        // Créer la mosaïque de 4 photos si disponibles
+        let coverContent = '';
+        if (g.thumbnails && g.thumbnails.length > 0) {
+            const thumbs = g.thumbnails.slice(0, 4);
+            coverContent = `
+                <div class="gallery-mosaic">
+                    ${thumbs.map(thumb => `
+                        <div class="mosaic-item" style="background-image: url('${escapeHtml(thumb)}')"></div>
+                    `).join('')}
+                </div>
+            `;
+        } else {
+            coverContent = `<div class="gallery-icon">${icon}</div>`;
+        }
+        
         return `
             <div class="gallery-card" onclick="window.openGallery(${g.id}, '${escapeJs(g.name)}')">
-                <div class="gallery-cover">${icon}</div>
+                <div class="gallery-cover">${coverContent}</div>
                 <div class="gallery-info">
                     <div class="gallery-name">${escapeHtml(g.name)}</div>
                     <div class="gallery-meta">ID: ${g.id} • Type: ${escapeHtml(g.type)}</div>
@@ -91,11 +106,16 @@ export function renderFolders(folders) {
     });
 }
 
-export function showFolder(folderId, folderName) {
+export async function showFolder(folderId, folderName) {
     const node = findNodeById(hierarchyData, folderId);
     if (!node) return alert('Dossier introuvable');
     const descendants = extractGalleryIds(node).filter(n => n.id != null && n.type !== 'folder');
     displayGalleries(descendants);
+    
+    // Charger les thumbnails pour ce dossier
+    const { loadThumbnailsForCollections } = await import('./app.js');
+    loadThumbnailsForCollections(descendants);
+    
     const statsEl = el('stats');
     if (statsEl) statsEl.textContent = `${descendants.length} collection${descendants.length > 1 ? 's' : ''} dans "${folderName}"`;
     

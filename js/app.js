@@ -1,5 +1,5 @@
 import { el, escapeHtml } from './utils.js';
-import { fetchHierarchy } from './api.js';
+import { fetchHierarchy, fetchGalleryPhotos } from './api.js';
 import { 
     extractGalleryIds, 
     displayGalleries, 
@@ -49,6 +49,10 @@ async function loadHierarchy() {
         if (statsEl) statsEl.textContent = `${collections.length} collection${collections.length > 1 ? 's' : ''}`;
 
         displayGalleries(collections);
+        
+        // Charger les thumbnails pour chaque collection
+        loadThumbnailsForCollections(collections);
+        
         renderFolders(folders);
         initSearchAutocomplete();
         initModalListeners();
@@ -56,4 +60,52 @@ async function loadHierarchy() {
         console.error('loadHierarchy error', err);
         if (container) container.innerHTML = `<div class="error-message">Erreur: ${escapeHtml(err.message)}</div>`;
     }
+}
+
+async function loadThumbnailsForCollections(collections) {
+    for (const collection of collections) {
+        try {
+            const photos = await fetchGalleryPhotos(collection.id);
+            
+            if (photos && Array.isArray(photos) && photos.length > 0) {
+                // Extraire les URLs des thumbnails
+                collection.thumbnails = photos.slice(0, 4).map(photo => 
+                    photo.thumbnail || photo.thumb || photo.url_thumb || photo.sizes?.thumbnail || photo.url
+                );
+                
+                // Mettre à jour l'affichage de cette collection
+                updateCollectionThumbnails(collection);
+            }
+        } catch (err) {
+            console.error(`Erreur chargement thumbnails pour ${collection.name}:`, err);
+        }
+    }
+}
+
+// Exporter pour pouvoir être utilisée depuis gallery.js
+export { loadThumbnailsForCollections };
+
+function updateCollectionThumbnails(collection) {
+    if (!collection.thumbnails || collection.thumbnails.length === 0) return;
+    
+    const card = document.querySelector(`.gallery-card[onclick*="openGallery(${collection.id}"]`);
+    if (!card) return;
+    
+    const cover = card.querySelector('.gallery-cover');
+    if (!cover) return;
+    
+    const thumbs = collection.thumbnails.slice(0, 4);
+    cover.innerHTML = `
+        <div class="gallery-mosaic" style="opacity: 0; transition: opacity 0.5s ease-in;">
+            ${thumbs.map(thumb => `
+                <div class="mosaic-item" style="background-image: url('${escapeHtml(thumb)}')"></div>
+            `).join('')}
+        </div>
+    `;
+    
+    // Déclencher le fade-in après un court délai
+    setTimeout(() => {
+        const mosaic = cover.querySelector('.gallery-mosaic');
+        if (mosaic) mosaic.style.opacity = '1';
+    }, 10);
 }
