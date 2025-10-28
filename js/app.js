@@ -23,6 +23,26 @@ window.selectGallery = selectGallery;
 
 window.onload = () => loadHierarchy();
 
+async function loadCollectionDates(collections) {
+    for (const collection of collections) {
+        if (collection.type === 'collection') {
+            try {
+                const response = await fetch(`/wp-json/wplr-iptc/v1/collections/${collection.id}/info`);
+                if (response.ok) {
+                    const data = await response.json();
+                    if (data.dates) {
+                        collection.created_date = data.dates.created;
+                        collection.modified_date = data.dates.modified;
+                        collection.published_date = data.dates.published;
+                    }
+                }
+            } catch (err) {
+                console.error(`Erreur chargement dates pour ${collection.name}:`, err);
+            }
+        }
+    }
+}
+
 async function loadHierarchy() {
     const container = el('galleriesContainer');
     if (!container) return;
@@ -40,6 +60,9 @@ async function loadHierarchy() {
         
         const collections = nodes.filter(n => n.id != null && n.type !== 'folder');
         const folders = nodes.filter(n => n.type === 'folder');
+
+        // Charger les dates des collections
+        await loadCollectionDates(collections);
 
         setHierarchyData(hierarchyData);
         setAllGalleries(collections);
