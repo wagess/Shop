@@ -24,9 +24,13 @@ export function extractGalleryIds(node, result = []) {
             name: node.name || node.title || `Galerie ${node.id}`,
             type: node.type || 'gallery',
             count: node.count || node.length || 0,
-            path: node.path || ''
+            path: node.path || '',
+            // Ajouter les dates si disponibles
+            created_date: node.created_date || node.dateCreated || null,
+            modified_date: node.modified_date || node.dateModified || null,
+            published_date: node.published_date || node.datePublished || null
         };
-        console.log('📦 Extrait:', item.name, '- Type:', item.type, '- Count:', item.count);
+        console.log('📦 Extrait:', item.name, '- Type:', item.type, '- Créé:', item.created_date);
         result.push(item);
     }
     const childKeys = ['children', 'items', 'galleries', 'collections'];
@@ -71,12 +75,20 @@ export function displayGalleries(galleries) {
             coverContent = `<div class="gallery-icon">${icon}</div>`;
         }
         
+        // Formater la date
+        let dateDisplay = '';
+        if (g.created_date) {
+            const date = new Date(g.created_date);
+            dateDisplay = `<div class="gallery-date">📅 ${date.toLocaleDateString('fr-FR')}</div>`;
+        }
+        
         return `
             <div class="gallery-card" onclick="window.openGallery(${g.id}, '${escapeJs(g.name)}')">
                 <div class="gallery-cover">${coverContent}</div>
                 <div class="gallery-info">
                     <div class="gallery-name">${escapeHtml(g.name)}</div>
                     <div class="gallery-meta">ID: ${g.id} • Type: ${escapeHtml(g.type)}</div>
+                    ${dateDisplay}
                     <div class="gallery-count">${g.count} photo${g.count > 1 ? 's' : ''}</div>
                 </div>
             </div>
