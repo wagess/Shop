@@ -53,16 +53,11 @@ async function loadHierarchy() {
         console.log('🔍 Hierarchy brute:', JSON.stringify(hierarchyData, null, 2));
         
         const nodes = extractGalleryIds(hierarchyData);
-        
-        console.log('📋 Tous les nodes:', nodes);
-        console.log('📂 Folders:', nodes.filter(n => n.type === 'folder'));
-        console.log('📁 Collections:', nodes.filter(n => n.type === 'collection'));
-        
         const collections = nodes.filter(n => n.id != null && n.type !== 'folder');
         const folders = nodes.filter(n => n.type === 'folder');
 
-        // Charger les dates des collections
-        await loadCollectionDates(collections);
+        // ❌ SUPPRIMÉ - Charger les dates des collections
+        // await loadCollectionDates(collections);
 
         setHierarchyData(hierarchyData);
         setAllGalleries(collections);
