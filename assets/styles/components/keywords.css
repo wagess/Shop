@@ -2,16 +2,62 @@
 .keyword-tag {
     background: #e3f2fd;
     color: #1976d2;
-    padding: 4px 10px;
+    padding: 3px 10px;
     border-radius: 12px;
     font-size: 12px;
-    display: inline-block;
-    margin: 2px;
+    display: inline-flex;
+    align-items: center;
+    margin-right: 4px;
+    margin-bottom: 4px;
+    flex-shrink: 0;
+    height: 100%; /* Prend toute la hauteur du conteneur */
 }
 
 .keywords-container {
     margin: 10px 0;
     display: flex;
+    align-items: stretch; /* Étire tous les éléments à la même hauteur */
+    flex-wrap: nowrap;
+    overflow: hidden;
+    white-space: nowrap;
+    transition: all 0.3s ease;
+    min-height: 24px; /* Hauteur minimale */
+}
+
+.keywords-container.expanded {
     flex-wrap: wrap;
-    gap: var(--gap-small);
+    white-space: normal;
+    height: auto;
+    overflow: visible;
+    align-items: flex-start;
+}
+
+.more-keywords-btn {
+    background: none;
+    border: 1px solid #ebebeb;
+    cursor: pointer;
+    font-weight: bold;
+    color: #666;
+    padding: 2px;
+    margin-left: 4px;
+    flex-shrink: 0;
+    height: 100%;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 20px;
+    border-radius: 50%;
+    font-size: 14px;
+    line-height: 1;
+}
+
+.more-keywords-btn:hover {
+    color: #333;
+    background-color: #f0f0f0;
+    border-color: #999;
+}
+
+/* Style spécifique pour l'état fermé */
+.keywords-container:not(.expanded) .more-keywords-btn {
+    align-self: stretch; /* S'étire pour prendre toute la hauteur */
 }

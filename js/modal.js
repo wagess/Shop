@@ -32,7 +32,7 @@ async function displayPhotos(photos) {
         const imgUrl = photo.full_size || photo.url || photo.guid || photo.source_url || '';
         const title = photo.title || photo.post_title || photo.name || `Photo ${photo.id}`;
         const kws = collectKeywords(photo);
-        const kwsHtml = kws.length ? kws.map(k => `<span class="keyword-tag">${escapeHtml(k)}</span>`).join(' ') : `<span style="color:#999; font-size:12px;">Chargement mots-clés...</span>`;
+        const kwsHtml = kws.length ? renderKeywordsLimited(kws) : `<span style="color:#999; font-size:12px;">Chargement mots-clés...</span>`;
 
         return `
             <div class="photo-card" id="photo-card-${photo.id}">
@@ -72,17 +72,50 @@ async function displayPhotos(photos) {
             }
 
             if (kws && kws.length > 0) {
-                container.innerHTML = kws.map(k => `<span class="keyword-tag">${escapeHtml(k)}</span>`).join(' ');
+                container.innerHTML = renderKeywordsLimited(kws, photo.id);
             } else {
                 container.innerHTML = `<span style="color:#999; font-size:12px;">Aucun mot-clé</span>`;
             }
         } catch (err) {
             console.error('❌ IPTC fetch error pour photo', photo.id, ':', err);
             const kws = collectKeywords(photo);
-            container.innerHTML = kws.length ? kws.map(k => `<span class="keyword-tag">${escapeHtml(k)}</span>`).join(' ') : `<span style="color:#999; font-size:12px;">Aucun mot-clé</span>`;
+            container.innerHTML = kws.length ? renderKeywordsLimited(kws, photo.id) : `<span style="color:#999; font-size:12px;">Aucun mot-clé</span>`;
         }
     }));
 }
+
+function renderKeywordsLimited(keywords, photoId = null) {
+    if (!keywords || keywords.length === 0) return '';
+    
+    const maxVisible = 3;
+    const visibleKeywords = keywords.slice(0, maxVisible);
+    const hiddenCount = keywords.length - maxVisible;
+    
+    let html = visibleKeywords.map(k => `<span class="keyword-tag">${escapeHtml(k)}</span>`).join(' ');
+    
+    if (hiddenCount > 0) {
+        const allKeywordsData = JSON.stringify(keywords);
+        html += ` <button class="more-keywords-btn" data-keywords='${escapeHtml(allKeywordsData)}' onclick="event.stopPropagation(); toggleAllKeywords('${photoId || ''}', this);">+</button>`;
+    }
+    
+    return html;
+}
+
+window.toggleAllKeywords = function(photoId, button) {
+    const container = button.parentElement;
+    const isExpanded = button.dataset.expanded === 'true';
+    
+    const allKeywords = JSON.parse(button.dataset.keywords || '[]');
+    
+    if (isExpanded) {
+        container.innerHTML = renderKeywordsLimited(allKeywords, photoId);
+        container.classList.remove('expanded');
+    } else {
+        const allKeywordsHtml = allKeywords.map(k => `<span class="keyword-tag">${escapeHtml(k)}</span>`).join(' ');
+        container.innerHTML = allKeywordsHtml + ` <button class="more-keywords-btn" data-keywords='${escapeHtml(JSON.stringify(allKeywords))}' onclick="event.stopPropagation(); toggleAllKeywords('${photoId}', this);" data-expanded="true">−</button>`;
+        container.classList.add('expanded');
+    }
+};
 
 function collectKeywords(photo) {
     const s = new Set();
