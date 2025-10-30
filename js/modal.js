@@ -9,18 +9,33 @@ export async function openGallery(galleryId, galleryName) {
 
     modal.style.display = 'block';
     title.textContent = galleryName;
-    grid.innerHTML = '<div class="loading"><div class="spinner"></div>Chargement des photos...</div>';
+    
+    // Utiliser le même loader que les galeries
+    grid.innerHTML = `
+        <div class="gallery-loading">
+            <div class="loading-spinner"></div>
+            <div class="loading-text">Chargement des photos...</div>
+        </div>
+    `;
 
     try {
         const photos = await fetchGalleryPhotos(galleryId);
         if (!photos || photos.length === 0) {
-            grid.innerHTML = '<div class="loading">Aucune photo dans cette galerie</div>';
+            grid.innerHTML = `
+                <div class="gallery-loading">
+                    <div class="loading-text">Aucune photo dans cette galerie</div>
+                </div>
+            `;
             return;
         }
         displayPhotos(photos);
     } catch (err) {
         console.error('openGallery error', err);
-        grid.innerHTML = `<div class="error-message">Erreur: ${escapeHtml(err.message)}</div>`;
+        grid.innerHTML = `
+            <div class="gallery-loading">
+                <div class="loading-text">Erreur: ${escapeHtml(err.message)}</div>
+            </div>
+        `;
     }
 }
 
@@ -36,7 +51,16 @@ async function displayPhotos(photos) {
 
         return `
             <div class="photo-card" id="photo-card-${photo.id}">
-                <img src="${escapeHtml(imgUrl)}" alt="${escapeHtml(title)}" class="photo-img" onerror="this.style.background='linear-gradient(45deg,#ddd,#ccc)'; this.alt='Image non disponible';">
+                <div class="photo-image-container">
+                    <div class="gallery-loading" id="preloader-${photo.id}">
+                        <div class="loading-spinner"></div>
+                        <div class="loading-text">Chargement...</div>
+                    </div>
+                    <img src="${escapeHtml(imgUrl)}" alt="${escapeHtml(title)}" class="photo-img" 
+                         style="opacity: 0; transition: opacity 0.5s ease-in;" 
+                         onload="this.style.opacity=1; document.getElementById('preloader-${photo.id}').style.display='none';"
+                         onerror="this.style.background='linear-gradient(45deg,#ddd,#ccc)'; this.alt='Image non disponible'; this.style.opacity=1; document.getElementById('preloader-${photo.id}').style.display='none';">
+                </div>
                 <div class="photo-info">
                     <div class="photo-title">${escapeHtml(title)}</div>
                     <div class="photo-id">ID: ${photo.id}</div>
