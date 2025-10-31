@@ -94,11 +94,17 @@ function renderKeywordsLimited(keywords, photoId = null) {
     const visibleKeywords = keywords.slice(0, maxVisible);
     const hiddenCount = keywords.length - maxVisible;
     
-    let html = visibleKeywords.map(k => `<span class="keyword-tag">${escapeHtml(k)}</span>`).join(' ');
+    // Tronquer les mots-clés trop longs pour éviter le débordement
+    const truncatedKeywords = visibleKeywords.map(k => {
+        const keyword = String(k);
+        return keyword.length > 20 ? keyword.substring(0, 17) + '...' : keyword;
+    });
+    
+    let html = truncatedKeywords.map(k => `<span class="keyword-tag">${escapeHtml(k)}</span>`).join(' ');
     
     if (hiddenCount > 0) {
         const allKeywordsData = JSON.stringify(keywords);
-        html += ` <button class="more-keywords-btn" data-keywords='${escapeHtml(allKeywordsData)}' onclick="event.stopPropagation(); toggleAllKeywords('${photoId || ''}', this);">+</button>`;
+        html += ` <button class="more-keywords-btn" data-keywords='${escapeHtml(allKeywordsData)}' onclick="event.stopPropagation(); toggleAllKeywords('${photoId || ''}', this);" title="Afficher ${hiddenCount} mot(s)-clé(s) supplémentaire(s)">+${hiddenCount}</button>`;
     }
     
     return html;
