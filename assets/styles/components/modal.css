@@ -28,6 +28,7 @@
     color: var(--white);
     font-size: 2em;
     font-weight: bold;
+    text-align: right;
 }
 
 .close-modal {
