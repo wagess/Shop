@@ -35,18 +35,19 @@ async function displayPhotos(photos) {
         const kwsHtml = kws.length ? renderKeywordsLimited(kws) : `<span style="color:#999; font-size:12px;">Chargement mots-clés...</span>`;
 
         return `
-            <div class="photo-card" id="photo-card-${photo.id}">
-                <img src="${escapeHtml(imgUrl)}" alt="${escapeHtml(title)}" class="photo-img" 
-                     onclick="openLightbox('${escapeJs(imgUrl)}', '${escapeJs(title)}')"
-                     onerror="this.style.background='linear-gradient(45deg,#ddd,#ccc)'; this.alt='Image non disponible';">
-                <div class="photo-info">
-                    <div class="photo-title">${escapeHtml(title)}</div>
-                    <div class="photo-id">ID: ${photo.id}</div>
-                    <div class="keywords-container" id="keywords-${photo.id}">${kwsHtml}</div>
-                    <button class="order-btn" onclick="event.stopPropagation(); window.orderPrint('${escapeJs(title)}','${escapeJs(imgUrl)}', ${photo.id});">🖨️ Commander l'impression</button>
-                </div>
-            </div>
-        `;
+    <div class="photo-card" id="photo-card-${photo.id}">
+        <img src="${escapeHtml(imgUrl)}" alt="${escapeHtml(title)}" class="photo-img" 
+             onclick="openLightbox('${escapeJs(imgUrl)}', '${escapeJs(title)}')"
+             style="cursor: pointer !important;"
+             onerror="this.style.background='linear-gradient(45deg,#ddd,#ccc)'; this.alt='Image non disponible';">
+        <div class="photo-info">
+            <div class="photo-title">${escapeHtml(title)}</div>
+            <div class="photo-id">ID: ${photo.id}</div>
+            <div class="keywords-container" id="keywords-${photo.id}">${kwsHtml}</div>
+            <button class="order-btn" onclick="event.stopPropagation(); window.orderPrint('${escapeJs(title)}','${escapeJs(imgUrl)}', ${photo.id});">🖨️ Commander l'impression</button>
+        </div>
+    </div>
+`;
     }).join('');
 
     await Promise.allSettled(photos.map(async photo => {

@@ -74,6 +74,12 @@
     object-fit: cover;
     background: linear-gradient(45deg, #f0f0f0, #e0e0e0);
     display: block;
+    cursor: pointer !important; /* Forcer le cursor pointer */
+}
+
+/* Ou plus spécifiquement */
+.photo-card .photo-img {
+    cursor: pointer;
 }
 
 .photo-info {
