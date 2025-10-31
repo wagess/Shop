@@ -36,7 +36,9 @@ async function displayPhotos(photos) {
 
         return `
             <div class="photo-card" id="photo-card-${photo.id}">
-                <img src="${escapeHtml(imgUrl)}" alt="${escapeHtml(title)}" class="photo-img" onerror="this.style.background='linear-gradient(45deg,#ddd,#ccc)'; this.alt='Image non disponible';">
+                <img src="${escapeHtml(imgUrl)}" alt="${escapeHtml(title)}" class="photo-img" 
+                     onclick="openLightbox('${escapeJs(imgUrl)}', '${escapeJs(title)}')"
+                     onerror="this.style.background='linear-gradient(45deg,#ddd,#ccc)'; this.alt='Image non disponible';">
                 <div class="photo-info">
                     <div class="photo-title">${escapeHtml(title)}</div>
                     <div class="photo-id">ID: ${photo.id}</div>
@@ -130,8 +132,85 @@ Merci,
     alert('Email préparé. Vérifiez votre client mail.');
 }
 
+// Ajouter ces nouvelles fonctions
+export function openLightbox(imageUrl, title) {
+    // Créer la lightbox si elle n'existe pas
+    let lightbox = el('lightbox');
+    if (!lightbox) {
+        lightbox = document.createElement('div');
+        lightbox.id = 'lightbox';
+        lightbox.innerHTML = `
+            <div class="lightbox-overlay" onclick="closeLightbox()">
+                <div class="lightbox-content" onclick="event.stopPropagation()">
+                    <button class="lightbox-close" onclick="closeLightbox()">&times;</button>
+                    <img class="lightbox-image" src="" alt="">
+                    <div class="lightbox-title"></div>
+                </div>
+            </div>
+        `;
+        document.body.appendChild(lightbox);
+        
+        // Charger le CSS lightbox si pas déjà présent
+        if (!document.querySelector('link[href*="lightbox.css"]')) {
+            const link = document.createElement('link');
+            link.rel = 'stylesheet';
+            link.href = './css/lightbox.css';
+            document.head.appendChild(link);
+        }
+    }
+    
+    // Afficher l'image
+    const img = lightbox.querySelector('.lightbox-image');
+    const titleEl = lightbox.querySelector('.lightbox-title');
+    
+    img.src = imageUrl;
+    img.alt = title;
+    titleEl.textContent = title;
+    
+    lightbox.style.display = 'block';
+    document.body.style.overflow = 'hidden';
+
+    // Détecter le format de l'image une fois chargée
+    img.onload = function() {
+        const isPortrait = this.naturalHeight > this.naturalWidth;
+        const content = lightbox.querySelector('.lightbox-content');
+        
+        if (isPortrait) {
+            // Image portrait : contraindre la hauteur, largeur auto
+            content.style.maxHeight = 'calc(100vh - 60px)';
+            content.style.maxWidth = 'none';
+            this.style.height = 'calc(100vh - 60px)';
+            this.style.width = 'auto';
+        } else {
+            // Image paysage : contraindre la largeur, hauteur auto avec plus de padding vertical
+            content.style.maxWidth = 'calc(100vw - 80px)';
+            content.style.maxHeight = 'calc(100vh - 100px)';
+            this.style.width = 'calc(100vw - 80px)';
+            this.style.height = 'auto';
+            this.style.maxHeight = 'calc(100vh - 100px)';
+        }
+    };
+}
+
+export function closeLightbox() {
+    const lightbox = el('lightbox');
+    if (lightbox) {
+        lightbox.style.display = 'none';
+        document.body.style.overflow = '';
+    }
+}
+
 export function initModalListeners() {
     const closeBtn = el('closeModalBtn');
     if (closeBtn) closeBtn.addEventListener('click', closeModal);
-    document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal(); });
+    document.addEventListener('keydown', e => { 
+        if (e.key === 'Escape') {
+            closeLightbox();
+            closeModal();
+        }
+    });
 }
+
+// Exposer les fonctions lightbox globalement
+window.openLightbox = openLightbox;
+window.closeLightbox = closeLightbox;
