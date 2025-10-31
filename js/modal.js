@@ -35,18 +35,19 @@ async function displayPhotos(photos) {
         const kwsHtml = kws.length ? renderKeywordsLimited(kws) : `<span style="color:#999; font-size:12px;">Chargement mots-clés...</span>`;
 
         return `
-            <div class="photo-card" id="photo-card-${photo.id}">
-                <img src="${escapeHtml(imgUrl)}" alt="${escapeHtml(title)}" class="photo-img" 
-                     onclick="openLightbox('${escapeJs(imgUrl)}', '${escapeJs(title)}')"
-                     onerror="this.style.background='linear-gradient(45deg,#ddd,#ccc)'; this.alt='Image non disponible';">
-                <div class="photo-info">
-                    <div class="photo-title">${escapeHtml(title)}</div>
-                    <div class="photo-id">ID: ${photo.id}</div>
-                    <div class="keywords-container" id="keywords-${photo.id}">${kwsHtml}</div>
-                    <button class="order-btn" onclick="event.stopPropagation(); window.orderPrint('${escapeJs(title)}','${escapeJs(imgUrl)}', ${photo.id});">🖨️ Commander l'impression</button>
-                </div>
-            </div>
-        `;
+    <div class="photo-card" id="photo-card-${photo.id}">
+        <img src="${escapeHtml(imgUrl)}" alt="${escapeHtml(title)}" class="photo-img" 
+             onclick="openLightbox('${escapeJs(imgUrl)}', '${escapeJs(title)}')"
+             style="cursor: pointer !important;"
+             onerror="this.style.background='linear-gradient(45deg,#ddd,#ccc)'; this.alt='Image non disponible';">
+        <div class="photo-info">
+            <div class="photo-title">${escapeHtml(title)}</div>
+            <div class="photo-id">ID: ${photo.id}</div>
+            <div class="keywords-container" id="keywords-${photo.id}">${kwsHtml}</div>
+            <button class="order-btn" onclick="event.stopPropagation(); window.orderPrint('${escapeJs(title)}','${escapeJs(imgUrl)}', ${photo.id});">🖨️ Commander l'impression</button>
+        </div>
+    </div>
+`;
     }).join('');
 
     await Promise.allSettled(photos.map(async photo => {
@@ -166,6 +167,13 @@ Merci,
 }
 
 // Ajouter ces nouvelles fonctions
+// Variables globales pour le suivi fluide
+let mouseX = window.innerWidth / 2;
+let mouseY = window.innerHeight / 2;
+let btnX = mouseX;
+let btnY = mouseY;
+const smoothness = 0.1; // Augmenté de 0.15 à 0.3 pour plus de rapidité
+
 export function openLightbox(imageUrl, title) {
     // Créer la lightbox si elle n'existe pas
     let lightbox = el('lightbox');
@@ -173,12 +181,8 @@ export function openLightbox(imageUrl, title) {
         lightbox = document.createElement('div');
         lightbox.id = 'lightbox';
         lightbox.innerHTML = `
-            <div class="lightbox-overlay" onclick="closeLightbox()">
-                <div class="lightbox-content" onclick="event.stopPropagation()">
-                    <button class="lightbox-close" onclick="closeLightbox()">&times;</button>
-                    <img class="lightbox-image" src="" alt="">
-                    <div class="lightbox-title"></div>
-                </div>
+            <div class="lightbox-overlay">
+                <img class="lightbox-image" src="" alt="">
             </div>
         `;
         document.body.appendChild(lightbox);
@@ -192,44 +196,138 @@ export function openLightbox(imageUrl, title) {
         }
     }
     
+    // Créer ou récupérer le bouton close
+    let closeBtn = document.querySelector('.lightbox-close');
+    if (!closeBtn) {
+        closeBtn = document.createElement('button');
+        closeBtn.className = 'lightbox-close';
+        closeBtn.innerHTML = '✕';
+        closeBtn.onclick = closeLightbox;
+        document.body.appendChild(closeBtn);
+    }
+    
     // Afficher l'image
     const img = lightbox.querySelector('.lightbox-image');
-    const titleEl = lightbox.querySelector('.lightbox-title');
-    
     img.src = imageUrl;
     img.alt = title;
-    titleEl.textContent = title;
     
-    lightbox.style.display = 'block';
+    // Position initiale du bouton (coin supérieur droit)
+    btnX = window.innerWidth - 50;
+    btnY = 50;
+    mouseX = btnX;
+    mouseY = btnY;
+    
+    // Position initiale et fade in du bouton
+    closeBtn.style.left = btnX + 'px';
+    closeBtn.style.top = btnY + 'px';
+    closeBtn.style.transform = 'translate(-50%, -50%)';
+    closeBtn.style.opacity = '0';
+    closeBtn.style.display = 'flex';
+    
+    // Afficher la lightbox
+    lightbox.classList.add('active');
     document.body.style.overflow = 'hidden';
+    
+    // Fade in du bouton après un court délai
+    setTimeout(() => {
+        closeBtn.style.opacity = '1';
+    }, 100);
+    
+    // Démarrer l'animation du bouton
+    updateButtonPosition();
+    
+    // Ajouter les événements
+    addLightboxEvents(lightbox, closeBtn, img);
 
     // Détecter le format de l'image une fois chargée
     img.onload = function() {
         const isPortrait = this.naturalHeight > this.naturalWidth;
-        const content = lightbox.querySelector('.lightbox-content');
         
         if (isPortrait) {
-            // Image portrait : contraindre la hauteur, largeur auto
-            content.style.maxHeight = 'calc(100vh - 60px)';
-            content.style.maxWidth = 'none';
-            this.style.height = 'calc(100vh - 60px)';
+            this.style.maxHeight = '90vh';
+            this.style.maxWidth = 'none';
             this.style.width = 'auto';
         } else {
-            // Image paysage : contraindre la largeur, hauteur auto avec plus de padding vertical
-            content.style.maxWidth = 'calc(100vw - 80px)';
-            content.style.maxHeight = 'calc(100vh - 100px)';
-            this.style.width = 'calc(100vw - 80px)';
-            this.style.height = 'auto';
-            this.style.maxHeight = 'calc(100vh - 100px)';
+            this.style.maxWidth = '90vw';
+            this.style.maxHeight = '90vh';
+            this.style.width = 'auto';
         }
     };
 }
 
+function addLightboxEvents(lightbox, closeBtn, img) {
+    // Supprimer les anciens événements
+    if (window._lightboxMouseHandler) {
+        lightbox.removeEventListener('mousemove', window._lightboxMouseHandler);
+    }
+    if (window._lightboxClickHandler) {
+        lightbox.removeEventListener('click', window._lightboxClickHandler);
+    }
+    
+    // Suivre la souris
+    function handleMouseMove(e) {
+        mouseX = e.clientX;
+        mouseY = e.clientY;
+    }
+    
+    // Fermer en cliquant
+    function handleClick(e) {
+        if (e.target === lightbox || e.target === lightbox.querySelector('.lightbox-overlay')) {
+            closeLightbox();
+        }
+    }
+    
+    // Ajouter les événements
+    lightbox.addEventListener('mousemove', handleMouseMove);
+    lightbox.addEventListener('click', handleClick);
+    
+    // Stocker les handlers
+    window._lightboxMouseHandler = handleMouseMove;
+    window._lightboxClickHandler = handleClick;
+}
+
+function updateButtonPosition() {
+    const lightbox = el('lightbox');
+    const closeBtn = document.querySelector('.lightbox-close');
+    
+    if (!lightbox || !lightbox.classList.contains('active') || !closeBtn) return;
+
+    btnX += (mouseX - btnX) * smoothness;
+    btnY += (mouseY - btnY) * smoothness;
+
+    closeBtn.style.left = btnX + 'px';
+    closeBtn.style.top = btnY + 'px';
+    closeBtn.style.transform = 'translate(-50%, -50%)';
+
+    requestAnimationFrame(updateButtonPosition);
+}
+
 export function closeLightbox() {
     const lightbox = el('lightbox');
+    const closeBtn = document.querySelector('.lightbox-close');
+    
     if (lightbox) {
-        lightbox.style.display = 'none';
+        lightbox.classList.remove('active');
         document.body.style.overflow = '';
+    }
+    
+    if (closeBtn) {
+        // Fade out du bouton
+        closeBtn.style.opacity = '0';
+        setTimeout(() => {
+            closeBtn.style.display = 'none';
+        }, 200);
+    }
+    
+    // Supprimer les événements
+    if (window._lightboxMouseHandler) {
+        lightbox.removeEventListener('mousemove', window._lightboxMouseHandler);
+        window._lightboxMouseHandler = null;
+    }
+    
+    if (window._lightboxClickHandler) {
+        lightbox.removeEventListener('click', window._lightboxClickHandler);
+        window._lightboxClickHandler = null;
     }
 }
 
