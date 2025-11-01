@@ -21,7 +21,17 @@ window.showFolder = showFolder;
 window.displayCollectionsView = displayCollectionsView;
 window.selectGallery = selectGallery;
 
-window.onload = () => loadHierarchy();
+// Variable globale pour stocker les collections
+let globalCollections = [];
+
+window.onload = () => {
+    loadHierarchy();
+    
+    // Attendre un petit délai pour s'assurer que le DOM est prêt
+    setTimeout(() => {
+        loadRandomImage();
+    }, 100);
+};
 
 async function loadHierarchy() {
     const container = el('galleriesContainer');
@@ -36,6 +46,8 @@ async function loadHierarchy() {
         const collections = nodes.filter(n => n.id != null && n.type !== 'folder');
         const folders = nodes.filter(n => n.type === 'folder');
 
+        globalCollections = collections;
+
         setHierarchyData(hierarchyData);
         setAllGalleries(collections);
         setAllSearchableItems(nodes.filter(n => n.id != null));
@@ -44,13 +56,11 @@ async function loadHierarchy() {
         if (statsEl) statsEl.textContent = `${collections.length} collection${collections.length > 1 ? 's' : ''}`;
 
         displayGalleries(collections);
-        
-        // Charger les thumbnails pour chaque collection
         loadThumbnailsForCollections(collections);
-        
         renderFolders(folders);
         initSearchAutocomplete();
         initModalListeners();
+
     } catch (err) {
         console.error('loadHierarchy error', err);
         if (container) container.innerHTML = `<div class="error-message">Erreur: ${escapeHtml(err.message)}</div>`;
@@ -75,10 +85,23 @@ async function loadThumbnailsForCollections(collections) {
             console.error(`Erreur chargement thumbnails pour ${collection.name}:`, err);
         }
     }
+    
+    console.log('✅ Tous les thumbnails sont chargés');
 }
 
-// Exporter pour pouvoir être utilisée depuis gallery.js
-export { loadThumbnailsForCollections };
+function updateRandomImage(imageUrl, collectionName) {
+    const randomImageEl = el('randomImage');
+    if (!randomImageEl) return;
+    
+    randomImageEl.style.opacity = '0';
+    
+    randomImageEl.onload = () => {
+        randomImageEl.style.opacity = '1';
+    };
+    
+    randomImageEl.src = imageUrl;
+    randomImageEl.alt = `Image de ${collectionName}`;
+}
 
 function updateCollectionThumbnails(collection) {
     if (!collection.thumbnails || collection.thumbnails.length === 0) return;
@@ -104,3 +127,72 @@ function updateCollectionThumbnails(collection) {
         if (mosaic) mosaic.style.opacity = '1';
     }, 10);
 }
+
+async function loadRandomImage() {
+    const randomImageEl = el('randomImage');
+    console.log('🔍 Element randomImage trouvé:', !!randomImageEl);
+    
+    if (!randomImageEl) {
+        console.error('❌ Element randomImage non trouvé dans le DOM');
+        return;
+    }
+
+    console.log('🔄 Chargement d\'une image aléatoire...');
+
+    try {
+        const timestamp = Date.now();
+        // Changer l'URL pour pointer vers votre WordPress
+        const wordpressUrl = 'https://www.photographie.stephanewagner.com'; // ou l'URL de votre WordPress
+        const response = await fetch(`${wordpressUrl}/wp-json/wplr-iptc/v1/random-image?size=large&t=${timestamp}`);
+        
+        if (!response.ok) {
+            console.error('❌ Erreur HTTP:', response.status, response.statusText);
+            return;
+        }
+        
+        const imageData = await response.json();
+        console.log('📨 Image reçue:', imageData.title, imageData.url);
+        
+        if (imageData.url) {
+            updateBackgroundImage(imageData.url);
+            
+            randomImageEl.style.opacity = '0.3';
+            
+            randomImageEl.onload = () => {
+                console.log('✅ Image chargée avec succès');
+                randomImageEl.style.opacity = '1';
+            };
+            
+            randomImageEl.src = imageData.url;
+            randomImageEl.alt = imageData.alt || imageData.title || 'Image aléatoire';
+        }
+    } catch (err) {
+        console.error('❌ Erreur:', err);
+    }
+}
+
+function updateBackgroundImage(imageUrl) {
+    // Mettre à jour le background du body::before
+    const style = document.createElement('style');
+    style.textContent = `
+        body::before {
+            background-image: url('${imageUrl}') !important;
+        }
+    `;
+    
+    // Supprimer l'ancien style s'il existe
+    const oldStyle = document.getElementById('dynamic-background');
+    if (oldStyle) {
+        oldStyle.remove();
+    }
+    
+    style.id = 'dynamic-background';
+    document.head.appendChild(style);
+}
+
+// Exposer les fonctions globalement
+window.loadRandomImage = loadRandomImage;
+window.loadThumbnailsForCollections = loadThumbnailsForCollections;
+
+// Export pour les modules ES6
+export { loadThumbnailsForCollections, updateCollectionThumbnails };

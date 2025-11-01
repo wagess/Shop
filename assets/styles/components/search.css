@@ -1,7 +1,7 @@
 /* ==================== Search ==================== */
 .search-container {
     position: relative;
-    margin: var(--gap-medium) auto;
+    margin: 40px auto;
     max-width: var(--search-max-width);
 }
 
