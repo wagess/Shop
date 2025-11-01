@@ -1,4 +1,5 @@
 import { el, escapeHtml, escapeJs } from './utils.js';
+import { loadThumbnailsForCollections } from './app.js';
 
 export let allGalleries = [];
 export let hierarchyData = null;
@@ -125,8 +126,7 @@ export async function showFolder(folderId, folderName) {
     displayGalleries(descendants);
     
     // Charger les thumbnails pour ce dossier
-    const { loadThumbnailsForCollections } = await import('./app.js');
-    loadThumbnailsForCollections(descendants);
+    await window.loadThumbnailsForCollections(descendants);
     
     const statsEl = el('stats');
     if (statsEl) statsEl.textContent = `${descendants.length} collection${descendants.length > 1 ? 's' : ''} dans "${folderName}"`;

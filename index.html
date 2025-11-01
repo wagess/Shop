@@ -7,29 +7,318 @@
     <link rel="stylesheet" href="./assets/styles/styles.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/photoswipe@5.4.4/dist/photoswipe.css">
     <link rel="stylesheet" href="./css/lightbox.css">
+    <style>
+    body {
+        position: relative;
+        margin: 0;
+        padding: 0;
+    }
+    body::before {
+        content: '';
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-size: cover;
+        background-position: center;
+        background-repeat: no-repeat;
+        filter: blur(10px);
+        z-index: -2;
+        transition: background-image 0.5s ease-in-out;
+    }
+    body::after {
+        content: '';
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.6);
+        z-index: -1;
+    }
+    
+    /* Responsive Design */
+    .main-content-wrapper {
+        display: flex;
+        height: 90vh;
+        align-items: center;
+    }
+    
+    .left-panel {
+        width: 50%;
+        padding: 20px;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+    }
+    
+    .right-panel {
+        width: 50%;
+        padding: 20px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        position: relative;
+    }
+    
+    /* Suppression des styles pour le loading spinner - utilisation de utilities.css */
+    /* .loading {
+        position: absolute;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        color: rgba(255, 255, 255, 0.8);
+        font-size: 16px;
+        z-index: 2;
+    }
+    
+    .loading.hidden {
+        display: none;
+    }
+    
+    .spinner {
+        width: 40px;
+        height: 40px;
+        border: 4px solid rgba(255, 255, 255, 0.3);
+        border-top: 4px solid rgba(255, 255, 255, 0.8);
+        border-radius: 50%;
+        animation: spin 1s linear infinite;
+        margin-bottom: 10px;
+    }
+    
+    @keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+    } */
+    
+    /* Override pour le spinner dans le contexte de l'image */
+    .right-panel .loading {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        width: auto;
+        height: auto;
+        background: none;
+        font-size: 16px;
+        z-index: 2;
+    }
+    
+    .right-panel .spinner {
+        width: 40px;
+        height: 40px;
+        margin-bottom: 10px;
+    }
+    
+    .loading.hidden {
+        display: none;
+    }
+    
+    /* Search Container Improvements */
+    .search-container {
+        width: 100%;
+        max-width: 500px; /* Limite la largeur maximale */
+        margin: 20px auto; /* Centre horizontalement */
+        position: relative;
+    }
+    
+    #searchInput {
+        width: 100%;
+        padding: 12px 16px;
+        font-size: 16px;
+        border: 2px solid rgba(255, 255, 255, 0.3);
+        border-radius: 8px;
+        background: rgba(255, 255, 255, 0.1);
+        color: white;
+        backdrop-filter: blur(10px);
+        transition: all 0.3s ease;
+        box-sizing: border-box;
+    }
+    
+    #searchInput::placeholder {
+        color: rgba(255, 255, 255, 0.7);
+    }
+    
+    #searchInput:focus {
+        outline: none;
+        border-color: rgba(255, 255, 255, 0.6);
+        background: rgba(255, 255, 255, 0.15);
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    }
+    
+    #searchSuggestions {
+        position: absolute;
+        top: 100%;
+        left: 0;
+        right: 0;
+        background: rgba(0, 0, 0, 0.9);
+        border-radius: 0 0 8px 8px;
+        max-height: 200px;
+        overflow-y: auto;
+        z-index: 1000;
+        backdrop-filter: blur(10px);
+    }
+    
+    #randomImage {
+        aspect-ratio: 3/2;
+        max-width: 90%;
+        max-height: 70%;
+        width: 100%;
+        height: auto;
+        object-fit: cover;
+        border-radius: 8px;
+        box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        transition: opacity 0.3s ease-in-out;
+        background-color: #3a3a3a; /* Fond gris foncé */
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        position: relative;
+    }
+    
+    /* Placeholder avant le chargement */
+    #randomImage:not([src])::before,
+    #randomImage[src=""]::before {
+        content: "📸 Chargement...";
+        color: rgba(255, 255, 255, 0.8);
+        font-size: 18px;
+        text-align: center;
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: #3a3a3a; /* Même fond gris foncé */
+        border-radius: 8px;
+    }
+    
+    /* Cache le texte alt par défaut */
+    #randomImage {
+        color: transparent;
+        text-indent: -9999px;
+    }
+    
+    /* Mobile Design */
+    @media (max-width: 768px) {
+        .main-content-wrapper {
+            flex-direction: column;
+            height: auto;
+            min-height: 80vh;
+        }
+        
+        .left-panel {
+            width: 100%;
+            padding: 15px;
+            order: 1;
+        }
+        
+        .right-panel {
+            width: 100%;
+            padding: 15px;
+            order: 2;
+            min-height: 250px;
+        }
+        
+        .search-container {
+            margin: 15px auto; /* Centre aussi sur mobile */
+            max-width: 100%; /* Pleine largeur sur mobile */
+        }
+        
+        #searchInput {
+            padding: 14px 16px;
+            font-size: 16px;
+        }
+        
+        #randomImage {
+            aspect-ratio: 3/2;
+            max-width: 100%;
+            max-height: 60vh;
+            width: 100%;
+            height: auto; /* Hauteur automatique sur mobile */
+        }
+        
+        .header h1 {
+            font-size: 1.5rem;
+            text-align: center;
+        }
+        
+        .header p {
+            text-align: center;
+            font-size: 0.9rem;
+        }
+        
+        #galleriesContainer {
+            padding: 10px;
+        }
+        
+        .galleries-grid {
+            grid-template-columns: 1fr;
+            gap: 15px;
+        }
+    }
+    
+    /* Tablet Design */
+    @media (max-width: 1024px) and (min-width: 769px) {
+        .left-panel, .right-panel {
+            padding: 15px;
+        }
+        
+        .search-container {
+            margin: 18px 0;
+        }
+        
+        #searchInput {
+            padding: 13px 16px;
+            font-size: 15px;
+        }
+        
+        #randomImage {
+            max-width: 95%;
+            max-height: 65vh;
+            width: 100%;
+            height: auto;
+        }
+        
+        .galleries-grid {
+            grid-template-columns: repeat(2, 1fr);
+        }
+    }
+    </style>
 </head>
 <body>
     <div class="container">
-        <div class="header">
-            <h1>📸 Shop Stéphane Wagner</h1>
-            <p>Explorez vos collections photo</p>
+        <div class="main-content-wrapper">
+            <div class="left-panel">
+                <div class="header">
+                    <h1>📸 Shop Stéphane Wagner</h1>
+                    <p>Explorez vos collections photo</p>
+                </div>
+
+                <div class="search-container">
+                    <input type="text" id="searchInput" placeholder="🔍 Rechercher une collection..." autocomplete="off">
+                    <div id="searchSuggestions"></div>
+                </div>
+
+                <!-- Liens de navigation vers les dossiers (en haut) -->
+                <div id="foldersContainerTop" style="margin-top: 20px; margin-bottom: 20px; text-align: center;"></div>
+
+                <div class="stats" id="stats"></div>
+            </div>
+            
+            <div class="right-panel">
+                <div class="loading" id="galleriesLoader">
+                    <div class="spinner"></div>
+                    Chargement des galeries...
+                </div>
+                <img id="randomImage" alt="Image aléatoire">
+            </div>
         </div>
-
-        <div class="search-container">
-            <input type="text" id="searchInput" placeholder="🔍 Rechercher une collection..." autocomplete="off">
-            <div id="searchSuggestions"></div>
-        </div>
-
-        <!-- Liens de navigation vers les dossiers (en haut) -->
-        <div id="foldersContainerTop" style="margin-top: 20px; margin-bottom: 20px; text-align: center;"></div>
-
-        <div class="stats" id="stats"></div>
 
         <div id="galleriesContainer" class="galleries-grid">
-            <div class="loading">
-                <div class="spinner"></div>
-                Chargement des galeries...
-            </div>
         </div>
 
         <!-- Liens de navigation vers les dossiers (en bas) -->

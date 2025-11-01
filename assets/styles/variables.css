@@ -50,7 +50,7 @@
     
     /* Tailles */
     --container-max-width: 1400px;
-    --search-max-width: 600px;
+    --search-max-width: 80%;
     --img-height: 250px;
     --gallery-min-width: 320px;
     --photo-min-width: 300px;
