@@ -61,9 +61,18 @@ async function loadHierarchy() {
         initSearchAutocomplete();
         initModalListeners();
 
+        hideGalleriesLoader(); // Masquer le loader après le chargement des galeries
+
     } catch (err) {
         console.error('loadHierarchy error', err);
         if (container) container.innerHTML = `<div class="error-message">Erreur: ${escapeHtml(err.message)}</div>`;
+    }
+}
+
+function hideGalleriesLoader() {
+    const loader = document.querySelector('.right-panel .loading');
+    if (loader) {
+        loader.classList.add('hidden');
     }
 }
 
