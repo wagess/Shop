@@ -135,10 +135,16 @@ export async function showFolder(folderId, folderName) {
     if (existing) existing.remove();
     const container = el('galleriesContainer');
     if (container) {
-        container.insertAdjacentHTML('beforebegin', `<div id="backToAll" style="margin:20px 0; text-align:center;"><a href="#" onclick="window.displayCollectionsView();return false;" style="color:white; text-decoration:underline; font-size:16px;">← Voir toutes les collections</a></div>`);
+        container.insertAdjacentHTML('afterend', `<div id="backToAll" style="margin:20px; padding:20px; text-align:center;"><a href="#" onclick="window.displayCollectionsView();return false;" style="color:white; text-decoration:underline; font-size:16px;">← Voir toutes les collections</a></div>`);
     }
     
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+    // Scroll down vers les galeries après un petit délai
+    setTimeout(() => {
+        const galleriesContainer = el('galleriesContainer');
+        if (galleriesContainer) {
+            galleriesContainer.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+    }, 100);
 }
 
 export function displayCollectionsView() {

@@ -41,7 +41,7 @@
     /* Responsive Design */
     .main-content-wrapper {
         display: flex;
-        height: 90vh;
+        height: 80vh;
         align-items: center;
     }
     
@@ -290,14 +290,15 @@
     </style>
 </head>
 <body>
+    <!-- Header en haut de page, hors container -->
+    <header style="width: 100%; padding: 20px; display: flex; justify-content: space-between; align-items: center; background: rgba(0, 0, 0, 0.1); backdrop-filter: blur(10px); position: relative; top: 0; z-index: 100;">
+        <h1 style="margin: 0; color: white; font-size: 1.8rem;">📸 Shop Stéphane Wagner</h1>
+        <p style="margin: 0; color: rgba(255, 255, 255, 0.8); font-size: 1rem;">Explorez vos collections photo</p>
+    </header>
+
     <div class="container">
         <div class="main-content-wrapper">
             <div class="left-panel">
-                <div class="header">
-                    <h1>📸 Shop Stéphane Wagner</h1>
-                    <p>Explorez vos collections photo</p>
-                </div>
-
                 <div class="search-container">
                     <input type="text" id="searchInput" placeholder="🔍 Rechercher une collection..." autocomplete="off">
                     <div id="searchSuggestions"></div>
@@ -307,6 +308,15 @@
                 <div id="foldersContainerTop" style="margin-top: 20px; margin-bottom: 20px; text-align: center;"></div>
 
                 <div class="stats" id="stats"></div>
+
+                <!-- Bouton scroll down -->
+                <div style="text-align: center; margin: 20px 0;">
+                    <button id="scrollDownBtn" style="background: rgba(255,255,255,0.1); border: 2px solid rgba(255,255,255,0.3); border-radius: 50%; padding: 12px; cursor: pointer; transition: all 0.3s ease; backdrop-filter: blur(10px);" onmouseover="this.style.background='rgba(255,255,255,0.2)'; this.style.transform='translateY(-2px)'" onmouseout="this.style.background='rgba(255,255,255,0.1)'; this.style.transform='translateY(0)'">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 13.5l-1.5-1.5L12 10.5l3.5 3.5-1.5 1.5L12 13.5z" fill="rgba(255,255,255,0.8)"/>
+                        </svg>
+                    </button>
+                </div>
             </div>
             
             <div class="right-panel">
@@ -318,6 +328,7 @@
             </div>
         </div>
 
+        
         <div id="galleriesContainer" class="galleries-grid">
         </div>
 
@@ -334,5 +345,13 @@
     </div>
 
     <script type="module" src="js/app.js"></script>
+    <script>
+        document.getElementById('scrollDownBtn').addEventListener('click', () => {
+            const galleriesContainer = document.getElementById('galleriesContainer');
+            if (galleriesContainer) {
+                galleriesContainer.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }
+        });
+    </script>
 </body>
 </html>
