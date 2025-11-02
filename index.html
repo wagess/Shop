@@ -62,37 +62,6 @@
         position: relative;
     }
     
-    /* Suppression des styles pour le loading spinner - utilisation de utilities.css */
-    /* .loading {
-        position: absolute;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
-        color: rgba(255, 255, 255, 0.8);
-        font-size: 16px;
-        z-index: 2;
-    }
-    
-    .loading.hidden {
-        display: none;
-    }
-    
-    .spinner {
-        width: 40px;
-        height: 40px;
-        border: 4px solid rgba(255, 255, 255, 0.3);
-        border-top: 4px solid rgba(255, 255, 255, 0.8);
-        border-radius: 50%;
-        animation: spin 1s linear infinite;
-        margin-bottom: 10px;
-    }
-    
-    @keyframes spin {
-        0% { transform: rotate(0deg); }
-        100% { transform: rotate(360deg); }
-    } */
-    
     /* Override pour le spinner dans le contexte de l'image */
     .right-panel .loading {
         position: absolute;
@@ -213,13 +182,13 @@
         .left-panel {
             width: 100%;
             padding: 15px;
-            order: 1;
+            order: 2;
         }
         
         .right-panel {
             width: 100%;
             padding: 15px;
-            order: 2;
+            order: 1;
             min-height: 250px;
         }
         
