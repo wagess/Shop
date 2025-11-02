@@ -1,0 +1,74 @@
+/* Typography - Utilisation des variables */
+
+h1, h2, h3, h4, h5, h6 {
+    margin: 0 0 var(--gap-medium) 0;
+    font-weight: var(--font-weight-semibold);
+    line-height: var(--line-height-tight);
+    letter-spacing: var(--letter-spacing-tight);
+}
+
+h1 {
+    font-size: var(--font-size-h1);
+    font-weight: var(--font-weight-bold);
+    line-height: var(--line-height-tight);
+}
+
+h2 {
+    font-size: var(--font-size-h2);
+    font-weight: var(--font-weight-semibold);
+}
+
+h3 {
+    font-size: var(--font-size-h3);
+    font-weight: var(--font-weight-semibold);
+}
+
+h4 {
+    font-size: var(--font-size-h4);
+    font-weight: var(--font-weight-medium);
+}
+
+h5 {
+    font-size: var(--font-size-h5);
+    font-weight: var(--font-weight-medium);
+}
+
+h6 {
+    font-size: var(--font-size-h6);
+    font-weight: var(--font-weight-medium);
+}
+
+/* Classes utilitaires */
+.text-large {
+    font-size: var(--font-size-h3);
+}
+
+.text-body {
+    font-size: var(--font-size-body);
+    line-height: var(--line-height-normal);
+}
+
+.text-small {
+    font-size: var(--font-size-small);
+    line-height: var(--line-height-normal);
+}
+
+.text-xs {
+    font-size: var(--font-size-xs);
+    line-height: var(--line-height-relaxed);
+}
+
+.font-light { font-weight: var(--font-weight-light); }
+.font-normal { font-weight: var(--font-weight-normal); }
+.font-medium { font-weight: var(--font-weight-medium); }
+.font-semibold { font-weight: var(--font-weight-semibold); }
+.font-bold { font-weight: var(--font-weight-bold); }
+.font-black { font-weight: var(--font-weight-black); }
+
+.leading-tight { line-height: var(--line-height-tight); }
+.leading-normal { line-height: var(--line-height-normal); }
+.leading-relaxed { line-height: var(--line-height-relaxed); }
+
+.tracking-tight { letter-spacing: var(--letter-spacing-tight); }
+.tracking-normal { letter-spacing: var(--letter-spacing-normal); }
+.tracking-wide { letter-spacing: var(--letter-spacing-wide); }
