@@ -6,78 +6,157 @@
     margin: 20px auto;
 }
 
-/* ==================== Search Input ==================== */
-#searchInput {
-    width: 100%;
-    padding: 12px 16px;
-    font-size: 16px;
-    border: 4px solid rgba(255, 255, 255, 0.3);
-    border-radius: 4px;
-    background: rgba(255, 255, 255, 0.1);
-    color: var(--white);
-    outline: none;
-    backdrop-filter: blur(10px);
-    transition: all 0.3s ease;
-    box-sizing: border-box;
+/* ==================== Modern Search Styles ==================== */
+.search-container-modern {
+    margin: 20px auto;
+    width: 90%;
 }
 
-#searchInput::placeholder {
+.search-input-wrapper {
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 28px;
+    padding: 10px;
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+    grid-template-areas: 'leading input trailing';
+    align-items: center;
+    gap: 8px;
+    transition: all 0.3s ease;
+}
+
+.search-input-wrapper:hover {
+    background: rgba(255, 255, 255, 0.15);
+    border-color: rgba(255, 255, 255, 0.3);
+}
+
+.search-input-wrapper:focus-within {
+    background: rgba(255, 255, 255, 0.2);
+    border-color: rgba(255, 255, 255, 0.4);
+    box-shadow: 0 0 20px rgba(255, 255, 255, 0.1);
+}
+
+.search-leading {
+    grid-area: leading;
+}
+
+.search-input-container {
+    grid-area: input;
+    position: relative;
+    flex: 1;
+}
+
+.search-trailing {
+    grid-area: trailing;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.search-input-container input {
+    width: 100%;
+    background: transparent;
+    border: none;
+    outline: none;
+    color: white;
+    font-size: 16px;
+    padding: 8px 12px;
+    border-radius: 20px;
+}
+
+.search-input-container input::placeholder {
+    color: rgba(255, 255, 255, 0.6);
+}
+
+.search-btn {
+    background: transparent;
+    border: none;
+    border-radius: 50%;
+    width: 36px;
+    height: 36px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
     color: rgba(255, 255, 255, 0.7);
 }
 
-#searchInput:focus {
-    border-color: rgba(255, 255, 255, 0.6);
-    background: rgba(255, 255, 255, 0.15);
-    transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+.search-btn:hover {
+    background: rgba(255, 255, 255, 0.1);
+    color: white;
+    transform: scale(1.05);
+}
+
+.search-submit {
+    background: rgba(255, 255, 255, 0.2);
+    color: white;
+}
+
+.search-submit:hover {
+    background: rgba(255, 255, 255, 0.3);
 }
 
 /* ==================== Search Suggestions ==================== */
 #searchSuggestions {
     position: absolute;
-    top: 100%;
+    top: calc(100% + 16px);
     left: 0;
     right: 0;
-    background: rgba(0, 0, 0, 0.9);
-    border-radius: 0 0 8px 8px;
+    background: rgba(0, 0, 0, 1);
+    border-radius: 16px;
     max-height: 200px;
     overflow-y: auto;
     z-index: 1000;
-    backdrop-filter: blur(10px);
+    backdrop-filter: blur(15px);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
     display: none;
+    padding: 8px;
 }
 
 .suggestion-item {
-    padding: var(--padding-small);
+    padding: 12px 16px;
     cursor: pointer;
     display: flex;
     align-items: center;
-    gap: 10px;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-    transition: var(--transition-fast);
-}
-
-.suggestion-item:hover {
-    background: var(--bg-white-transparent);
+    gap: 12px;
+    border-radius: 12px;
+    transition: all 0.3s ease;
+    margin-bottom: 4px;
 }
 
 .suggestion-item:last-child {
-    border-bottom: none;
+    margin-bottom: 0;
+}
+
+.suggestion-item:hover {
+    background: rgba(255, 255, 255, 0.2);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
 }
 
 .suggestion-icon {
-    font-size: 20px;
+    font-size: 18px;
+    opacity: 0.9;
+    color: white;
 }
 
 .suggestion-name {
     flex: 1;
-    color: var(--white);
+    color: white;
     font-weight: 500;
+    font-size: 15px;
 }
 
 .suggestion-count {
-    color: rgba(255, 255, 255, 0.6);
+    color: rgba(255, 255, 255, 0.8);
     font-size: 12px;
+    background: rgba(255, 255, 255, 0.15);
+    padding: 4px 8px;
+    border-radius: 8px;
+    font-weight: 500;
 }
 
 /* ==================== Random Image ==================== */
