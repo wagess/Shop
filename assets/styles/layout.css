@@ -34,7 +34,8 @@ body::after {
 /* ==================== Base Layout ==================== */
 .container {
     max-width: var(--container-max-width);
-    margin: 0 auto;
+    margin: var(--gap-large) auto;
+    margin-top: 0px;
     vertical-align: middle;
 }
 
@@ -53,7 +54,7 @@ body::after {
 /* ==================== Main Content Layout ==================== */
 .main-content-wrapper {
     display: flex;
-    height: 80vh;
+    height: 75vh;
     align-items: center;
 }
 

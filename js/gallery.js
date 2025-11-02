@@ -125,9 +125,6 @@ export async function showFolder(folderId, folderName) {
     const descendants = extractGalleryIds(node).filter(n => n.id != null && n.type !== 'folder');
     displayGalleries(descendants);
     
-    // Charger les thumbnails pour ce dossier
-    await window.loadThumbnailsForCollections(descendants);
-    
     const statsEl = el('stats');
     if (statsEl) statsEl.textContent = `${descendants.length} collection${descendants.length > 1 ? 's' : ''} dans "${folderName}"`;
     
@@ -138,13 +135,18 @@ export async function showFolder(folderId, folderName) {
         container.insertAdjacentHTML('afterend', `<div id="backToAll" style="margin:20px; padding:20px; text-align:center;"><a href="#" onclick="window.displayCollectionsView();return false;" style="color:white; text-decoration:underline; font-size:16px;">← Voir toutes les collections</a></div>`);
     }
     
-    // Scroll down vers les galeries après un petit délai
+    // Scroll immédiatement après l'affichage
     setTimeout(() => {
         const galleriesContainer = el('galleriesContainer');
         if (galleriesContainer) {
             galleriesContainer.scrollIntoView({ behavior: 'smooth', block: 'start' });
         }
-    }, 100);
+    }, 50); // Réduit le délai de 100ms à 50ms
+    
+    // Charger les thumbnails en arrière-plan sans bloquer
+    window.loadThumbnailsForCollections(descendants).catch(err => {
+        console.warn('Erreur chargement thumbnails:', err);
+    });
 }
 
 export function displayCollectionsView() {

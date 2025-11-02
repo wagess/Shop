@@ -8,14 +8,21 @@
 </head>
 <body>
     <!-- Header en haut de page, hors container -->
-    <header style="width: 100%; padding: 20px; display: flex; justify-content: space-between; align-items: center; background: rgba(0, 0, 0, 0.1); backdrop-filter: blur(10px); position: relative; top: 0; z-index: 100;">
-        <h1 style="margin: 0; color: white;">📸 Shop Stéphane Wagner</h1>
-        <p style="margin: 0; color: rgba(255, 255, 255, 0.8); font-size: 1rem; text-align: right;">Explorez mes collections photo !</p>
+    <header style="width: 100%; padding: var(--gap-large); display: flex; justify-content: space-between; align-items: center; background: rgba(0, 0, 0, 0); position: relative; top: 0; z-index: 100;">
+        
+        <div style="display: flex; align-items: center; gap: 12px;">
+            <img src="./assets/svg/Stéphane Wagner.svg" alt="Logo Stéphane Wagner" style="width: 180px; height: auto; filter: invert(1);">
+            
+        </div>
+        <h4 style="margin: 0; color: white; font-size: var(--font-size-small); font-weight: var(--font-weight-light); border: 1px solid white; border-radius: 2px; padding: 8px 16px;">ShopPhoto</h4>
     </header>
 
     <div class="container">
         <div class="main-content-wrapper">
             <div class="left-panel">
+
+                <p style="margin: 0; color: rgb(169, 169, 169); font-size: var(--font-size-large); font-weight: 100; text-align: center;">Explorez mon univers photographique !</p>
+    
                 <div class="search-container">
                     <input type="text" id="searchInput" placeholder="🔍 Rechercher une collection..." autocomplete="off">
                     <div id="searchSuggestions"></div>
