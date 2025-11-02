@@ -18,17 +18,18 @@
     backdrop-filter: blur(10px);
     padding: var(--gap-medium) var(--gap-large);
     display: flex;
-    justify-content: space-between;
+    justify-content: flex-start; /* Changé de space-between à flex-start */
     align-items: center;
     z-index: 1001;
     box-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
+    gap: var(--gap-medium); /* Ajouter un espace entre bouton et titre */
 }
 
 .modal-title {
     color: var(--white);
     font-size: 2em;
     font-weight: bold;
-    text-align: right;
+    text-align: left;
 }
 
 .close-modal {

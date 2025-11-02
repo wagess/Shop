@@ -178,7 +178,7 @@ let mouseX = window.innerWidth / 2;
 let mouseY = window.innerHeight / 2;
 let btnX = mouseX;
 let btnY = mouseY;
-const smoothness = 0.1; // Augmenté de 0.15 à 0.3 pour plus de rapidité
+const smoothness = 0.3; // Augmenté de 0.15 à 0.3 pour plus de rapidité
 
 export function openLightbox(imageUrl, title) {
     // Créer la lightbox si elle n'existe pas
@@ -217,8 +217,8 @@ export function openLightbox(imageUrl, title) {
     img.src = imageUrl;
     img.alt = title;
     
-    // Position initiale du bouton (coin supérieur droit)
-    btnX = window.innerWidth - 50;
+    // Position initiale du bouton (coin supérieur gauche)
+    btnX = 50;        // Changé de window.innerWidth - 50 à 50
     btnY = 50;
     mouseX = btnX;
     mouseY = btnY;
