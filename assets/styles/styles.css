@@ -4,6 +4,7 @@
 /* Import de la base */
 @import './reset.css';
 @import './layout.css';
+@import './typography.css';
 
 /* Import des composants */
 @import './components/search.css';
@@ -11,6 +12,7 @@
 @import './components/modal.css';
 @import './components/buttons.css';
 @import './components/keywords.css';
+@import './components/lightbox.css';
 
 /* Import des utilitaires */
 @import './utilities.css';
