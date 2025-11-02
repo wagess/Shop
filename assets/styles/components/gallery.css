@@ -98,3 +98,13 @@
 .gallery-cover.loading .gallery-icon {
     opacity: 0.5;
 }
+
+.picture-details__title {
+    font-family: "rock salt";
+    font-weight: 400;
+    text-transform: capitalize;
+    text-align: center;
+    color: whitesmoke;
+    font-size: var(--font-weight-medium);
+    letter-spacing: 0.75px;
+}
