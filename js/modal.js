@@ -24,11 +24,18 @@ export async function openGallery(galleryId, galleryName) {
     }
 }
 
+// Variables globales pour la navigation
+let currentPhotos = [];
+let currentPhotoIndex = 0;
+
 async function displayPhotos(photos) {
     const grid = el('photosGrid');
     if (!grid) return;
 
-    grid.innerHTML = photos.map(photo => {
+    // Stocker les photos pour la navigation dans la lightbox
+    currentPhotos = photos;
+
+    grid.innerHTML = photos.map((photo, index) => {
         const imgUrl = photo.full_size || photo.url || photo.guid || photo.source_url || '';
         const title = photo.title || photo.post_title || photo.name || `Photo ${photo.id}`;
         const kws = collectKeywords(photo);
@@ -37,7 +44,7 @@ async function displayPhotos(photos) {
         return `
     <div class="photo-card" id="photo-card-${photo.id}">
         <img src="${escapeHtml(imgUrl)}" alt="${escapeHtml(title)}" class="photo-img" 
-             onclick="openLightbox('${escapeJs(imgUrl)}', '${escapeJs(title)}')"
+             onclick="openLightbox('${escapeJs(imgUrl)}', '${escapeJs(title)}', ${index})"
              style="cursor: pointer !important;"
              onerror="this.style.background='linear-gradient(45deg,#ddd,#ccc)'; this.alt='Image non disponible';">
         <div class="photo-info">
@@ -178,9 +185,11 @@ let mouseX = window.innerWidth / 2;
 let mouseY = window.innerHeight / 2;
 let btnX = mouseX;
 let btnY = mouseY;
-const smoothness = 0.3; // Augmenté de 0.15 à 0.3 pour plus de rapidité
+const smoothness = 0.2; // Augmenté de 0.15 à 0.3 pour plus de rapidité
 
-export function openLightbox(imageUrl, title) {
+export function openLightbox(imageUrl, title, photoIndex = 0) {
+    currentPhotoIndex = photoIndex;
+    
     // Créer la lightbox si elle n'existe pas
     let lightbox = el('lightbox');
     if (!lightbox) {
@@ -197,7 +206,7 @@ export function openLightbox(imageUrl, title) {
         if (!document.querySelector('link[href*="lightbox.css"]')) {
             const link = document.createElement('link');
             link.rel = 'stylesheet';
-            link.href = './css/lightbox.css';
+            link.href = './assets/styles/components/lightbox.css';
             document.head.appendChild(link);
         }
     }
@@ -207,7 +216,11 @@ export function openLightbox(imageUrl, title) {
     if (!closeBtn) {
         closeBtn = document.createElement('button');
         closeBtn.className = 'lightbox-close';
-        closeBtn.innerHTML = '✕';
+        // Initialiser avec l'icône X SVG
+        closeBtn.innerHTML = `<svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+            <path d="M10 8.58579L14.2929 4.29289C14.6834 3.90237 15.3166 3.90237 15.7071 4.29289C16.0976 4.68342 16.0976 5.31658 15.7071 5.70711L11.4142 10L15.7071 14.2929C16.0976 14.6834 16.0976 15.3166 15.7071 15.7071C15.3166 16.0976 14.6834 16.0976 14.2929 15.7071L10 11.4142L5.70711 15.7071C5.31658 16.0976 4.68342 16.0976 4.29289 15.7071C3.90237 15.3166 3.90237 14.6834 4.29289 14.2929L8.58579 10L4.29289 5.70711C3.90237 5.31658 3.90237 4.68342 4.29289 4.29289C4.68342 3.90237 5.31658 3.90237 5.70711 4.29289L10 8.58579Z"></path>
+        </svg>`;
+        closeBtn.title = 'Fermer';
         closeBtn.onclick = closeLightbox;
         document.body.appendChild(closeBtn);
     }
@@ -217,8 +230,8 @@ export function openLightbox(imageUrl, title) {
     img.src = imageUrl;
     img.alt = title;
     
-    // Position initiale du bouton (coin supérieur gauche)
-    btnX = 50;        // Changé de window.innerWidth - 50 à 50
+    // Position initiale du bouton
+    btnX = 50;
     btnY = 50;
     mouseX = btnX;
     mouseY = btnY;
@@ -261,6 +274,33 @@ export function openLightbox(imageUrl, title) {
     };
 }
 
+function navigateToPhoto(direction) {
+    if (!currentPhotos || currentPhotos.length === 0) return;
+    
+    let newIndex = currentPhotoIndex;
+    
+    if (direction === 'prev') {
+        newIndex = currentPhotoIndex > 0 ? currentPhotoIndex - 1 : currentPhotos.length - 1;
+    } else if (direction === 'next') {
+        newIndex = currentPhotoIndex < currentPhotos.length - 1 ? currentPhotoIndex + 1 : 0;
+    }
+    
+    if (newIndex !== currentPhotoIndex) {
+        const photo = currentPhotos[newIndex];
+        const imgUrl = photo.full_size || photo.url || photo.guid || photo.source_url || '';
+        const title = photo.title || photo.post_title || photo.name || `Photo ${photo.id}`;
+        
+        currentPhotoIndex = newIndex;
+        
+        // Mettre à jour l'image dans la lightbox
+        const img = document.querySelector('.lightbox-image');
+        if (img) {
+            img.src = imgUrl;
+            img.alt = title;
+        }
+    }
+}
+
 function addLightboxEvents(lightbox, closeBtn, img) {
     // Supprimer les anciens événements
     if (window._lightboxMouseHandler) {
@@ -270,18 +310,77 @@ function addLightboxEvents(lightbox, closeBtn, img) {
         lightbox.removeEventListener('click', window._lightboxClickHandler);
     }
     
-    // Suivre la souris
+    // Suivre la souris ET changer l'icône du bouton
     function handleMouseMove(e) {
         mouseX = e.clientX;
         mouseY = e.clientY;
-    }
-    
-    // Fermer en cliquant
-    function handleClick(e) {
-        if (e.target === lightbox || e.target === lightbox.querySelector('.lightbox-overlay')) {
-            closeLightbox();
+        
+        // Changer l'icône selon la position du curseur avec zones de 15%
+        const screenWidth = window.innerWidth;
+        const leftZone = screenWidth * 0.15;  // 15% à gauche
+        const rightZone = screenWidth * 0.85; // 85% = début de la zone droite (15% à droite)
+        
+        if (mouseX < leftZone) {
+            // Zone gauche (15%) = vraie flèche gauche
+            closeBtn.innerHTML = `<svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                <path d="M12.7071 4.29289C13.0976 4.68342 13.0976 5.31658 12.7071 5.70711L8.41421 10L12.7071 14.2929C13.0976 14.6834 13.0976 15.3166 12.7071 15.7071C12.3166 16.0976 11.6834 16.0976 11.2929 15.7071L6.29289 10.7071C5.90237 10.3166 5.90237 9.68342 6.29289 9.29289L11.2929 4.29289C11.6834 3.90237 12.3166 3.90237 12.7071 4.29289Z"></path>
+            </svg>`;
+            closeBtn.title = 'Image précédente';
+        } else if (mouseX > rightZone) {
+            // Zone droite (15%) = vraie flèche droite
+            closeBtn.innerHTML = `<svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                <path d="M7.29289 4.29289C7.68342 3.90237 8.31658 3.90237 8.70711 4.29289L13.7071 9.29289C14.0976 9.68342 14.0976 10.3166 13.7071 10.7071L8.70711 15.7071C8.31658 16.0976 7.68342 16.0976 7.29289 15.7071C6.90237 15.3166 6.90237 14.6834 7.29289 14.2929L11.5858 10L7.29289 5.70711C6.90237 5.31658 6.90237 4.68342 7.29289 4.29289Z"></path>
+            </svg>`;
+            closeBtn.title = 'Image suivante';
+        } else {
+            // Zone centrale (70%) = X pour fermer
+            closeBtn.innerHTML = `<svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                <path d="M10 8.58579L14.2929 4.29289C14.6834 3.90237 15.3166 3.90237 15.7071 4.29289C16.0976 4.68342 16.0976 5.31658 15.7071 5.70711L11.4142 10L15.7071 14.2929C16.0976 14.6834 16.0976 15.3166 15.7071 15.7071C15.3166 16.0976 14.6834 16.0976 14.2929 15.7071L10 11.4142L5.70711 15.7071C5.31658 16.0976 4.68342 16.0976 4.29289 15.7071C3.90237 15.3166 3.90237 14.6834 4.29289 14.2929L8.58579 10L4.29289 5.70711C3.90237 5.31658 3.90237 4.68342 4.29289 4.29289C4.68342 3.90237 5.31658 3.90237 5.70711 4.29289L10 8.58579Z"></path>
+            </svg>`;
+            closeBtn.title = 'Fermer';
         }
     }
+    
+    // Gérer les clics selon les zones
+    function handleClick(e) {
+        if (e.target === lightbox || e.target === lightbox.querySelector('.lightbox-overlay')) {
+            // Calculer la zone de clic
+            const screenWidth = window.innerWidth;
+            const clickX = e.clientX;
+            const leftZone = screenWidth * 0.15;
+            const rightZone = screenWidth * 0.85;
+            
+            if (clickX < leftZone) {
+                // Clic dans la zone gauche = image précédente
+                navigateToPhoto('prev');
+            } else if (clickX > rightZone) {
+                // Clic dans la zone droite = image suivante
+                navigateToPhoto('next');
+            } else {
+                // Clic dans la zone centrale = fermer
+                closeLightbox();
+            }
+        }
+    }
+    
+    // Gérer les clics sur le bouton selon son icône
+    closeBtn.onclick = function(e) {
+        e.stopPropagation();
+        
+        // Vérifier le contenu du bouton pour déterminer l'action
+        const buttonContent = closeBtn.innerHTML;
+        
+        if (buttonContent.includes('L6.29289 10.7071C5.90237 10.3166')) {
+            // Flèche gauche (pattern spécifique à la flèche gauche)
+            navigateToPhoto('prev');
+        } else if (buttonContent.includes('L13.7071 9.29289C14.0976 9.68342')) {
+            // Flèche droite (pattern spécifique à la flèche droite)
+            navigateToPhoto('next');
+        } else {
+            // X pour fermer
+            closeLightbox();
+        }
+    };
     
     // Ajouter les événements
     lightbox.addEventListener('mousemove', handleMouseMove);
@@ -340,10 +439,16 @@ export function closeLightbox() {
 export function initModalListeners() {
     const closeBtn = el('closeModalBtn');
     if (closeBtn) closeBtn.addEventListener('click', closeModal);
+    
+    // Ajouter la navigation au clavier pour la lightbox
     document.addEventListener('keydown', e => { 
         if (e.key === 'Escape') {
             closeLightbox();
             closeModal();
+        } else if (e.key === 'ArrowLeft') {
+            navigateToPhoto('prev');
+        } else if (e.key === 'ArrowRight') {
+            navigateToPhoto('next');
         }
     });
 }
