@@ -67,3 +67,73 @@
 .lightbox-title {
     display: none;
 }
+
+.mobile-nav-btn {
+    position: fixed;
+    width: 60px;
+    height: 60px;
+    background: rgba(0, 0, 0, 0.7);
+    border: none;
+    border-radius: 50%;
+    color: white;
+    font-size: 24px;
+    cursor: pointer;
+    z-index: 10001;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+    opacity: 0.7;
+}
+
+.mobile-nav-btn:hover {
+    background: rgba(0, 0, 0, 0.9);
+    opacity: 1;
+    /* transform: scale(1.1); */
+}
+
+.mobile-prev-btn {
+    left: 20px;
+    top: 50%;
+    /* transform: translateY(-50%); */
+}
+
+.mobile-next-btn {
+    right: 20px;
+    top: 50%;
+    /* transform: translateY(-50%); */
+}
+
+.mobile-close-btn {
+    top: 20px;
+    left: 50%;
+    /* transform: translateX(-50%); */
+}
+
+@media (max-width: 768px) {
+    .lightbox-image {
+        max-width: 95vw !important;
+        max-height: 80vh !important;
+        width: auto !important;
+        height: auto !important;
+        object-fit: contain;
+    }
+    
+    .mobile-nav-btn {
+        width: 50px;
+        height: 50px;
+        font-size: 20px;
+    }
+    
+    .mobile-prev-btn {
+        left: 15px;
+    }
+    
+    .mobile-next-btn {
+        right: 15px;
+    }
+    
+    .mobile-close-btn {
+        top: 15px;
+    }
+}
