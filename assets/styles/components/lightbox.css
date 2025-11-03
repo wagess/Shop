@@ -70,9 +70,9 @@
 
 .mobile-nav-btn {
     position: fixed;
-    width: 60px;
-    height: 60px;
-    background: rgba(0, 0, 0, 0.7);
+    width: 40px;
+    height: 40px;
+    background: rgba(0, 0, 0, 0.5);
     border: none;
     border-radius: 50%;
     color: white;
@@ -95,19 +95,19 @@
 .mobile-prev-btn {
     left: 20px;
     top: 50%;
-    /* transform: translateY(-50%); */
+    transform: translateY(-50%);
 }
 
 .mobile-next-btn {
     right: 20px;
     top: 50%;
-    /* transform: translateY(-50%); */
+    transform: translateY(-50%);
 }
 
 .mobile-close-btn {
-    top: 20px;
+    top: 10px;
     left: 50%;
-    /* transform: translateX(-50%); */
+    transform: translateX(-50%);
 }
 
 @media (max-width: 768px) {
@@ -126,14 +126,20 @@
     }
     
     .mobile-prev-btn {
-        left: 15px;
+        left: 0px;
+        border-radius: 0 5px 5px 0;
+        width: 30px;
+        height: 100px;
     }
     
     .mobile-next-btn {
-        right: 15px;
+        right: 0px;
+        border-radius: 5px 0 0 5px;
+        width: 30px;
+        height: 100px;
     }
     
     .mobile-close-btn {
-        top: 15px;
+        bottom: 20px;        
     }
 }
