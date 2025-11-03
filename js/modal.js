@@ -193,11 +193,11 @@ export function openLightbox(imageUrl, title) {
         `;
         document.body.appendChild(lightbox);
         
-        // Charger le CSS lightbox si pas déjà présent
+        // Charger le CSS lightbox si pas déjà présent - CORRECTION DU CHEMIN
         if (!document.querySelector('link[href*="lightbox.css"]')) {
             const link = document.createElement('link');
             link.rel = 'stylesheet';
-            link.href = './css/lightbox.css';
+            link.href = './assets/styles/components/lightbox.css';
             document.head.appendChild(link);
         }
     }
