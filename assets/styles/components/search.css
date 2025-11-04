@@ -104,8 +104,9 @@
     top: calc(100% + 16px);
     left: 0;
     right: 0;
+    width: 100%;
     background: rgba(0, 0, 0, 1);
-    border-radius: 16px;
+    border-radius: 5px;
     max-height: 200px;
     overflow-y: auto;
     z-index: 1000;
@@ -114,6 +115,15 @@
     box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
     display: none;
     padding: 8px;
+}
+
+/* Version alternative plus simple pour mobile */
+@media (max-width: 768px) {
+    #searchSuggestions {
+        width: 135%;
+        left: 50%;
+        transform: translateX(-50%);
+    }
 }
 
 .suggestion-item {
