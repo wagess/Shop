@@ -58,13 +58,14 @@ async function loadHierarchy() {
         const statsEl = el('stats');
         if (statsEl) statsEl.textContent = `${shuffledCollections.length} collection${shuffledCollections.length > 1 ? 's' : ''}`;
 
-        displayGalleries(shuffledCollections);
-        loadThumbnailsForCollections(shuffledCollections);
+        // Utiliser displayGalleries avec pagination (page 1 par défaut)
+        displayGalleries(shuffledCollections, 1);
+        loadThumbnailsForCollections(shuffledCollections.slice(0, 8)); // Charger seulement les 8 premières
         renderFolders(folders);
         initSearchAutocomplete();
         initModalListeners();
 
-        hideGalleriesLoader(); // Masquer le loader après le chargement des galeries
+        hideGalleriesLoader();
 
     } catch (err) {
         console.error('loadHierarchy error', err);
@@ -89,7 +90,10 @@ function hideGalleriesLoader() {
 }
 
 async function loadThumbnailsForCollections(collections) {
-    for (const collection of collections) {
+    // Limiter aux collections actuellement visibles pour optimiser le chargement
+    const visibleCollections = collections.slice(0, 8);
+    
+    for (const collection of visibleCollections) {
         try {
             const photos = await fetchGalleryPhotos(collection.id);
             
@@ -107,7 +111,7 @@ async function loadThumbnailsForCollections(collections) {
         }
     }
     
-    console.log('✅ Tous les thumbnails sont chargés');
+    console.log('✅ Thumbnails chargés pour les premières collections');
 }
 
 function updateRandomImage(imageUrl, collectionName) {
