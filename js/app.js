@@ -46,17 +46,20 @@ async function loadHierarchy() {
         const collections = nodes.filter(n => n.id != null && n.type !== 'folder');
         const folders = nodes.filter(n => n.type === 'folder');
 
-        globalCollections = collections;
+        // Mélanger aléatoirement les collections
+        const shuffledCollections = shuffleArray([...collections]);
+        
+        globalCollections = shuffledCollections;
 
         setHierarchyData(hierarchyData);
-        setAllGalleries(collections);
+        setAllGalleries(shuffledCollections);
         setAllSearchableItems(nodes.filter(n => n.id != null));
 
         const statsEl = el('stats');
-        if (statsEl) statsEl.textContent = `${collections.length} collection${collections.length > 1 ? 's' : ''}`;
+        if (statsEl) statsEl.textContent = `${shuffledCollections.length} collection${shuffledCollections.length > 1 ? 's' : ''}`;
 
-        displayGalleries(collections);
-        loadThumbnailsForCollections(collections);
+        displayGalleries(shuffledCollections);
+        loadThumbnailsForCollections(shuffledCollections);
         renderFolders(folders);
         initSearchAutocomplete();
         initModalListeners();
@@ -67,6 +70,15 @@ async function loadHierarchy() {
         console.error('loadHierarchy error', err);
         if (container) container.innerHTML = `<div class="error-message">Erreur: ${escapeHtml(err.message)}</div>`;
     }
+}
+
+// Fonction pour mélanger un tableau (algorithme Fisher-Yates)
+function shuffleArray(array) {
+    for (let i = array.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [array[i], array[j]] = [array[j], array[i]];
+    }
+    return array;
 }
 
 function hideGalleriesLoader() {
