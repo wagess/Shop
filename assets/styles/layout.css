@@ -94,6 +94,29 @@ body::after {
     margin-bottom: 10px;
 }
 
+/* ==================== Nav button Design ==================== */
+/* Desktop */
+
+.nav-button {
+    margin: 0;
+    color: white;
+    font-size: var(--font-size-small);
+    font-weight: var(--font-weight-light);
+    background: rgba(255, 255, 255, 0.1);
+    border: none;
+    border-radius: 50px;
+    padding: 12px 20px;
+    text-decoration: none;
+    display: inline-block;
+    transition: all 0.3s ease;
+    backdrop-filter: blur(10px);
+}
+
+.nav-button:hover {
+    background: rgba(255, 255, 255, 0.2);
+    transform: translateY(-2px);
+}
+
 /* ==================== Responsive Design ==================== */
 /* Tablet Design */
 @media (max-width: 1024px) and (min-width: 769px) {
@@ -179,5 +202,32 @@ body::after {
     .galleries-grid {
         grid-template-columns: 1fr;
         gap: 15px;
+    }
+    .nav-text {
+        display: none !important;
+    }
+    
+    .nav-icon {
+        display: inline !important;
+        font-size: 18px;
+    }
+    
+    /* Affichage mobile pour les liens de navigation */
+    .nav-text {
+        display: none !important;
+    }
+    
+    .nav-icon {
+        display: inline !important;
+    }
+    
+    /* Boutons plus compacts sur mobile */
+    .nav-button {
+        padding: 10px 14px;
+        min-width: 44px;
+        min-height: 44px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
     }
 }
