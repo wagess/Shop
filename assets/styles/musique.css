@@ -1,0 +1,186 @@
+/* Modale Spotify - Style onboarding */
+.spotify-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background-color: rgba(0, 0, 0, 0.85);
+    backdrop-filter: blur(15px);
+    display: none;
+    justify-content: center;
+    align-items: center;
+    z-index: 10000; /* Plus élevé pour être au-dessus de tout */
+    animation: fadeIn 0.5s ease-out;
+}
+
+.spotify-modal-content {
+    background: linear-gradient(135deg, #191414 0%, #1db954 100%);
+    border-radius: 20px;
+    padding: 32px;
+    max-width: 480px;
+    width: 85%;
+    max-height: 80vh;
+    overflow-y: auto;
+    box-shadow: 
+        0 25px 50px rgba(0, 0, 0, 0.5),
+        0 0 0 1px rgba(255, 255, 255, 0.1);
+    animation: modalSlideIn 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+    position: relative;
+}
+
+.spotify-modal-header {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    margin-bottom: 24px;
+    position: relative;
+}
+
+.spotify-modal-header h3 {
+    margin: 0 0 8px 0;
+    color: #fff;
+    font-size: 1.4em;
+    font-weight: 700;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.spotify-modal-subtitle {
+    color: rgba(255, 255, 255, 0.8);
+    font-size: 0.9em;
+    margin: 0;
+    font-weight: 400;
+}
+
+.close-spotify-modal {
+    position: absolute;
+    top: -8px;
+    right: -8px;
+    background: rgba(255, 255, 255, 0.1);
+    border: none;
+    color: #fff;
+    cursor: pointer;
+    padding: 12px;
+    border-radius: 50%;
+    transition: all 0.3s ease;
+    opacity: 0.8;
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.close-spotify-modal:hover {
+    background-color: rgba(255, 255, 255, 0.2);
+    opacity: 1;
+    transform: scale(1.1);
+}
+
+.spotify-iframe-container {
+    margin: 24px 0;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+}
+
+.spotify-modal-actions {
+    display: flex;
+    gap: 16px;
+    justify-content: center;
+    margin-top: 24px;
+}
+
+.btn-primary, .btn-secondary {
+    padding: 12px 24px;
+    border-radius: 50px;
+    border: none;
+    cursor: pointer;
+    font-weight: 600;
+    font-size: 0.9em;
+    transition: all 0.3s ease;
+    min-width: 120px;
+}
+
+.btn-primary {
+    background: linear-gradient(45deg, #1db954, #1ed760);
+    color: white;
+    box-shadow: 0 4px 15px rgba(29, 185, 84, 0.4);
+}
+
+.btn-primary:hover {
+    background: linear-gradient(45deg, #1ed760, #21e065);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(29, 185, 84, 0.6);
+}
+
+.btn-secondary {
+    background: rgba(255, 255, 255, 0.1);
+    color: white;
+    border: 2px solid rgba(255, 255, 255, 0.2);
+    backdrop-filter: blur(10px);
+}
+
+.btn-secondary:hover {
+    background: rgba(255, 255, 255, 0.2);
+    border-color: rgba(255, 255, 255, 0.4);
+    transform: translateY(-1px);
+}
+
+/* Animations */
+@keyframes fadeIn {
+    from { 
+        opacity: 0;
+    }
+    to { 
+        opacity: 1;
+    }
+}
+
+@keyframes modalSlideIn {
+    from {
+        opacity: 0;
+        transform: scale(0.8) translateY(60px);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1) translateY(0);
+    }
+}
+
+/* Style pour empêcher le scroll du body quand la modale est ouverte */
+.modal-open {
+    overflow: hidden;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .spotify-modal-content {
+        margin: 20px;
+        padding: 24px;
+        width: calc(100% - 40px);
+    }
+    
+    .spotify-modal-actions {
+        flex-direction: column;
+        gap: 12px;
+    }
+    
+    .btn-primary, .btn-secondary {
+        width: 100%;
+        padding: 14px 24px;
+    }
+    
+    .spotify-modal-header h3 {
+        font-size: 1.2em;
+    }
+}
+
+@media (max-width: 480px) {
+    .spotify-modal-content {
+        margin: 16px;
+        padding: 20px;
+        border-radius: 16px;
+    }
+}

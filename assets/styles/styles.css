@@ -18,6 +18,7 @@
 
 /* Import des utilitaires */
 @import './utilities.css';
+@import './musique.css';
 
 .search-container-modern {
     margin: 20px auto;

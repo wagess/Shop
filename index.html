@@ -5,10 +5,29 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Shop Stéphane Wagner</title>
     <link rel="stylesheet" href="./assets/styles/styles.css">
+    <link rel="stylesheet" href="./assets/styles/musique.css">
     <!-- Favicon avec emoji -->
     <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>📸</text></svg>">
 </head>
 <body>
+    <!-- Modale Spotify -->
+    <div id="spotifyModal" class="spotify-modal">
+        <div class="spotify-modal-content">
+            <div class="spotify-modal-header">
+                <h3>🎵 Bienvenue dans mon univers</h3>
+                <p class="spotify-modal-subtitle">Écoutez ma playlist pendant que vous explorez<br><small style="opacity: 0.7;">Cliquez sur ▶️ dans le lecteur pour démarrer</small></p>
+            </div>
+            <div class="spotify-iframe-container">
+                <!-- <iframe data-testid="embed-iframe" style="border-radius:12px" src="https://open.spotify.com/embed/playlist/37i9dQZF1DX1WNn0uqbB04?utm_source=generator&theme=0&autoplay=1" width="100%" height="152" frameBorder="0" allowfullscreen="" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe> -->
+                <iframe data-testid="embed-iframe" style="border-radius:12px" src="https://open.spotify.com/embed/playlist/37i9dQZF1DX1WNn0uqbB04?utm_source=generator&theme=0" width="100%" height="352" frameBorder="0" allowfullscreen="" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>
+            </div>
+            <div class="spotify-modal-actions">
+                <button class="btn-secondary" id="closeSpotifyModal">M'accompagner en musique !</button>
+                <button class="btn-primary" id="stopSpotifyBtn">Non merci.</button>
+            </div>
+        </div>
+    </div>
+
     <!-- Header en haut de page, hors container -->
     <header style="width: 100%; padding: var(--gap-large); display: flex; justify-content: space-between; align-items: center; background: rgba(0, 0, 0, 0); position: relative; top: 0; z-index: 100;">
         
@@ -133,11 +152,148 @@
 
     <script type="module" src="js/app.js"></script>
     <script>
-        document.getElementById('scrollDownBtn').addEventListener('click', () => {
-            const galleriesContainer = document.getElementById('galleriesContainer');
-            if (galleriesContainer) {
-                galleriesContainer.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        // Gestion de la modale Spotify
+        document.addEventListener('DOMContentLoaded', function() {
+            const spotifyModal = document.getElementById('spotifyModal');
+            const closeSpotifyModal = document.getElementById('closeSpotifyModal');
+            const stopSpotifyBtn = document.getElementById('stopSpotifyBtn');
+            let floatingStopBtn = null;
+            let spotifyIframe = null;
+
+            // Afficher la modale au chargement
+            setTimeout(() => {
+                spotifyModal.style.display = 'flex';
+                document.body.classList.add('modal-open');
+                // Récupérer l'iframe
+                spotifyIframe = spotifyModal.querySelector('iframe');
+            }, 1500);
+
+            // Créer le bouton stop flottant
+            function createFloatingStopButton() {
+                floatingStopBtn = document.createElement('button');
+                floatingStopBtn.innerHTML = `
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <rect x="6" y="6" width="12" height="12" rx="1"></rect>
+                    </svg>
+                `;
+                floatingStopBtn.style.cssText = `
+                    position: fixed;
+                    bottom: 20px;
+                    right: 20px;
+                    z-index: 9999;
+                    background: linear-gradient(45deg, #1db954, #1ed760);
+                    color: white;
+                    border: none;
+                    border-radius: 50%;
+                    width: 50px;
+                    height: 50px;
+                    cursor: pointer;
+                    box-shadow: 0 4px 15px rgba(29, 185, 84, 0.4);
+                    transition: all 0.3s ease;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    opacity: 0.8;
+                `;
+
+                // Effets hover
+                floatingStopBtn.addEventListener('mouseenter', function() {
+                    this.style.opacity = '1';
+                    this.style.transform = 'scale(1.1)';
+                    this.style.boxShadow = '0 6px 20px rgba(29, 185, 84, 0.6)';
+                });
+
+                floatingStopBtn.addEventListener('mouseleave', function() {
+                    this.style.opacity = '0.8';
+                    this.style.transform = 'scale(1)';
+                    this.style.boxShadow = '0 4px 15px rgba(29, 185, 84, 0.4)';
+                });
+
+                // Clic pour arrêter la musique
+                floatingStopBtn.addEventListener('click', function() {
+                    stopMusic();
+                });
+
+                document.body.appendChild(floatingStopBtn);
             }
+
+            // Fermer la modale et tenter de démarrer la musique
+            function closeModalKeepMusic() {
+                // Tenter de démarrer la musique en rechargeant l'iframe avec autoplay
+                if (spotifyIframe) {
+                    const currentSrc = spotifyIframe.src;
+                    // Ajouter ou forcer le paramètre autoplay
+                    const newSrc = currentSrc.includes('autoplay=1') ? 
+                        currentSrc : 
+                        currentSrc + '&autoplay=1';
+                    
+                    // Recharger l'iframe pour tenter l'autoplay
+                    spotifyIframe.src = newSrc;
+                    
+                    // Essayer de simuler une interaction utilisateur sur l'iframe
+                    setTimeout(() => {
+                        try {
+                            // Créer un événement de clic sur l'iframe
+                            const clickEvent = new MouseEvent('click', {
+                                view: window,
+                                bubbles: true,
+                                cancelable: true
+                            });
+                            spotifyIframe.dispatchEvent(clickEvent);
+                        } catch (e) {
+                            console.log('Autoplay non autorisé par le navigateur');
+                        }
+                    }, 500);
+                }
+                
+                spotifyModal.style.display = 'none';
+                document.body.classList.remove('modal-open');
+                createFloatingStopButton();
+            }
+
+            // Arrêter complètement la musique
+            function stopMusic() {
+                // Arrêter l'iframe en supprimant et recréant l'élément
+                if (spotifyIframe) {
+                    const newIframe = document.createElement('iframe');
+                    newIframe.setAttribute('data-testid', 'embed-iframe');
+                    newIframe.style.borderRadius = '12px';
+                    newIframe.src = 'about:blank'; // Vider l'iframe
+                    newIframe.width = '100%';
+                    newIframe.height = '152';
+                    newIframe.frameBorder = '0';
+                    
+                    // Remplacer l'iframe dans la modale
+                    spotifyIframe.parentNode.replaceChild(newIframe, spotifyIframe);
+                    spotifyIframe = newIframe;
+                }
+                
+                spotifyModal.style.display = 'none';
+                document.body.classList.remove('modal-open');
+                
+                if (floatingStopBtn) {
+                    floatingStopBtn.remove();
+                    floatingStopBtn = null;
+                }
+            }
+
+            // Event listeners
+            closeSpotifyModal.addEventListener('click', closeModalKeepMusic);
+            stopSpotifyBtn.addEventListener('click', stopMusic);
+
+            // Fermer en cliquant sur le fond (garder la musique)
+            spotifyModal.addEventListener('click', function(e) {
+                if (e.target === spotifyModal) {
+                    closeModalKeepMusic();
+                }
+            });
+
+            // Fermer avec Escape (garder la musique)
+            document.addEventListener('keydown', function(e) {
+                if (e.key === 'Escape' && spotifyModal.style.display === 'flex') {
+                    closeModalKeepMusic();
+                }
+            });
         });
     </script>
 </body>
