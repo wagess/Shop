@@ -230,7 +230,7 @@ export function renderFolders(folders) {
 
     // HTML pour tous les dossiers
     const allFoldersHtml = `
-        <div id="foldersList" style="display:flex; justify-content:center; flex-wrap:wrap; gap:10px;">
+        <div id="foldersList" style="display:flex; justify-content:center; flex-wrap:wrap; gap:16px; padding:20px;">
             ${folders.map(f => `
                 <button class="folder-link" data-id="${f.id}" data-name="${escapeHtml(f.name||'')}" data-type="folder"
                     style="padding:8px 12px; border-radius:8px; border:none; background:rgba(255,255,255,0.06); color:white; cursor:pointer; transition: all 0.3s ease;"
@@ -289,13 +289,13 @@ export function renderFolders(folders) {
     // Afficher les favoris en haut
     if (containerTop) {
         containerTop.innerHTML = (favoriteFolders.length > 0 || favoriteCollections.length > 0) 
-            ? `<div style="color:white; margin-bottom:16px; font-weight:bold;">Favoris :</div>${favoritesHtml}`
+            ? `<div style="color:white; margin-bottom:16px; font-weight:normal;">Thèmes favoris</div>${favoritesHtml}`
             : '';
     }
     
     // Afficher toutes les catégories en bas
     if (containerBottom) {
-        containerBottom.innerHTML = `<div style="color:white; margin-bottom:8px; font-weight:bold;">Catégories :</div>${allFoldersHtml}`;
+        containerBottom.innerHTML = `<div style="color:white; margin-bottom:16px; font-weight:normal;">Toutes les catégories :</div>${allFoldersHtml}`;
     }
 
     // Fonction pour gérer le clic selon le type

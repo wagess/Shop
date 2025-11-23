@@ -192,6 +192,7 @@
 #randomImage {
     color: transparent;
     text-indent: -9999px;
+    min-width: 600px;
 }
 
 /* Placeholder avant le chargement */
