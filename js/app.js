@@ -8,10 +8,12 @@ import {
     setAllGalleries,
     setAllSearchableItems,
     showFolder,
-    displayCollectionsView
+    displayCollectionsView,
+    findNodeById,
+    selectGallery  // Importer selectGallery depuis gallery.js
 } from './gallery.js';
 import { openGallery, closeModal, orderPrint, initModalListeners } from './modal.js';
-import { initSearchAutocomplete, selectGallery } from './search.js';
+import { initSearchAutocomplete } from './search.js';  // Supprimer selectGallery d'ici
 import { loadThumbnailsForCollections } from './thumbnails.js';
 import { 
     loadRandomImage, 
@@ -26,15 +28,46 @@ window.showFolder = showFolder;
 window.displayCollectionsView = displayCollectionsView;
 window.selectGallery = selectGallery;
 
-// Variable globale pour stocker les collections
+// Variable globale pour stocker les collections - la rendre accessible globalement
 let globalCollections = [];
 
 window.onload = () => {
     loadHierarchy();
-    // Supprimer ce setTimeout qui s'exécute trop tôt
-    // setTimeout(() => {
-    //     loadRandomImageFromCollectionByName("Scènes de vie", globalCollections);
-    // }, 100);
+    
+    // Ajouter la fonctionnalité au bouton de scroll
+    const scrollBtn = document.getElementById('scrollDownBtn');
+    if (scrollBtn) {
+        scrollBtn.addEventListener('click', () => {
+            // Sauvegarder le contenu original
+            const originalContent = scrollBtn.innerHTML;
+            
+            // Afficher le spinner
+            scrollBtn.innerHTML = `
+                <div style="width: 24px; height: 24px; border: 2px solid rgba(255,255,255,0.3); border-top: 2px solid white; border-radius: 50%; animation: spin 1s linear infinite;"></div>
+                <style>
+                    @keyframes spin {
+                        0% { transform: rotate(0deg); }
+                        100% { transform: rotate(360deg); }
+                    }
+                </style>
+            `;
+            scrollBtn.style.pointerEvents = 'none';
+            
+            const galleriesContainer = document.getElementById('galleriesContainer');
+            if (galleriesContainer) {
+                galleriesContainer.scrollIntoView({ 
+                    behavior: 'smooth', 
+                    block: 'start' 
+                });
+                
+                // Restaurer le contenu original après 1.5 secondes
+                setTimeout(() => {
+                    scrollBtn.innerHTML = originalContent;
+                    scrollBtn.style.pointerEvents = 'auto';
+                }, 1500);
+            }
+        });
+    }
 };
 
 async function loadHierarchy() {
@@ -50,12 +83,25 @@ async function loadHierarchy() {
         const collections = nodes.filter(n => n.id != null && n.type !== 'folder');
         const folders = nodes.filter(n => n.type === 'folder');
 
+        // Calculer le count pour chaque folder directement depuis hierarchyData
+        folders.forEach(folder => {
+            const folderNode = findNodeById(hierarchyData, folder.id);
+            if (folderNode) {
+                const descendants = extractGalleryIds(folderNode).filter(n => n.id != null && n.type !== 'folder');
+                folder.count = descendants.length;
+                console.log(`📂 Folder "${folder.name}" contient ${folder.count} collections`);
+            }
+        });
+
         const shuffledCollections = shuffleArray([...collections]);
         globalCollections = shuffledCollections;
 
+        // Rendre globalCollections accessible partout
+        window.globalCollections = globalCollections;
+
         setHierarchyData(hierarchyData);
         setAllGalleries(shuffledCollections);
-        setAllSearchableItems(nodes.filter(n => n.id != null));
+        setAllSearchableItems([...shuffledCollections, ...folders]);
 
         const statsEl = el('stats');
         if (statsEl) statsEl.textContent = `${shuffledCollections.length} collection${shuffledCollections.length > 1 ? 's' : ''}`;
@@ -68,7 +114,6 @@ async function loadHierarchy() {
 
         hideGalleriesLoader();
 
-        // Maintenant charger l'image aléatoire APRÈS avoir chargé les collections
         console.log('📚 Collections disponibles:', globalCollections.map(c => c.name));
         await loadRandomImageFromCollectionByName("Scènes de vie", globalCollections);
 
@@ -93,6 +138,28 @@ function hideGalleriesLoader() {
     }
 }
 
+// Fonction pour recharger les thumbnails après un changement de vue
+function reloadThumbnails() {
+    const galleryCards = document.querySelectorAll('.gallery-card');
+    const visibleCollections = [];
+    
+    galleryCards.forEach((card, index) => {
+        const galleryId = card.dataset.galleryId;
+        const collection = globalCollections.find(c => c.id == galleryId);
+        if (collection && index < 8) { // Limiter aux 8 premiers visibles
+            visibleCollections.push(collection);
+        }
+    });
+    
+    console.log('🔄 Rechargement thumbnails pour:', visibleCollections.map(c => c.name));
+    if (visibleCollections.length > 0) {
+        loadThumbnailsForCollections(visibleCollections);
+    }
+}
+
 // Exposer les nouvelles fonctions globalement
 window.loadRandomImageFromCollectionByName = (name) => 
     loadRandomImageFromCollectionByName(name, globalCollections);
+
+window.reloadThumbnails = reloadThumbnails;
+window.loadThumbnailsForCollections = loadThumbnailsForCollections;

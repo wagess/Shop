@@ -110,6 +110,14 @@ export function displayGalleries(galleries, page = 1) {
 
     // Ajouter la pagination
     renderPagination(totalPages, page, galleries.length);
+
+    // À la fin de la fonction, après avoir créé les cartes
+    // Recharger les thumbnails pour la nouvelle vue
+    setTimeout(() => {
+        if (window.reloadThumbnails) {
+            window.reloadThumbnails();
+        }
+    }, 100);
 }
 
 function renderPagination(totalPages, currentPage, totalItems) {
@@ -197,22 +205,99 @@ export function renderFolders(folders) {
             ${folders.map(f => `<button class="folder-link" data-id="${f.id}" data-name="${escapeHtml(f.name||'')}" style="padding:8px 12px; border-radius:8px; border:none; background:rgba(255,255,255,0.06); color:white; cursor:pointer;">📂 ${escapeHtml(f.name)}</button>`).join('')}
         </div>
     `;
-    if (containerTop) containerTop.innerHTML = html;
+    
+    if (containerTop) containerTop.innerHTML = `<div style="color:white; margin-bottom:8px; font-weight:bold;">Dossiers :</div>${html}`;
     if (containerBottom) containerBottom.innerHTML = `<div style="color:white; margin-bottom:8px; font-weight:bold;">Dossiers :</div>${html}`;
 
     document.querySelectorAll('#foldersList .folder-link').forEach(btn => {
-        btn.addEventListener('click', () => showFolder(btn.getAttribute('data-id'), btn.getAttribute('data-name') || ''));
+        btn.addEventListener('click', () => {
+            // Sauvegarder le contenu original
+            const originalContent = btn.innerHTML;
+            const originalStyle = btn.style.cssText;
+            
+            // Ajouter le spinner à côté du texte existant
+            btn.innerHTML = `
+                <div style="display: flex; align-items: center; gap: 8px;">
+                    <div style="width: 16px; height: 16px; border: 2px solid rgba(255,255,255,0.3); border-top: 2px solid white; border-radius: 50%; animation: spin 1s linear infinite;"></div>
+                    ${originalContent}
+                </div>
+                <style>
+                    @keyframes spin {
+                        0% { transform: rotate(0deg); }
+                        100% { transform: rotate(360deg); }
+                    }
+                </style>
+            `;
+            btn.style.pointerEvents = 'none'; // Désactiver temporairement
+            
+            // Appeler la fonction showFolder
+            showFolder(btn.getAttribute('data-id'), btn.getAttribute('data-name') || '');
+            
+            // Restaurer le contenu original après 1.5 secondes
+            setTimeout(() => {
+                btn.innerHTML = originalContent;
+                btn.style.cssText = originalStyle;
+            }, 1500);
+        });
     });
 }
 
 export async function showFolder(folderId, folderName) {
-    const node = findNodeById(hierarchyData, folderId);
-    if (!node) return alert('Dossier introuvable');
-    const descendants = extractGalleryIds(node).filter(n => n.id != null && n.type !== 'folder');
-    displayGalleries(descendants, 1); // Toujours commencer à la page 1 pour un nouveau dossier
+    console.log('🔍 Recherche du dossier:', folderId, 'Type:', typeof folderId);
+    console.log('📊 Données hiérarchie disponibles:', !!hierarchyData);
+    
+    if (!hierarchyData) {
+        console.error('❌ hierarchyData non définie');
+        return alert('Données non chargées, veuillez rafraîchir la page');
+    }
+    
+    // Chercher dans allGalleries d'abord (pour les dossiers qui sont aussi des collections)
+    let node = allGalleries.find(g => String(g.id) === String(folderId));
+    
+    if (!node) {
+        // Chercher dans la hiérarchie complète
+        node = findNodeById(hierarchyData, folderId);
+    }
+    
+    if (!node) {
+        console.error('❌ Dossier introuvable avec ID:', folderId);
+        console.log('🔎 Tous les IDs disponibles:');
+        const allIds = getAllIdsFromNode(hierarchyData);
+        console.table(allIds);
+        
+        // Chercher dans allGalleries aussi
+        console.log('🔎 IDs dans allGalleries:', allGalleries.map(g => ({ id: g.id, name: g.name, type: g.type })));
+        
+        return alert(`Dossier introuvable (ID: ${folderId})`);
+    }
+    
+    console.log('✅ Dossier trouvé:', node);
+    
+    // Si c'est un dossier avec des enfants
+    let descendants = [];
+    if (node.children && Array.isArray(node.children)) {
+        descendants = extractGalleryIds(node).filter(n => n.id != null && n.type !== 'folder');
+    } else if (node.type === 'folder') {
+        // Chercher tous les éléments qui ont ce dossier comme parent
+        descendants = allGalleries.filter(g => g.parentId === node.id || g.parent === node.id);
+    } else {
+        // Si c'est une galerie unique, l'afficher
+        descendants = [node];
+    }
+    
+    console.log('📦 Collections trouvées dans le dossier:', descendants);
+    
+    if (descendants.length === 0) {
+        console.warn('⚠️ Aucune collection trouvée dans ce dossier');
+        return alert(`Aucune collection trouvée dans "${folderName}"`);
+    }
+    
+    displayGalleries(descendants, 1);
     
     // Charger les thumbnails pour ce dossier
-    await window.loadThumbnailsForCollections(descendants);
+    if (window.loadThumbnailsForCollections) {
+        await window.loadThumbnailsForCollections(descendants);
+    }
     
     const statsEl = el('stats');
     if (statsEl) statsEl.textContent = `${descendants.length} collection${descendants.length > 1 ? 's' : ''} dans "${folderName}"`;
@@ -246,8 +331,28 @@ export function displayCollectionsView() {
 
 export function findNodeById(node, id) {
     if (!node) return null;
-    if (node.id != null && node.id == id) return node;
-    const childKeys = ['children','items','galleries','collections'];
+    
+    // Gérer le cas où node est un tableau (racine de hierarchyData)
+    if (Array.isArray(node)) {
+        for (const item of node) {
+            const found = findNodeById(item, id);
+            if (found) return found;
+        }
+        return null;
+    }
+    
+    // Conversion pour gérer les types différents
+    const nodeId = String(node.id);
+    const searchId = String(id);
+    
+    console.log('🔍 Comparaison:', nodeId, '===', searchId, '?', nodeId === searchId);
+    
+    if (node.id != null && nodeId === searchId) {
+        console.log('✅ Nœud trouvé:', node);
+        return node;
+    }
+    
+    const childKeys = ['children', 'items', 'galleries', 'collections'];
     for (const k of childKeys) {
         if (node[k] && Array.isArray(node[k])) {
             for (const c of node[k]) {
@@ -256,11 +361,41 @@ export function findNodeById(node, id) {
             }
         }
     }
-    if (Array.isArray(node)) {
-        for (const it of node) {
-            const found = findNodeById(it, id);
-            if (found) return found;
-        }
-    }
     return null;
+}
+
+export function selectGallery(selectedCollection) {
+    console.log('🎯 Sélection de la collection:', selectedCollection.name);
+    
+    // Afficher la galerie sélectionnée
+    displayGalleries([selectedCollection], 1);
+    
+    // Recharger les thumbnails pour cette galerie
+    setTimeout(() => {
+        if (window.loadThumbnailsForCollections) {
+            window.loadThumbnailsForCollections([selectedCollection]);
+        }
+    }, 200);
+    
+    // Scroll vers les galeries
+    setTimeout(() => {
+        const container = el('galleriesContainer');
+        if (container) {
+            container.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+    }, 150);
+    
+    // Mettre à jour les stats
+    const statsEl = el('stats');
+    if (statsEl) {
+        statsEl.textContent = `1 collection sélectionnée`;
+    }
+    
+    // Ajouter le bouton retour
+    const existing = el('backToAll');
+    if (existing) existing.remove();
+    const container = el('galleriesContainer');
+    if (container) {
+        container.insertAdjacentHTML('afterend', `<div id="backToAll" style="margin:20px; padding:20px; text-align:center;"><a href="#" onclick="window.displayCollectionsView();return false;" style="color:white; text-decoration:underline; font-size:16px;">← Voir toutes les collections</a></div>`);
+    }
 }
