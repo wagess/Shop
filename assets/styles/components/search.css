@@ -10,6 +10,7 @@
 .search-container-modern {
     margin: 20px auto;
     width: 90%;
+    z-index: 10;
 }
 
 .search-input-wrapper {

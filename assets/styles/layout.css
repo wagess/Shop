@@ -39,6 +39,11 @@ body::after {
     vertical-align: middle;
 }
 
+#foldersContainerTop {
+    margin-bottom: var(--gap-large);
+    z-index: 0;
+}
+
 /* ==================== Header ==================== */
 .header {
     text-align: center;

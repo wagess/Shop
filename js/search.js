@@ -18,6 +18,17 @@ export function initSearchAutocomplete() {
         return;
     }
 
+    // Corriger le placement de searchSuggestions si nécessaire
+    if (suggestionsBox) {
+        const wrapper = searchInput.closest('.search-input-wrapper');
+        const container = searchInput.closest('.search-input-container');
+        
+        if (wrapper && container && container.contains(suggestionsBox)) {
+            // Déplacer searchSuggestions au bon niveau
+            wrapper.appendChild(suggestionsBox);
+        }
+    }
+
     console.log('✅ Elements trouvés');
 
     searchInput.addEventListener('input', (e) => {

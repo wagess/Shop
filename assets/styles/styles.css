@@ -20,10 +20,6 @@
 @import './utilities.css';
 @import './musique.css';
 
-.search-container-modern {
-    margin: 20px auto;
-    max-width: 600px;
-}
 
 .search-input-wrapper {
     background: rgba(255, 255, 255, 0.1);
