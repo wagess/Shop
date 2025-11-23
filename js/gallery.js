@@ -2,11 +2,11 @@ import { el, escapeHtml, escapeJs } from './utils.js';
 
 // Configuration des thématiques favorites
 const FAVORITE_FOLDERS = [
-    { id: 'bestof', name: 'Best Of', icon: '⭐' },
-    { id: 'paysages', name: 'Paysages', icon: '🏔️' },
-    { id: 'portraits', name: 'Portraits', icon: '👤' },
-    { id: 'tango', name: 'Tango', icon: '🌿' },
-    { id: 'voyages', name: 'Voyages', icon: '🏙️' }
+    { id: '67', name: 'Scènes de vie', icon: '⭐', type: 'collection' },
+    { id: 'paysages', name: 'Paysages', icon: '🏔️', type: 'folder' },
+    { id: 'portraits', name: 'Portraits', icon: '👤', type: 'folder' },
+    { id: 'tango', name: 'Tango', icon: '🌿', type: 'folder' },
+    { id: 'voyages', name: 'Voyages', icon: '🏙️', type: 'folder' },
 ];
 
 export let allGalleries = [];
@@ -209,11 +209,22 @@ export function renderFolders(folders) {
         return;
     }
 
-    // Dossiers favoris basés sur la configuration
+    // Séparer favoris dossiers et collections
     const favoriteFolders = folders.filter(f => 
         FAVORITE_FOLDERS.some(fav => 
-            fav.id.toString().toLowerCase() === f.id.toString().toLowerCase() || 
-            fav.id.toLowerCase() === f.name?.toLowerCase()
+            fav.type === 'folder' && (
+                fav.id.toString().toLowerCase() === f.id.toString().toLowerCase() || 
+                fav.id.toLowerCase() === f.name?.toLowerCase()
+            )
+        )
+    );
+    
+    const favoriteCollections = allGalleries.filter(g => 
+        FAVORITE_FOLDERS.some(fav => 
+            fav.type === 'collection' && (
+                fav.id.toString() === g.id.toString() || 
+                fav.id.toLowerCase() === g.name?.toLowerCase()
+            )
         )
     );
 
@@ -221,7 +232,7 @@ export function renderFolders(folders) {
     const allFoldersHtml = `
         <div id="foldersList" style="display:flex; justify-content:center; flex-wrap:wrap; gap:10px;">
             ${folders.map(f => `
-                <button class="folder-link" data-id="${f.id}" data-name="${escapeHtml(f.name||'')}" 
+                <button class="folder-link" data-id="${f.id}" data-name="${escapeHtml(f.name||'')}" data-type="folder"
                     style="padding:8px 12px; border-radius:8px; border:none; background:rgba(255,255,255,0.06); color:white; cursor:pointer; transition: all 0.3s ease;"
                     onmouseover="this.style.background='rgba(255,255,255,0.15)'; this.style.transform='translateY(-2px)'; this.style.boxShadow='0 4px 12px rgba(0,0,0,0.3)';"
                     onmouseout="this.style.background='rgba(255,255,255,0.06)'; this.style.transform='translateY(0)'; this.style.boxShadow='none';">
@@ -231,19 +242,40 @@ export function renderFolders(folders) {
         </div>
     `;
 
-    // HTML pour les dossiers favoris avec icônes personnalisées
-    const favoriteFoldersHtml = favoriteFolders.length > 0 ? `
-        <div id="favoriteFoldersList" style="display:flex; justify-content:center; flex-wrap:wrap; gap:10px;">
+    // HTML pour les favoris (dossiers + collections) avec icônes personnalisées
+    const favoritesHtml = (favoriteFolders.length > 0 || favoriteCollections.length > 0) ? `
+        <div id="favoritesList" style="display:flex; justify-content:center; flex-wrap:wrap; gap:10px;">
             ${favoriteFolders.map(f => {
                 const favConfig = FAVORITE_FOLDERS.find(fav => 
-                    fav.id.toString().toLowerCase() === f.id.toString().toLowerCase() || 
-                    fav.id.toLowerCase() === f.name?.toLowerCase()
+                    fav.type === 'folder' && (
+                        fav.id.toString().toLowerCase() === f.id.toString().toLowerCase() || 
+                        fav.id.toLowerCase() === f.name?.toLowerCase()
+                    )
                 );
                 const icon = favConfig?.icon || '📂';
                 const displayName = favConfig?.name || f.name;
                 
                 return `
-                    <button class="folder-link" data-id="${f.id}" data-name="${escapeHtml(f.name||'')}" 
+                    <button class="favorite-item" data-id="${f.id}" data-name="${escapeHtml(f.name||'')}" data-type="folder"
+                        style="padding:12px 16px; border-radius:8px; border:none; background:rgba(255,255,255,0.06); color:white; cursor:pointer; transition: all 0.3s ease;"
+                        onmouseover="this.style.background='rgba(255,255,255,0.15)'; this.style.transform='translateY(-2px)'; this.style.boxShadow='0 4px 12px rgba(0,0,0,0.3)';"
+                        onmouseout="this.style.background='rgba(255,255,255,0.06)'; this.style.transform='translateY(0)'; this.style.boxShadow='none';">
+                        ${icon} ${escapeHtml(displayName)}
+                    </button>
+                `;
+            }).join('')}
+            ${favoriteCollections.map(c => {
+                const favConfig = FAVORITE_FOLDERS.find(fav => 
+                    fav.type === 'collection' && (
+                        fav.id.toString() === c.id.toString() || 
+                        fav.id.toLowerCase() === c.name?.toLowerCase()
+                    )
+                );
+                const icon = favConfig?.icon || '🎨';
+                const displayName = favConfig?.name || c.name;
+                
+                return `
+                    <button class="favorite-item" data-id="${c.id}" data-name="${escapeHtml(c.name||'')}" data-type="collection"
                         style="padding:12px 16px; border-radius:8px; border:none; background:rgba(255,255,255,0.06); color:white; cursor:pointer; transition: all 0.3s ease;"
                         onmouseover="this.style.background='rgba(255,255,255,0.15)'; this.style.transform='translateY(-2px)'; this.style.boxShadow='0 4px 12px rgba(0,0,0,0.3)';"
                         onmouseout="this.style.background='rgba(255,255,255,0.06)'; this.style.transform='translateY(0)'; this.style.boxShadow='none';">
@@ -256,8 +288,8 @@ export function renderFolders(folders) {
     
     // Afficher les favoris en haut
     if (containerTop) {
-        containerTop.innerHTML = favoriteFolders.length > 0 
-            ? `<div style="color:white; margin-bottom:16px; font-weight:bold;">Thématiques favorites :</div>${favoriteFoldersHtml}`
+        containerTop.innerHTML = (favoriteFolders.length > 0 || favoriteCollections.length > 0) 
+            ? `<div style="color:white; margin-bottom:16px; font-weight:bold;">Favoris :</div>${favoritesHtml}`
             : '';
     }
     
@@ -266,37 +298,54 @@ export function renderFolders(folders) {
         containerBottom.innerHTML = `<div style="color:white; margin-bottom:8px; font-weight:bold;">Catégories :</div>${allFoldersHtml}`;
     }
 
-    // Ajouter les événements pour tous les boutons
-    document.querySelectorAll('#foldersList .folder-link, #favoriteFoldersList .folder-link').forEach(btn => {
-        btn.addEventListener('click', () => {
-            // Sauvegarder le contenu original
-            const originalContent = btn.innerHTML;
-            const originalStyle = btn.style.cssText;
-            
-            // Ajouter le spinner à côté du texte existant
-            btn.innerHTML = `
-                <div style="display: flex; align-items: center; gap: 8px;">
-                    <div style="width: 16px; height: 16px; border: 2px solid rgba(255,255,255,0.3); border-top: 2px solid white; border-radius: 50%; animation: spin 1s linear infinite;"></div>
-                    ${originalContent}
-                </div>
-                <style>
-                    @keyframes spin {
-                        0% { transform: rotate(0deg); }
-                        100% { transform: rotate(360deg); }
-                    }
-                </style>
-            `;
-            btn.style.pointerEvents = 'none'; // Désactiver temporairement
-            
-            // Appeler la fonction showFolder
-            showFolder(btn.getAttribute('data-id'), btn.getAttribute('data-name') || '');
-            
-            // Restaurer le contenu original après 1.5 secondes
-            setTimeout(() => {
-                btn.innerHTML = originalContent;
-                btn.style.cssText = originalStyle;
-            }, 1500);
-        });
+    // Fonction pour gérer le clic selon le type
+    function handleItemClick(btn) {
+        const type = btn.getAttribute('data-type');
+        const id = btn.getAttribute('data-id');
+        const name = btn.getAttribute('data-name') || '';
+        
+        // Sauvegarder le contenu original
+        const originalContent = btn.innerHTML;
+        const originalStyle = btn.style.cssText;
+        
+        // Ajouter le spinner
+        btn.innerHTML = `
+            <div style="display: flex; align-items: center; gap: 8px;">
+                <div style="width: 16px; height: 16px; border: 2px solid rgba(255,255,255,0.3); border-top: 2px solid white; border-radius: 50%; animation: spin 1s linear infinite;"></div>
+                ${originalContent}
+            </div>
+            <style>
+                @keyframes spin {
+                    0% { transform: rotate(0deg); }
+                    100% { transform: rotate(360deg); }
+                }
+            </style>
+        `;
+        btn.style.pointerEvents = 'none';
+        
+        // Appeler la bonne fonction selon le type
+        if (type === 'collection') {
+            // Ouvrir directement l'album de la collection
+            window.openGallery(id, name);
+        } else {
+            // Afficher le dossier
+            showFolder(id, name);
+        }
+        
+        // Restaurer le contenu original
+        setTimeout(() => {
+            btn.innerHTML = originalContent;
+            btn.style.cssText = originalStyle;
+        }, 1500);
+    }
+
+    // Ajouter les événements
+    document.querySelectorAll('#foldersList .folder-link').forEach(btn => {
+        btn.addEventListener('click', () => handleItemClick(btn));
+    });
+    
+    document.querySelectorAll('#favoritesList .favorite-item').forEach(btn => {
+        btn.addEventListener('click', () => handleItemClick(btn));
     });
 }
 

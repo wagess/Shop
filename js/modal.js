@@ -23,8 +23,7 @@ export async function openGallery(galleryId, galleryName) {
         }
         
         // Mettre à jour le titre avec le nombre de photos
-        title.textContent = `${galleryName} (${photos.length} photo${photos.length > 1 ? 's' : ''})`;
-        
+        title.innerHTML = `${escapeHtml(galleryName)} <span class="photo-count">(${photos.length} photo${photos.length > 1 ? 's' : ''})</span> <span class="gallery-id">- ID: ${galleryId}</span>`;
         displayPhotos(photos);
     } catch (err) {
         console.error('openGallery error', err);
