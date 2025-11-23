@@ -8,15 +8,23 @@ export async function openGallery(galleryId, galleryName) {
     if (!modal || !title || !grid) return;
 
     modal.style.display = 'block';
+    
+    // Supprimer le bouton retour du titre - juste afficher le nom de la galerie
     title.textContent = galleryName;
+    
     grid.innerHTML = '<div class="loading"><div class="spinner"></div>Chargement des photos...</div>';
 
     try {
         const photos = await fetchGalleryPhotos(galleryId);
         if (!photos || photos.length === 0) {
             grid.innerHTML = '<div class="loading">Aucune photo dans cette galerie</div>';
+            title.textContent = `${galleryName} (0 photo)`;
             return;
         }
+        
+        // Mettre à jour le titre avec le nombre de photos
+        title.textContent = `${galleryName} (${photos.length} photo${photos.length > 1 ? 's' : ''})`;
+        
         displayPhotos(photos);
     } catch (err) {
         console.error('openGallery error', err);
@@ -555,11 +563,15 @@ export function closeLightbox() {
 
 export function initModalListeners() {
     const closeBtn = el('closeModalBtn');
-    if (closeBtn) closeBtn.addEventListener('click', closeModal);
+    if (closeBtn) closeBtn.addEventListener('click', () => {
+        closeModal();
+        window.displayCollectionsView();
+    });
     document.addEventListener('keydown', e => { 
         if (e.key === 'Escape') {
             closeLightbox();
             closeModal();
+            window.displayCollectionsView();
         } else if (e.key === 'ArrowLeft') {
             navigateToPhoto('prev');
         } else if (e.key === 'ArrowRight') {

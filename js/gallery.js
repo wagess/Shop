@@ -1,5 +1,14 @@
 import { el, escapeHtml, escapeJs } from './utils.js';
 
+// Configuration des thématiques favorites
+const FAVORITE_FOLDERS = [
+    { id: 'bestof', name: 'Best Of', icon: '⭐' },
+    { id: 'paysages', name: 'Paysages', icon: '🏔️' },
+    { id: 'portraits', name: 'Portraits', icon: '👤' },
+    { id: 'tango', name: 'Tango', icon: '🌿' },
+    { id: 'voyages', name: 'Voyages', icon: '🏙️' }
+];
+
 export let allGalleries = [];
 export let hierarchyData = null;
 export let allSearchableItems = [];
@@ -200,16 +209,65 @@ export function renderFolders(folders) {
         return;
     }
 
-    const html = `
+    // Dossiers favoris basés sur la configuration
+    const favoriteFolders = folders.filter(f => 
+        FAVORITE_FOLDERS.some(fav => 
+            fav.id.toString().toLowerCase() === f.id.toString().toLowerCase() || 
+            fav.id.toLowerCase() === f.name?.toLowerCase()
+        )
+    );
+
+    // HTML pour tous les dossiers
+    const allFoldersHtml = `
         <div id="foldersList" style="display:flex; justify-content:center; flex-wrap:wrap; gap:10px;">
-            ${folders.map(f => `<button class="folder-link" data-id="${f.id}" data-name="${escapeHtml(f.name||'')}" style="padding:8px 12px; border-radius:8px; border:none; background:rgba(255,255,255,0.06); color:white; cursor:pointer;">📂 ${escapeHtml(f.name)}</button>`).join('')}
+            ${folders.map(f => `
+                <button class="folder-link" data-id="${f.id}" data-name="${escapeHtml(f.name||'')}" 
+                    style="padding:8px 12px; border-radius:8px; border:none; background:rgba(255,255,255,0.06); color:white; cursor:pointer; transition: all 0.3s ease;"
+                    onmouseover="this.style.background='rgba(255,255,255,0.15)'; this.style.transform='translateY(-2px)'; this.style.boxShadow='0 4px 12px rgba(0,0,0,0.3)';"
+                    onmouseout="this.style.background='rgba(255,255,255,0.06)'; this.style.transform='translateY(0)'; this.style.boxShadow='none';">
+                    📂 ${escapeHtml(f.name)}
+                </button>
+            `).join('')}
         </div>
     `;
-    
-    if (containerTop) containerTop.innerHTML = `<div style="color:white; margin-bottom:8px; font-weight:bold;">Dossiers :</div>${html}`;
-    if (containerBottom) containerBottom.innerHTML = `<div style="color:white; margin-bottom:8px; font-weight:bold;">Dossiers :</div>${html}`;
 
-    document.querySelectorAll('#foldersList .folder-link').forEach(btn => {
+    // HTML pour les dossiers favoris avec icônes personnalisées
+    const favoriteFoldersHtml = favoriteFolders.length > 0 ? `
+        <div id="favoriteFoldersList" style="display:flex; justify-content:center; flex-wrap:wrap; gap:10px;">
+            ${favoriteFolders.map(f => {
+                const favConfig = FAVORITE_FOLDERS.find(fav => 
+                    fav.id.toString().toLowerCase() === f.id.toString().toLowerCase() || 
+                    fav.id.toLowerCase() === f.name?.toLowerCase()
+                );
+                const icon = favConfig?.icon || '📂';
+                const displayName = favConfig?.name || f.name;
+                
+                return `
+                    <button class="folder-link" data-id="${f.id}" data-name="${escapeHtml(f.name||'')}" 
+                        style="padding:12px 16px; border-radius:8px; border:none; background:rgba(255,255,255,0.06); color:white; cursor:pointer; transition: all 0.3s ease;"
+                        onmouseover="this.style.background='rgba(255,255,255,0.15)'; this.style.transform='translateY(-2px)'; this.style.boxShadow='0 4px 12px rgba(0,0,0,0.3)';"
+                        onmouseout="this.style.background='rgba(255,255,255,0.06)'; this.style.transform='translateY(0)'; this.style.boxShadow='none';">
+                        ${icon} ${escapeHtml(displayName)}
+                    </button>
+                `;
+            }).join('')}
+        </div>
+    ` : '';
+    
+    // Afficher les favoris en haut
+    if (containerTop) {
+        containerTop.innerHTML = favoriteFolders.length > 0 
+            ? `<div style="color:white; margin-bottom:16px; font-weight:bold;">Thématiques favorites :</div>${favoriteFoldersHtml}`
+            : '';
+    }
+    
+    // Afficher toutes les catégories en bas
+    if (containerBottom) {
+        containerBottom.innerHTML = `<div style="color:white; margin-bottom:8px; font-weight:bold;">Catégories :</div>${allFoldersHtml}`;
+    }
+
+    // Ajouter les événements pour tous les boutons
+    document.querySelectorAll('#foldersList .folder-link, #favoriteFoldersList .folder-link').forEach(btn => {
         btn.addEventListener('click', () => {
             // Sauvegarder le contenu original
             const originalContent = btn.innerHTML;
@@ -306,7 +364,7 @@ export async function showFolder(folderId, folderName) {
     if (existing) existing.remove();
     const container = el('galleriesContainer');
     if (container) {
-        container.insertAdjacentHTML('afterend', `<div id="backToAll" style="margin:20px; padding:20px; text-align:center;"><a href="#" onclick="window.displayCollectionsView();return false;" style="color:white; text-decoration:underline; font-size:16px;">← Voir toutes les collections</a></div>`);
+        container.insertAdjacentHTML('afterend', `<div id="backToAll" style="margin:20px; padding:20px; text-align:center;"><a href="#" onclick="window.displayCollectionsView();return false;" style="color:white; text-decoration:underline; font-size:16px;">← Retour à l'accueil</a></div>`);
     }
     
     // Scroll down vers les galeries après un petit délai
@@ -327,6 +385,9 @@ export function displayCollectionsView() {
     
     const searchInput = el('searchInput');
     if (searchInput) searchInput.value = '';
+    
+    // Scroll vers le haut de la page
+    window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
 export function findNodeById(node, id) {
@@ -396,6 +457,6 @@ export function selectGallery(selectedCollection) {
     if (existing) existing.remove();
     const container = el('galleriesContainer');
     if (container) {
-        container.insertAdjacentHTML('afterend', `<div id="backToAll" style="margin:20px; padding:20px; text-align:center;"><a href="#" onclick="window.displayCollectionsView();return false;" style="color:white; text-decoration:underline; font-size:16px;">← Voir toutes les collections</a></div>`);
+        container.insertAdjacentHTML('afterend', `<div id="backToAll" style="margin:20px; padding:20px; text-align:center;"><a href="#" onclick="window.displayCollectionsView();return false;" style="color:white; text-decoration:underline; font-size:16px;">← Retour à l'accueil</a></div>`);
     }
 }
