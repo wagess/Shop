@@ -116,6 +116,11 @@ async function loadHierarchy() {
 
         console.log('📚 Collections disponibles:', globalCollections.map(c => c.name));
         await loadRandomImageFromCollectionByName("Scènes de vie", globalCollections);
+        
+        // Test direct pour afficher les infos
+        setTimeout(() => {
+            updateImageInfo("Scènes de vie", "Test Image");
+        }, 1000);
 
     } catch (err) {
         console.error('loadHierarchy error', err);
@@ -157,9 +162,40 @@ function reloadThumbnails() {
     }
 }
 
+// Nouvelle fonction pour mettre à jour les informations de l'image
+function updateImageInfo(collectionName) {
+    const imageInfo = document.getElementById('imageInfo');
+    const collectionNameEl = document.getElementById('collectionName');
+    
+    console.log('📝 Tentative mise à jour info image:', { collectionName });
+    
+    if (imageInfo && collectionNameEl) {
+        collectionNameEl.textContent = 'Collection : ' + collectionName;
+        
+        // Forcer l'affichage
+        imageInfo.style.display = 'block';
+        imageInfo.style.visibility = 'visible';
+        imageInfo.style.opacity = '1';
+        
+        console.log('✅ Informations mises à jour');
+    } else {
+        console.error('❌ Éléments non trouvés:', { imageInfo, collectionNameEl });
+    }
+}
+
 // Exposer les nouvelles fonctions globalement
-window.loadRandomImageFromCollectionByName = (name) => 
-    loadRandomImageFromCollectionByName(name, globalCollections);
+window.loadRandomImageFromCollectionByName = async (name) => {
+    try {
+        const result = await loadRandomImageFromCollectionByName(name, globalCollections);
+        // Afficher seulement le nom de la collection
+        updateImageInfo(name);
+    } catch (error) {
+        console.error('Erreur lors du chargement de l\'image:', error);
+    }
+};
+
+// Exposer la fonction updateImageInfo globalement
+window.updateImageInfo = updateImageInfo;
 
 window.reloadThumbnails = reloadThumbnails;
 window.loadThumbnailsForCollections = loadThumbnailsForCollections;
