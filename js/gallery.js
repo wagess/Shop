@@ -1,5 +1,4 @@
 import { el, escapeHtml, escapeJs } from './utils.js';
-import { loadThumbnailsForCollections } from './app.js';
 
 export let allGalleries = [];
 export let hierarchyData = null;

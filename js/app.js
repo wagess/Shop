@@ -1,5 +1,5 @@
 import { el, escapeHtml } from './utils.js';
-import { fetchHierarchy, fetchGalleryPhotos } from './api.js';
+import { fetchHierarchy } from './api.js';
 import { 
     extractGalleryIds, 
     displayGalleries, 
@@ -12,6 +12,11 @@ import {
 } from './gallery.js';
 import { openGallery, closeModal, orderPrint, initModalListeners } from './modal.js';
 import { initSearchAutocomplete, selectGallery } from './search.js';
+import { loadThumbnailsForCollections } from './thumbnails.js';
+import { 
+    loadRandomImage, 
+    loadRandomImageFromCollectionByName 
+} from './images.js';
 
 // Expose global functions for onclick handlers
 window.openGallery = openGallery;
@@ -26,11 +31,10 @@ let globalCollections = [];
 
 window.onload = () => {
     loadHierarchy();
-    
-    // Attendre un petit délai pour s'assurer que le DOM est prêt
-    setTimeout(() => {
-        loadRandomImage();
-    }, 100);
+    // Supprimer ce setTimeout qui s'exécute trop tôt
+    // setTimeout(() => {
+    //     loadRandomImageFromCollectionByName("Scènes de vie", globalCollections);
+    // }, 100);
 };
 
 async function loadHierarchy() {
@@ -46,9 +50,7 @@ async function loadHierarchy() {
         const collections = nodes.filter(n => n.id != null && n.type !== 'folder');
         const folders = nodes.filter(n => n.type === 'folder');
 
-        // Mélanger aléatoirement les collections
         const shuffledCollections = shuffleArray([...collections]);
-        
         globalCollections = shuffledCollections;
 
         setHierarchyData(hierarchyData);
@@ -58,14 +60,17 @@ async function loadHierarchy() {
         const statsEl = el('stats');
         if (statsEl) statsEl.textContent = `${shuffledCollections.length} collection${shuffledCollections.length > 1 ? 's' : ''}`;
 
-        // Utiliser displayGalleries avec pagination (page 1 par défaut)
         displayGalleries(shuffledCollections, 1);
-        loadThumbnailsForCollections(shuffledCollections.slice(0, 8)); // Charger seulement les 8 premières
+        loadThumbnailsForCollections(shuffledCollections.slice(0, 8));
         renderFolders(folders);
         initSearchAutocomplete();
         initModalListeners();
 
         hideGalleriesLoader();
+
+        // Maintenant charger l'image aléatoire APRÈS avoir chargé les collections
+        console.log('📚 Collections disponibles:', globalCollections.map(c => c.name));
+        await loadRandomImageFromCollectionByName("Scènes de vie", globalCollections);
 
     } catch (err) {
         console.error('loadHierarchy error', err);
@@ -73,7 +78,6 @@ async function loadHierarchy() {
     }
 }
 
-// Fonction pour mélanger un tableau (algorithme Fisher-Yates)
 function shuffleArray(array) {
     for (let i = array.length - 1; i > 0; i--) {
         const j = Math.floor(Math.random() * (i + 1));
@@ -89,135 +93,6 @@ function hideGalleriesLoader() {
     }
 }
 
-async function loadThumbnailsForCollections(collections) {
-    // Limiter aux collections actuellement visibles pour optimiser le chargement
-    const visibleCollections = collections.slice(0, 8);
-    
-    for (const collection of visibleCollections) {
-        try {
-            const photos = await fetchGalleryPhotos(collection.id);
-            
-            if (photos && Array.isArray(photos) && photos.length > 0) {
-                // Extraire les URLs des thumbnails
-                collection.thumbnails = photos.slice(0, 4).map(photo => 
-                    photo.thumbnail || photo.thumb || photo.url_thumb || photo.sizes?.thumbnail || photo.url
-                );
-                
-                // Mettre à jour l'affichage de cette collection
-                updateCollectionThumbnails(collection);
-            }
-        } catch (err) {
-            console.error(`Erreur chargement thumbnails pour ${collection.name}:`, err);
-        }
-    }
-    
-    console.log('✅ Thumbnails chargés pour les premières collections');
-}
-
-function updateRandomImage(imageUrl, collectionName) {
-    const randomImageEl = el('randomImage');
-    if (!randomImageEl) return;
-    
-    randomImageEl.style.opacity = '0';
-    
-    randomImageEl.onload = () => {
-        randomImageEl.style.opacity = '1';
-    };
-    
-    randomImageEl.src = imageUrl;
-    randomImageEl.alt = `Image de ${collectionName}`;
-}
-
-function updateCollectionThumbnails(collection) {
-    if (!collection.thumbnails || collection.thumbnails.length === 0) return;
-    
-    const card = document.querySelector(`.gallery-card[onclick*="openGallery(${collection.id}"]`);
-    if (!card) return;
-    
-    const cover = card.querySelector('.gallery-cover');
-    if (!cover) return;
-    
-    const thumbs = collection.thumbnails.slice(0, 4);
-    cover.innerHTML = `
-        <div class="gallery-mosaic" style="opacity: 0; transition: opacity 0.5s ease-in;">
-            ${thumbs.map(thumb => `
-                <div class="mosaic-item" style="background-image: url('${escapeHtml(thumb)}')"></div>
-            `).join('')}
-        </div>
-    `;
-    
-    // Déclencher le fade-in après un court délai
-    setTimeout(() => {
-        const mosaic = cover.querySelector('.gallery-mosaic');
-        if (mosaic) mosaic.style.opacity = '1';
-    }, 10);
-}
-
-async function loadRandomImage() {
-    const randomImageEl = el('randomImage');
-    console.log('🔍 Element randomImage trouvé:', !!randomImageEl);
-    
-    if (!randomImageEl) {
-        console.error('❌ Element randomImage non trouvé dans le DOM');
-        return;
-    }
-
-    console.log('🔄 Chargement d\'une image aléatoire...');
-
-    try {
-        const timestamp = Date.now();
-        // Changer l'URL pour pointer vers votre WordPress
-        const wordpressUrl = 'https://www.photographie.stephanewagner.com'; // ou l'URL de votre WordPress
-        const response = await fetch(`${wordpressUrl}/wp-json/wplr-iptc/v1/random-image?size=large&t=${timestamp}`);
-        
-        if (!response.ok) {
-            console.error('❌ Erreur HTTP:', response.status, response.statusText);
-            return;
-        }
-        
-        const imageData = await response.json();
-        console.log('📨 Image reçue:', imageData.title, imageData.url);
-        
-        if (imageData.url) {
-            updateBackgroundImage(imageData.url);
-            
-            randomImageEl.style.opacity = '0.3';
-            
-            randomImageEl.onload = () => {
-                console.log('✅ Image chargée avec succès');
-                randomImageEl.style.opacity = '1';
-            };
-            
-            randomImageEl.src = imageData.url;
-            randomImageEl.alt = imageData.alt || imageData.title || 'Image aléatoire';
-        }
-    } catch (err) {
-        console.error('❌ Erreur:', err);
-    }
-}
-
-function updateBackgroundImage(imageUrl) {
-    // Mettre à jour le background du body::before
-    const style = document.createElement('style');
-    style.textContent = `
-        body::before {
-            background-image: url('${imageUrl}') !important;
-        }
-    `;
-    
-    // Supprimer l'ancien style s'il existe
-    const oldStyle = document.getElementById('dynamic-background');
-    if (oldStyle) {
-        oldStyle.remove();
-    }
-    
-    style.id = 'dynamic-background';
-    document.head.appendChild(style);
-}
-
-// Exposer les fonctions globalement
-window.loadRandomImage = loadRandomImage;
-window.loadThumbnailsForCollections = loadThumbnailsForCollections;
-
-// Export pour les modules ES6
-export { loadThumbnailsForCollections, updateCollectionThumbnails };
+// Exposer les nouvelles fonctions globalement
+window.loadRandomImageFromCollectionByName = (name) => 
+    loadRandomImageFromCollectionByName(name, globalCollections);
