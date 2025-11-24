@@ -18,6 +18,22 @@ export function initSearchAutocomplete() {
         return;
     }
 
+    // Ajouter l'événement de scroll sur focus pour mobile
+    searchInput.addEventListener('focus', () => {
+        // Vérifier si on est en mobile (largeur d'écran < 768px)
+        if (window.innerWidth < 768) {
+            const searchContainer = searchInput.closest('.search-container-modern');
+            if (searchContainer) {
+                setTimeout(() => {
+                    searchContainer.scrollIntoView({ 
+                        behavior: 'smooth', 
+                        block: 'start' 
+                    });
+                }, 100); // Petit délai pour laisser le clavier mobile s'ouvrir
+            }
+        }
+    });
+
     // Corriger le placement de searchSuggestions si nécessaire
     if (suggestionsBox) {
         const wrapper = searchInput.closest('.search-input-wrapper');
