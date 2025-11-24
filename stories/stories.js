@@ -4,7 +4,7 @@
 // Données des stories
 const stories = {
     nature: {
-        title: "Évasion Nature",
+        title: "Évasion en Nature",
         description: "Une immersion dans les paysages sauvages",
         date: "Mars 2024",
         photos: 5,

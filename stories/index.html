@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Exposition Photo - Mes Stories</title>
+    <!-- Meta tags réseaux sociaux ici... -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://votre-site.com/">
+    <meta property="og:title" content="Exposition Photo - Histoires Visuelles">
+    <meta property="og:description" content="Découvrez mes histoires photographiques immersives">
+    <meta property="og:image" content="https://images.unsplash.com/photo-1452587925148-ce544e77e70d?w=1200">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Exposition Photo">
+    <meta name="twitter:description" content="Mes histoires visuelles">
+    <meta name="twitter:image" content="https://images.unsplash.com/photo-1452587925148-ce544e77e70d?w=1200">
+    <meta name="theme-color" content="#1a1a2e">
+    <link rel="stylesheet" href="stories.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Exposition Photo</h1>
+            <p class="subtitle">Découvrez mes histoires visuelles à travers des collections photographiques immersives</p>
+        </header>
+        <div class="gallery" id="gallery"></div>
+    </div>
+    <!-- Stories Viewer -->
+    <div class="stories-viewer" id="storiesViewer">
+        <div class="story-header">
+            <div class="story-actions">
+                <button class="story-close" id="closeBtn" title="Fermer">×</button>
+            </div>
+            <div class="story-progress" id="storyProgress"></div>
+            <div class="story-actions">
+                <button class="story-btn" id="shareBtn" title="Partager">🔗</button>
+            </div>
+        </div>
+        <div class="story-content">
+            <div class="story-slides" id="storySlides"></div>
+            <button class="nav-btn prev-btn" id="prevSlideBtn">‹</button>
+            <button class="nav-btn next-btn" id="nextSlideBtn">›</button>
+        </div>
+        <!-- Share Options -->
+        <div class="share-options" id="shareOptions">
+            <div class="share-option native" data-platform="native"><i>🔗</i> <span>Partager...</span></div>
+            <div class="share-option facebook" data-platform="facebook"><i>f</i> <span>Facebook</span></div>
+            <div class="share-option twitter" data-platform="twitter"><i>🐦</i> <span>Twitter</span></div>
+            <div class="share-option instagram" data-platform="instagram"><i>📷</i> <span>Instagram</span></div>
+            <div class="share-option whatsapp" data-platform="whatsapp"><i>💬</i> <span>WhatsApp</span></div>
+            <div class="share-option linkedin" data-platform="linkedin"><i>in</i> <span>LinkedIn</span></div>
+            <div class="share-option copy" data-platform="copy"><i>📋</i> <span>Copier le lien</span></div>
+        </div>
+    </div>
+    <div class="toast" id="toast"></div>
+    <script src="stories.js"></script>
+</body>
+</html>
