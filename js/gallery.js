@@ -3,10 +3,10 @@ import { el, escapeHtml, escapeJs } from './utils.js';
 // Configuration des thématiques favorites
 const FAVORITE_FOLDERS = [
     { id: '67', name: 'Scènes de vie', icon: '⭐', type: 'collection' },
-    { id: 'paysages', name: 'Paysages', icon: '🏔️', type: 'folder' },
+    { id: '73', name: 'Paysages', icon: '🏔️', type: 'collection' },
     { id: 'portraits', name: 'Portraits', icon: '👤', type: 'folder' },
-    { id: 'tango', name: 'Tango', icon: '🌿', type: 'folder' },
-    { id: 'voyages', name: 'Voyages', icon: '🏙️', type: 'folder' },
+    { id: 'tango', name: 'Tango', icon: '💃', type: 'folder' },
+    { id: 'voyages', name: 'Voyages', icon: '✈️', type: 'folder' },
 ];
 
 export let allGalleries = [];
