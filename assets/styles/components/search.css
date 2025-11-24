@@ -121,7 +121,7 @@
 /* Version alternative plus simple pour mobile */
 @media (max-width: 768px) {
     #searchSuggestions {
-        width: 135%;
+        width: 100%;
         left: 50%;
         transform: translateX(-50%);
     }
