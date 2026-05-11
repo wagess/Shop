@@ -1,5 +1,5 @@
 import { el, escapeHtml, escapeJs } from './utils.js';
-import { fetchGalleryPhotos, fetchPhotoKeywords } from './api.js';
+import { fetchGalleryPhotos, fetchPhotoKeywords, sendOrderEmail } from './api.js';
 
 export async function openGallery(galleryId, galleryName) {
     const modal = el('photosModal');
@@ -178,20 +178,202 @@ export function closeModal() {
 }
 
 export function orderPrint(title, imageUrl, photoId) {
-    const to = 'wagess@gmail.com';
-    const subject = `Commande impression: ${title}`;
-    const body = `Bonjour,
+    showOrderForm(title, imageUrl, photoId);
+}
 
-Je souhaite commander une impression.
+function showOrderForm(title, imageUrl, photoId) {
+    document.getElementById('orderFormOverlay')?.remove();
 
-Titre: ${title}
-ID: ${photoId}
-Image: ${imageUrl}
+    const overlay = document.createElement('div');
+    overlay.id = 'orderFormOverlay';
+    overlay.className = 'order-overlay';
+    overlay.innerHTML = `
+        <div class="order-modal" role="dialog" aria-modal="true" aria-label="Commander une impression">
 
-Merci,
-[Votre nom]`;
-    window.location.href = `mailto:${to}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
-    alert('Email préparé. Vérifiez votre client mail.');
+            <div class="order-modal__header">
+                <button class="order-modal__back" id="orderBackBtn" aria-label="Retour" style="visibility:hidden">
+                    <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M12.7071 4.29289C13.0976 4.68342 13.0976 5.31658 12.7071 5.70711L8.41421 10L12.7071 14.2929C13.0976 14.6834 13.0976 15.3166 12.7071 15.7071C12.3166 16.0976 11.6834 16.0976 11.2929 15.7071L6.29289 10.7071C5.90237 10.3166 5.90237 9.68342 6.29289 9.29289L11.2929 4.29289C11.6834 3.90237 12.3166 3.90237 12.7071 4.29289Z"/>
+                    </svg>
+                </button>
+                <div class="order-steps">
+                    <span class="order-step order-step--active" id="orderStep1Dot"></span>
+                    <span class="order-step" id="orderStep2Dot"></span>
+                </div>
+                <button class="order-modal__close" id="closeOrderForm" aria-label="Fermer">
+                    <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M10 8.58579L14.2929 4.29289C14.6834 3.90237 15.3166 3.90237 15.7071 4.29289C16.0976 4.68342 16.0976 5.31658 15.7071 5.70711L11.4142 10L15.7071 14.2929C16.0976 14.6834 16.0976 15.3166 15.7071 15.7071C15.3166 16.0976 14.6834 16.0976 14.2929 15.7071L10 11.4142L5.70711 15.7071C5.31658 16.0976 4.68342 16.0976 4.29289 15.7071C3.90237 15.3166 3.90237 14.6834 4.29289 14.2929L8.58579 10L4.29289 5.70711C3.90237 5.31658 3.90237 4.68342 4.29289 4.29289C4.68342 3.90237 5.31658 3.90237 5.70711 4.29289L10 8.58579Z"/>
+                    </svg>
+                </button>
+            </div>
+
+            <div class="order-modal__preview">
+                <img src="${escapeHtml(imageUrl)}" alt="${escapeHtml(title)}">
+                <span class="order-modal__preview-title">${escapeHtml(title)}</span>
+            </div>
+
+            <div class="order-modal__steps-wrapper">
+
+                <!-- Étape 1 : Format & papier -->
+                <div class="order-step-panel" id="orderPanel1">
+                    <p class="order-step-label">Étape 1 — Format & finition</p>
+                    <div class="order-format-grid">
+                        ${['20×30 cm','30×40 cm','40×60 cm','50×70 cm','60×90 cm','Autre'].map((f, i) => `
+                        <label class="order-format-card${i === 2 ? ' order-format-card--selected' : ''}">
+                            <input type="radio" name="format" value="${f}"${i === 2 ? ' checked' : ''}>
+                            <span class="order-format-card__label">${f}</span>
+                        </label>`).join('')}
+                    </div>
+                    <div class="order-paper-row">
+                        ${['Brillant','Mat','Fine Art'].map((p, i) => `
+                        <label class="order-paper-chip${i === 1 ? ' order-paper-chip--selected' : ''}">
+                            <input type="radio" name="paper" value="${p}"${i === 1 ? ' checked' : ''}>
+                            ${p}
+                        </label>`).join('')}
+                    </div>
+                    <button type="button" class="order-submit" id="orderNextBtn">Continuer →</button>
+                </div>
+
+                <!-- Étape 2 : Coordonnées -->
+                <div class="order-step-panel order-step-panel--hidden" id="orderPanel2">
+                    <p class="order-step-label">Étape 2 — Vos coordonnées</p>
+                    <form id="orderForm" novalidate>
+                        <div class="order-field">
+                            <label for="orderName">Nom complet <span class="order-field__required">*</span></label>
+                            <input type="text" id="orderName" name="name" required placeholder="Votre nom">
+                        </div>
+                        <div class="order-field">
+                            <label for="orderEmail">Courriel <span class="order-field__required">*</span></label>
+                            <input type="email" id="orderEmail" name="email" required placeholder="votre@courriel.com">
+                        </div>
+                        <div class="order-field">
+                            <label for="orderPhone">Téléphone</label>
+                            <input type="tel" id="orderPhone" name="phone" placeholder="Optionnel">
+                        </div>
+                        <div class="order-field">
+                            <label for="orderMessage">Message</label>
+                            <textarea id="orderMessage" name="message" rows="3" placeholder="Précisions, questions..."></textarea>
+                        </div>
+                        <div class="order-feedback" id="orderFeedback"></div>
+                        <button type="submit" class="order-submit" id="orderSubmitBtn">Envoyer la commande</button>
+                    </form>
+                </div>
+
+            </div>
+        </div>
+    `;
+    document.body.appendChild(overlay);
+    requestAnimationFrame(() => overlay.classList.add('order-overlay--visible'));
+
+    function closeForm() {
+        overlay.classList.remove('order-overlay--visible');
+        overlay.addEventListener('transitionend', () => overlay.remove(), { once: true });
+    }
+
+    document.getElementById('closeOrderForm').addEventListener('click', closeForm);
+    overlay.addEventListener('click', e => { if (e.target === overlay) closeForm(); });
+
+    // Sélection format
+    overlay.querySelectorAll('.order-format-card input').forEach(input => {
+        input.addEventListener('change', () => {
+            overlay.querySelectorAll('.order-format-card').forEach(c => c.classList.remove('order-format-card--selected'));
+            input.closest('.order-format-card').classList.add('order-format-card--selected');
+        });
+    });
+
+    // Sélection papier
+    overlay.querySelectorAll('.order-paper-chip input').forEach(input => {
+        input.addEventListener('change', () => {
+            overlay.querySelectorAll('.order-paper-chip').forEach(c => c.classList.remove('order-paper-chip--selected'));
+            input.closest('.order-paper-chip').classList.add('order-paper-chip--selected');
+        });
+    });
+
+    // Étape 1 → 2
+    document.getElementById('orderNextBtn').addEventListener('click', () => {
+        goToStep(2);
+    });
+
+    // Étape 2 → 1
+    document.getElementById('orderBackBtn').addEventListener('click', () => {
+        goToStep(1);
+    });
+
+    function goToStep(step) {
+        const panel1 = document.getElementById('orderPanel1');
+        const panel2 = document.getElementById('orderPanel2');
+        const backBtn = document.getElementById('orderBackBtn');
+        const dot1 = document.getElementById('orderStep1Dot');
+        const dot2 = document.getElementById('orderStep2Dot');
+
+        if (step === 2) {
+            panel1.classList.add('order-step-panel--exit');
+            panel1.addEventListener('transitionend', () => {
+                panel1.classList.add('order-step-panel--hidden');
+                panel1.classList.remove('order-step-panel--exit');
+                panel2.classList.remove('order-step-panel--hidden');
+                requestAnimationFrame(() => panel2.classList.add('order-step-panel--enter'));
+                requestAnimationFrame(() => {
+                    requestAnimationFrame(() => panel2.classList.remove('order-step-panel--enter'));
+                });
+                document.getElementById('orderName')?.focus();
+            }, { once: true });
+            backBtn.style.visibility = 'visible';
+            dot1.classList.remove('order-step--active');
+            dot2.classList.add('order-step--active');
+        } else {
+            panel2.classList.add('order-step-panel--exit-reverse');
+            panel2.addEventListener('transitionend', () => {
+                panel2.classList.add('order-step-panel--hidden');
+                panel2.classList.remove('order-step-panel--exit-reverse');
+                panel1.classList.remove('order-step-panel--hidden');
+                requestAnimationFrame(() => panel1.classList.add('order-step-panel--enter-reverse'));
+                requestAnimationFrame(() => {
+                    requestAnimationFrame(() => panel1.classList.remove('order-step-panel--enter-reverse'));
+                });
+            }, { once: true });
+            backBtn.style.visibility = 'hidden';
+            dot1.classList.add('order-step--active');
+            dot2.classList.remove('order-step--active');
+        }
+    }
+
+    // Soumission
+    document.getElementById('orderForm').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const btn = document.getElementById('orderSubmitBtn');
+        const feedback = document.getElementById('orderFeedback');
+
+        const format = overlay.querySelector('input[name="format"]:checked')?.value || '';
+        const paper  = overlay.querySelector('input[name="paper"]:checked')?.value || '';
+
+        btn.disabled = true;
+        btn.textContent = 'Envoi en cours...';
+        feedback.textContent = '';
+        feedback.className = 'order-feedback';
+
+        try {
+            await sendOrderEmail({
+                name: e.target.name.value.trim(),
+                email: e.target.email.value.trim(),
+                phone: e.target.phone.value.trim(),
+                format,
+                paper,
+                message: e.target.message.value.trim(),
+                photo_title: title,
+                photo_id: photoId,
+                photo_url: imageUrl,
+            });
+            feedback.textContent = 'Votre commande a été envoyée. Je vous contacterai sous peu.';
+            feedback.className = 'order-feedback order-feedback--success';
+            btn.textContent = 'Commande envoyée !';
+        } catch (err) {
+            feedback.textContent = `Erreur : ${err.message}`;
+            feedback.className = 'order-feedback order-feedback--error';
+            btn.disabled = false;
+            btn.textContent = 'Envoyer la commande';
+        }
+    });
 }
 
 // Ajouter ces nouvelles fonctions

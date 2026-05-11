@@ -14,5 +14,5 @@
 
 .order-btn:hover {
     transform: translateY(-2px);
-    box-shadow: var(--shadow-button);
+    box-shadow: 0 5px 15px rgba(87, 173, 157, 0.4);
 }

@@ -9,7 +9,7 @@ const stories = {
         date: "Mars 2024",
         photos: 5,
         images: [
-            "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=800",
+            "https://www.photographie.stephanewagner.com/wp-content/uploads/2025/11/81490026.webp",
             "https://images.unsplash.com/photo-1441974231531-c6227db76b6e?w=800",
             "https://images.unsplash.com/photo-1470071459604-3b5ec3a7fe05?w=800",
             "https://images.unsplash.com/photo-1472214103451-9374bd1c798e?w=800",
@@ -31,6 +31,18 @@ const stories = {
             "Texte pour la photo 8",
             "Texte pour la photo 9",
             "Texte pour la photo 10"
+        ],
+        templates: [ // Un template par slide
+            'caption-bottom',    // slide 1
+            'caption-overlay',   // slide 2
+            'default',           // slide 3
+            'caption-bottom',    // slide 4
+            'caption-overlay',   // slide 5
+            'default',           // slide 6
+            'caption-bottom',    // slide 7
+            'caption-overlay',   // slide 8
+            'default',           // slide 9
+            'caption-bottom'     // slide 10
         ]
     },
     urban: {
@@ -142,29 +154,61 @@ function generateGallery() {
     });
 }
 
+// Exemple de fonction de rendu de slide selon le template
+function renderStorySlide(image, caption, template = 'default', title = '', index = 0) {
+    console.log(`slide ${index + 1} : template = ${template}`);
+    switch (template) {
+        case 'caption-bottom':
+            return `
+                <div class="story-slide">
+                    <img src="${image}" alt="${title} - Photo ${index + 1}">
+                    <div class="story-caption bottom">${caption || ''}</div>
+                </div>
+            `;
+        case 'caption-overlay':
+            return `
+                <div class="story-slide overlay">
+                    <img src="${image}" alt="${title} - Photo ${index + 1}">
+                    <div class="story-caption overlay">${caption || ''}</div>
+                </div>
+            `;
+        // ...dans renderStorySlide...
+        case 'caption-paysage':
+            return `
+                <div class="story-slide paysage">
+                    <div class="paysage-caption-container">
+                        ${caption ? `<div class="story-caption paysage">${caption}</div>` : ''}
+                    </div>
+                    <div class="paysage-image-container">
+                        <img src="${image}" alt="${title} - Photo ${index + 1}" class="paysage-img">
+                    </div>
+                </div>
+            `;
+        default:
+            return `
+                <div class="story-slide">
+                    ${caption ? `<div class="story-caption">${caption}</div>` : ''}
+                    <img src="${image}" alt="${title} - Photo ${index + 1}">
+                </div>
+            `;
+    }
+}
+
 // Ouvrir une story
 function openStory(storyId) {
     currentStory = stories[storyId];
+    const globalTemplate = currentStory.template || 'default';
 
-    // Générer les slides (aucune classe active ici)
+    // Générer les slides avec le template choisi pour chaque slide
     storySlides.innerHTML = '';
     currentStory.images.forEach((image, index) => {
-        const slideDiv = document.createElement('div');
-        slideDiv.className = 'story-slide';
-
-        if (currentStory.captions && currentStory.captions[index]) {
-            const caption = document.createElement('div');
-            caption.className = 'story-caption';
-            caption.textContent = currentStory.captions[index];
-            slideDiv.appendChild(caption);
+        const caption = currentStory.captions && currentStory.captions[index] ? currentStory.captions[index] : '';
+        // Correction ici : on vérifie que le template existe à cet index, pas juste sa valeur
+        let slideTemplate = globalTemplate;
+        if (currentStory.templates && typeof currentStory.templates[index] !== 'undefined') {
+            slideTemplate = currentStory.templates[index];
         }
-
-        const img = document.createElement('img');
-        img.src = image;
-        img.alt = `${currentStory.title} - Photo ${index + 1}`;
-        slideDiv.appendChild(img);
-
-        storySlides.appendChild(slideDiv);
+        storySlides.innerHTML += renderStorySlide(image, caption, slideTemplate, currentStory.title, index);
     });
 
     // Générer les barres de progression
