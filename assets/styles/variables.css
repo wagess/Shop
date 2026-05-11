@@ -30,7 +30,7 @@
     /* Backgrounds */
     --bg-gradient: linear-gradient(135deg, #282323 0%, #404245 100%);
     --bg-gradient-purple: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    --bg-gradient-success: linear-gradient(45deg, #4CAF50, #45a049);
+    --bg-gradient-success: #57ad9d;
     --bg-modal: rgba(0, 0, 0, 0.95);
     --bg-modal-header: rgba(0, 0, 0, 0.9);
     --bg-suggestion: rgba(30, 30, 30, 0.95);

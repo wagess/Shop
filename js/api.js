@@ -20,6 +20,17 @@ export async function fetchGalleryPhotos(galleryId) {
     return await resp.json();
 }
 
+export async function sendOrderEmail(data) {
+    const resp = await fetch(`${IPTC_API}/send-order`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data),
+    });
+    const json = await resp.json().catch(() => ({}));
+    if (!resp.ok) throw new Error(json.message || `HTTP ${resp.status}`);
+    return json;
+}
+
 export async function fetchPhotoKeywords(photoId) {
     const url = `${IPTC_API}/media/${photoId}/keywords?profile=aiptc`;
     const headers = {};
