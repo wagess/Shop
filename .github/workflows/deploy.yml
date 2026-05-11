@@ -12,7 +12,7 @@ jobs:
       - name: Deploy via SSH
         uses: appleboy/ssh-action@v1.0.3
         with:
-          host: shop.stephanewagner.com
+          host: pdx1-shared-a1-34.dreamhost.com
           username: wagess
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           script: |
