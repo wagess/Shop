@@ -34,20 +34,17 @@
         
         <div style="display: flex; align-items: center; gap: 12px;">
             <img src="./assets/svg/Stéphane Wagner.svg" alt="Logo Stéphane Wagner" style="width: 180px; height: auto; filter: invert(1);">
-            <a href="/" target="_self" class="nav-button">
-                <span class="nav-text">Shop</span>
-                <span class="nav-icon" style="display: none;">
-                    <svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5" xmlns="http://www.w3.org/2000/svg">
-                        <path d="M3 4C3 3.44772 3.44772 3 4 3H16C16.5523 3 17 3.44772 17 4V16C17 16.5523 16.5523 17 16 17H4C3.44772 17 3 16.5523 3 16V4Z" stroke-linecap="round" stroke-linejoin="round"/>
-                        <path d="M7 3V17" stroke-linecap="round" stroke-linejoin="round"/>
-                        <path d="M11 3V17" stroke-linecap="round" stroke-linejoin="round"/>
-                        <path d="M15 3V17" stroke-linecap="round" stroke-linejoin="round"/>
-                    </svg>
-                </span>
+            <a href="/phototheque.html" target="_self" class="nav-button">
+                <span class="nav-text">Photothèque</span>
             </a>
         </div>
         
         <div style="display: flex; align-items: center; gap: 16px;">
+            <button id="spotifyNavBtn" title="Écouter ma playlist" style="background: linear-gradient(45deg, #1db954, #1ed760); color: white; border: none; border-radius: 50px; padding: 12px 16px; cursor: pointer; display: flex; align-items: center; gap: 8px; font-size: var(--font-size-small); font-weight: var(--font-weight-light); transition: all 0.3s ease; backdrop-filter: blur(10px);">
+                <svg id="spotifyNavIcon" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                    <rect x="6" y="6" width="12" height="12" rx="1"/>
+                </svg>
+            </button>
             <a href="https://www.photographie.stephanewagner.com/" target="_blank" class="nav-button">
                 <span class="nav-text">Portfolio</span>
                 <span class="nav-icon" style="display: none;">
@@ -58,8 +55,8 @@
                     </svg>
                 </span>
             </a>
-            <a href="https://www.blog.stephanewagner.com/" target="_blank" class="nav-button">
-                <span class="nav-text">Blog</span>
+            <a href="/stories/" target="_blank" class="nav-button">
+                <span class="nav-text">Stories</span>
                 <span class="nav-icon" style="display: none;">
                     <svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5" xmlns="http://www.w3.org/2000/svg">
                         <path d="M4 4H16C16.5523 4 17 4.44772 17 5V15C17 15.5523 16.5523 16 16 16H4C3.44772 16 3 15.5523 3 15V5C3 4.44772 3.44772 4 4 4Z" stroke-linecap="round" stroke-linejoin="round"/>
@@ -127,21 +124,28 @@
                     <div class="spinner"></div>
                     Chargement des galeries...
                 </div>
-                <div class="image-container" style="display: flex; flex-direction: column; align-items: center;">
-                    <img id="randomImage" alt="Image aléatoire">
-                    <div class="image-info" id="imageInfo" style="display: none; text-align: center; margin-top: 8px; padding: 4px 8px; color: rgba(255,255,255,0.5); background: rgba(0,0,0,0.2); border-radius: 6px; backdrop-filter: blur(5px);">
-                        <div id="collectionName" style="font-size: 12px; color: rgba(200, 200, 200, 0.6); font-weight: 300; letter-spacing: 0.3px;"></div>
-                    </div>
+                <div class="image-container" style="position: relative; width: 100%;">
+                    <img id="randomImage" alt="Image aléatoire" style="display: block; width: 100%;">
+                    
+                    <button class="order-btn" id="randomImageOrderBtn" style="display:none; position: absolute; bottom: 0; left: 50%; transform: translate(-50%, 50%); white-space: nowrap; width: auto;">Commander un tirage</button>
+                    
                 </div>
             </div>
         </div>
 
         
-        <div id="galleriesContainer" class="galleries-grid">
+        <!-- Album featured -->
+        <div id="featuredAlbumSection" style="margin-top: 40px;">
+            <div style="padding: 0 var(--gap-large) 20px; display: flex; align-items: center; justify-content: space-between;">
+                <h2 id="featuredAlbumTitle" style="color: white; font-weight: 300; margin: 0;">Scènes de vie</h2>
+                <a href="/phototheque.html" class="nav-button">Toutes les collections →</a>
+            </div>
+            <div class="loading" id="featuredAlbumLoader" style="display: none;">
+                <div class="spinner"></div>
+                Chargement...
+            </div>
+            <div id="featuredPhotosGrid" class="photos-grid"></div>
         </div>
-
-        <!-- Liens de navigation vers les dossiers (en bas) -->
-        <div id="foldersContainerBottom" style="margin: 40px; text-align: center;"></div>
     </div>
 
     <div id="photosModal" class="photos-modal">

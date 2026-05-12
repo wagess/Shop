@@ -122,6 +122,11 @@ body::after {
     transform: translateY(-2px);
 }
 
+.nav-button--active {
+    background: rgba(255, 255, 255, 0.25);
+    font-weight: var(--font-weight-medium);
+}
+
 /* ==================== Responsive Design ==================== */
 /* Tablet Design */
 @media (max-width: 1024px) and (min-width: 769px) {

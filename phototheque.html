@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Photothèque — Stéphane Wagner</title>
+    <link rel="stylesheet" href="./assets/styles/styles.css">
+    <link rel="stylesheet" href="./assets/styles/musique.css">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>📸</text></svg>">
+</head>
+<body>
+
+    <header style="width: 100%; padding: var(--gap-large); display: flex; justify-content: space-between; align-items: center; background: rgba(0, 0, 0, 0); position: relative; top: 0; z-index: 100;">
+
+        <div style="display: flex; align-items: center; gap: 12px;">
+            <img src="./assets/svg/Stéphane Wagner.svg" alt="Logo Stéphane Wagner" style="width: 180px; height: auto; filter: invert(1);">
+            <a href="/" target="_self" class="nav-button">
+                <span class="nav-text">Shop</span>
+                <span class="nav-icon" style="display: none;">
+                    <svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M3 4C3 3.44772 3.44772 3 4 3H16C16.5523 3 17 3.44772 17 4V16C17 16.5523 16.5523 17 16 17H4C3.44772 17 3 16.5523 3 16V4Z" stroke-linecap="round" stroke-linejoin="round"/>
+                        <path d="M7 3V17" stroke-linecap="round" stroke-linejoin="round"/>
+                        <path d="M11 3V17" stroke-linecap="round" stroke-linejoin="round"/>
+                        <path d="M15 3V17" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                </span>
+            </a>
+            <a href="/phototheque.html" target="_self" class="nav-button nav-button--active">
+                <span class="nav-text">Photothèque</span>
+            </a>
+        </div>
+
+        <div style="display: flex; align-items: center; gap: 16px;">
+            <a href="https://www.photographie.stephanewagner.com/" target="_blank" class="nav-button">
+                <span class="nav-text">Portfolio</span>
+                <span class="nav-icon" style="display: none;">
+                    <svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M4 6C4 4.89543 4.89543 4 6 4H14C15.1046 4 16 4.89543 16 6V14C16 15.1046 15.1046 16 14 16H6C4.89543 16 4 15.1046 4 14V6Z" stroke-linecap="round" stroke-linejoin="round"/>
+                        <circle cx="8.5" cy="8.5" r="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                        <path d="M4 13L7 10L10 13L14 9L16 11" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                </span>
+            </a>
+            <a href="https://www.blog.stephanewagner.com/" target="_blank" class="nav-button">
+                <span class="nav-text">Stories</span>
+                <span class="nav-icon" style="display: none;">
+                    <svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M4 4H16C16.5523 4 17 4.44772 17 5V15C17 15.5523 16.5523 16 16 16H4C3.44772 16 3 15.5523 3 15V5C3 4.44772 3.44772 4 4 4Z" stroke-linecap="round" stroke-linejoin="round"/>
+                        <path d="M6 7H14" stroke-linecap="round" stroke-linejoin="round"/>
+                        <path d="M6 10H14" stroke-linecap="round" stroke-linejoin="round"/>
+                        <path d="M6 13H11" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                </span>
+            </a>
+        </div>
+    </header>
+
+    <div class="container">
+
+        <!-- Barre de recherche -->
+        <div class="search-container-modern" style="margin-bottom: 20px;">
+            <div class="search-input-wrapper">
+                <div class="search-leading">
+                    <button type="button" class="search-btn" id="searchOptionsBtn" aria-label="Options de recherche">
+                        <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M8 2C4.68629 2 2 4.68629 2 8C2 11.3137 4.68629 14 8 14C9.29583 14 10.4957 13.5892 11.4765 12.8907L16.2929 17.7071C16.6834 18.0976 17.3166 18.0976 17.7071 17.7071C18.0976 17.3166 18.0976 16.6834 17.7071 16.2929L12.8907 11.4765C13.5892 10.4957 14 9.29583 14 8C14 4.68629 11.3137 2 8 2ZM4 8C4 5.79086 5.79086 4 8 4C10.2091 4 12 5.79086 12 8C12 10.2091 10.2091 12 8 12C5.79086 12 4 10.2091 4 8Z"></path>
+                        </svg>
+                    </button>
+                </div>
+                <div class="search-input-container">
+                    <input type="text" id="searchInput" placeholder="Rechercher une collection..." autocomplete="off">
+                    <div id="searchSuggestions"></div>
+                </div>
+                <div class="search-trailing">
+                    <button type="button" class="search-btn search-submit" id="searchSubmitBtn" aria-label="Lancer la recherche">
+                        <svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M10 17.25S2.5 12 2.5 6.5C2.5 4.5 4 3 6 3C7.5 3 8.5 4 10 5.5C11.5 4 12.5 3 14 3C16 3 17.5 4.5 17.5 6.5C17.5 12 10 17.25 10 17.25Z"></path>
+                        </svg>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Stats -->
+        <div style="text-align: center; margin-bottom: 10px;">
+            <div class="stats" id="stats"></div>
+        </div>
+
+        <!-- Liens de navigation vers les dossiers (en haut) -->
+        <div id="foldersContainerTop" style="margin: 20px; text-align: center;"></div>
+
+        <!-- Loader -->
+        <div class="loading" id="galleriesLoader">
+            <div class="spinner"></div>
+            Chargement des galeries...
+        </div>
+
+        <!-- Grille des galeries -->
+        <div id="galleriesContainer" class="galleries-grid"></div>
+
+        <!-- Liens de navigation vers les dossiers (en bas) -->
+        <div id="foldersContainerBottom" style="margin: 40px; text-align: center;"></div>
+
+    </div>
+
+    <!-- Modale photos -->
+    <div id="photosModal" class="photos-modal">
+        <div class="modal-header">
+            <button class="close-modal" id="closeModalBtn">
+                <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M12.7071 4.29289C13.0976 4.68342 13.0976 5.31658 12.7071 5.70711L8.41421 10L12.7071 14.2929C13.0976 14.6834 13.0976 15.3166 12.7071 15.7071C12.3166 16.0976 11.6834 16.0976 11.2929 15.7071L6.29289 10.7071C5.90237 10.3166 5.90237 9.68342 6.29289 9.29289L11.2929 4.29289C11.6834 3.90237 12.3166 3.90237 12.7071 4.29289Z"></path>
+                </svg>
+            </button>
+            <div class="modal-title" id="modalTitle" style="font-size: var(--font-size-large);"></div>
+        </div>
+        <div id="photosGrid" class="photos-grid"></div>
+    </div>
+
+    <script type="module" src="js/app.js"></script>
+</body>
+</html>

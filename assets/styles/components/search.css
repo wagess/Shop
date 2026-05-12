@@ -9,7 +9,7 @@
 /* ==================== Modern Search Styles ==================== */
 .search-container-modern {
     margin: 20px auto;
-    width: 90%;
+    width: 100%;
     z-index: 10;
 }
 
@@ -173,7 +173,7 @@
 /* ==================== Random Image ==================== */
 #randomImage {
     aspect-ratio: 3/2;
-    max-width: 90%;
+    max-width: 100%;
     max-height: 70%;
     width: 100%;
     height: auto;

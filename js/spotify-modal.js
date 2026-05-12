@@ -1,171 +1,101 @@
+const ICON_STOP = `<svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><rect x="6" y="6" width="12" height="12" rx="1"/></svg>`;
+const ICON_MUSIC = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" xmlns="http://www.w3.org/2000/svg"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>`;
+
 class SpotifyModal {
     constructor() {
-        this.modal = null;
-        this.iframe = null;
-        this.floatingStopBtn = null;
-        this.init();
-    }
-
-    init() {
+        this.modal    = null;
+        this.iframe   = null;
+        this.navBtn   = null;
+        this.isPlaying = false;
         document.addEventListener('DOMContentLoaded', () => {
             this.setupElements();
             this.bindEvents();
-            this.showModal();
         });
     }
 
     setupElements() {
-        this.modal = document.getElementById('spotifyModal');
+        this.modal    = document.getElementById('spotifyModal');
         this.closeBtn = document.getElementById('closeSpotifyModal');
-        this.stopBtn = document.getElementById('stopSpotifyBtn');
+        this.stopBtn  = document.getElementById('stopSpotifyBtn');
+        this.navBtn   = document.getElementById('spotifyNavBtn');
+        if (this.modal) this.iframe = this.modal.querySelector('iframe');
     }
 
     bindEvents() {
-        this.closeBtn?.addEventListener('click', () => this.closeModalKeepMusic());
-        this.stopBtn?.addEventListener('click', () => this.stopMusic());
-        
-        // Fermer en cliquant sur le fond
-        this.modal?.addEventListener('click', (e) => {
-            if (e.target === this.modal) {
-                this.closeModalKeepMusic();
+        // Un seul handler sur le bouton nav : comportement selon l'état
+        this.navBtn?.addEventListener('click', () => {
+            if (this.isPlaying) {
+                this.stopMusic();
+            } else {
+                this.showModal();
             }
         });
 
-        // Fermer avec Escape
+        // "M'accompagner en musique !" → lance et ferme la modale
+        this.closeBtn?.addEventListener('click', () => this.startMusic());
+
+        // "Non merci." → ferme sans lancer
+        this.stopBtn?.addEventListener('click', () => this.hideModal());
+
+        // Clic sur le fond
+        this.modal?.addEventListener('click', (e) => {
+            if (e.target === this.modal) this.hideModal();
+        });
+
+        // Escape
         document.addEventListener('keydown', (e) => {
             if (e.key === 'Escape' && this.modal?.style.display === 'flex') {
-                this.closeModalKeepMusic();
+                this.hideModal();
             }
         });
     }
 
     showModal() {
-        setTimeout(() => {
-            if (this.modal) {
-                this.modal.style.display = 'flex';
-                document.body.classList.add('modal-open');
-                this.iframe = this.modal.querySelector('iframe');
-            }
-        }, 1500);
+        if (!this.modal) return;
+        this.modal.style.display = 'flex';
+        document.body.classList.add('modal-open');
     }
 
-    closeModalKeepMusic() {
-        this.attemptAutoplay();
+    hideModal() {
+        if (!this.modal) return;
+        this.modal.style.display = 'none';
+        document.body.classList.remove('modal-open');
+    }
+
+    startMusic() {
+        if (this.iframe) {
+            const src = this.iframe.src;
+            this.iframe.src = src.includes('autoplay=1') ? src : src + '&autoplay=1';
+        }
+        this.isPlaying = true;
+        this.updateNavBtn();
         this.hideModal();
-        this.createFloatingStopButton();
-    }
-
-    attemptAutoplay() {
-        if (!this.iframe) return;
-
-        const currentSrc = this.iframe.src;
-        const newSrc = currentSrc.includes('autoplay=1') ? 
-            currentSrc : 
-            currentSrc + '&autoplay=1';
-        
-        this.iframe.src = newSrc;
-        
-        // Simuler interaction utilisateur
-        setTimeout(() => {
-            try {
-                const clickEvent = new MouseEvent('click', {
-                    view: window,
-                    bubbles: true,
-                    cancelable: true
-                });
-                this.iframe.dispatchEvent(clickEvent);
-            } catch (e) {
-                console.log('Autoplay non autorisé par le navigateur');
-            }
-        }, 500);
     }
 
     stopMusic() {
         this.clearIframe();
-        this.hideModal();
-        this.removeFloatingButton();
+        this.isPlaying = false;
+        this.updateNavBtn();
     }
 
     clearIframe() {
         if (!this.iframe) return;
-
-        const newIframe = document.createElement('iframe');
-        newIframe.setAttribute('data-testid', 'embed-iframe');
-        newIframe.style.borderRadius = '12px';
-        newIframe.src = 'about:blank';
-        newIframe.width = '100%';
-        newIframe.height = '152';
-        newIframe.frameBorder = '0';
-        
-        this.iframe.parentNode.replaceChild(newIframe, this.iframe);
-        this.iframe = newIframe;
+        const blank = document.createElement('iframe');
+        blank.setAttribute('data-testid', 'embed-iframe');
+        blank.style.borderRadius = '12px';
+        blank.src = 'about:blank';
+        blank.width = '100%';
+        blank.height = '352';
+        blank.frameBorder = '0';
+        this.iframe.parentNode.replaceChild(blank, this.iframe);
+        this.iframe = blank;
     }
 
-    hideModal() {
-        if (this.modal) {
-            this.modal.style.display = 'none';
-            document.body.classList.remove('modal-open');
-        }
-    }
-
-    createFloatingStopButton() {
-        this.floatingStopBtn = document.createElement('button');
-        this.floatingStopBtn.innerHTML = `
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <rect x="6" y="6" width="12" height="12" rx="1"></rect>
-            </svg>
-        `;
-        
-        this.styleFloatingButton();
-        this.bindFloatingButtonEvents();
-        document.body.appendChild(this.floatingStopBtn);
-    }
-
-    styleFloatingButton() {
-        this.floatingStopBtn.style.cssText = `
-            position: fixed;
-            bottom: 20px;
-            right: 20px;
-            z-index: 9999;
-            background: linear-gradient(45deg, #1db954, #1ed760);
-            color: white;
-            border: none;
-            border-radius: 50%;
-            width: 50px;
-            height: 50px;
-            cursor: pointer;
-            box-shadow: 0 4px 15px rgba(29, 185, 84, 0.4);
-            transition: all 0.3s ease;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            opacity: 0.8;
-        `;
-    }
-
-    bindFloatingButtonEvents() {
-        this.floatingStopBtn.addEventListener('mouseenter', function() {
-            this.style.opacity = '1';
-            this.style.transform = 'scale(1.1)';
-            this.style.boxShadow = '0 6px 20px rgba(29, 185, 84, 0.6)';
-        });
-
-        this.floatingStopBtn.addEventListener('mouseleave', function() {
-            this.style.opacity = '0.8';
-            this.style.transform = 'scale(1)';
-            this.style.boxShadow = '0 4px 15px rgba(29, 185, 84, 0.4)';
-        });
-
-        this.floatingStopBtn.addEventListener('click', () => this.stopMusic());
-    }
-
-    removeFloatingButton() {
-        if (this.floatingStopBtn) {
-            this.floatingStopBtn.remove();
-            this.floatingStopBtn = null;
-        }
+    updateNavBtn() {
+        if (!this.navBtn) return;
+        this.navBtn.innerHTML = this.isPlaying ? ICON_STOP : ICON_MUSIC;
+        this.navBtn.title = this.isPlaying ? 'Arrêter la musique' : 'Écouter ma playlist';
     }
 }
 
-// Initialiser la modale Spotify
 new SpotifyModal();

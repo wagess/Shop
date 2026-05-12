@@ -1,6 +1,16 @@
 import { el, escapeHtml } from './utils.js';
 import { fetchGalleryPhotos } from './api.js';
 
+function updateOrderBtn(title, imageUrl, photoId) {
+    const btn = document.getElementById('randomImageOrderBtn');
+    if (!btn) return;
+    btn.style.display = '';
+    btn.onclick = (e) => {
+        e.stopPropagation();
+        window.orderPrint(title, imageUrl, photoId);
+    };
+}
+
 /**
  * Met à jour l'image d'arrière-plan dynamiquement
  */
@@ -60,6 +70,7 @@ async function loadRandomImage() {
             
             randomImageEl.src = imageData.url;
             randomImageEl.alt = imageData.alt || imageData.title || 'Image aléatoire';
+            updateOrderBtn(imageData.title || '', imageData.url, imageData.id);
         }
     } catch (err) {
         console.error('❌ Erreur:', err);
@@ -114,6 +125,7 @@ async function loadRandomImageFromCollection(collectionId) {
         
         randomImageEl.src = imageUrl;
         randomImageEl.alt = randomPhoto.alt || randomPhoto.title || randomPhoto.name || 'Image de collection';
+        updateOrderBtn(randomPhoto.title || randomPhoto.name || '', imageUrl, randomPhoto.id);
         
         return randomPhoto;
         
@@ -189,6 +201,7 @@ async function loadRandomImageFromCollectionByName(collectionName, collections) 
             
             randomImageEl.src = imageUrl;
             randomImageEl.alt = randomPhoto.alt || randomPhoto.title || randomPhoto.name || 'Image de collection';
+            updateOrderBtn(randomPhoto.title || randomPhoto.name || '', imageUrl, randomPhoto.id);
         }
         
         return randomPhoto;

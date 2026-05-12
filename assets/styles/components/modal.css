@@ -383,6 +383,16 @@
     padding: var(--gap-large);
 }
 
+#featuredPhotosGrid {
+    grid-template-columns: repeat(3, 1fr);
+}
+
+@media (max-width: 768px) {
+    #featuredPhotosGrid {
+        grid-template-columns: 1fr;
+    }
+}
+
 .photo-card {
     background: var(--white);
     border-radius: var(--border-radius-medium);

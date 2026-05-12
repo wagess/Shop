@@ -289,7 +289,7 @@ export function renderFolders(folders) {
     // Afficher les favoris en haut
     if (containerTop) {
         containerTop.innerHTML = (favoriteFolders.length > 0 || favoriteCollections.length > 0) 
-            ? `<div style="color:white; margin-bottom:16px; font-weight:normal;">Thèmes favoris</div>${favoritesHtml}`
+            ? `<div style="color:white; margin-bottom:16px; font-weight:normal;">Quelques thèmes favoris</div>${favoritesHtml}`
             : '';
     }
     

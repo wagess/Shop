@@ -24,7 +24,7 @@ export async function openGallery(galleryId, galleryName) {
         
         // Mettre à jour le titre avec le nombre de photos
         title.innerHTML = `${escapeHtml(galleryName)} <span class="photo-count">(${photos.length} photo${photos.length > 1 ? 's' : ''})</span> <span class="gallery-id">- ID: ${galleryId}</span>`;
-        displayPhotos(photos);
+        displayPhotos(photos, el('photosGrid'));
     } catch (err) {
         console.error('openGallery error', err);
         grid.innerHTML = `<div class="error-message">Erreur: ${escapeHtml(err.message)}</div>`;
@@ -43,8 +43,8 @@ function detectMobile() {
            || ('ontouchstart' in window);
 }
 
-async function displayPhotos(photos) {
-    const grid = el('photosGrid');
+export async function displayPhotos(photos, gridEl = null) {
+    const grid = gridEl || el('photosGrid');
     if (!grid) return;
 
     // Stocker les photos pour la navigation dans la lightbox
@@ -177,7 +177,32 @@ export function closeModal() {
     if (modal) modal.style.display = 'none';
 }
 
+let _shutterBuffer = null;
+
+async function loadShutterSound() {
+    try {
+        const response = await fetch('./assets/sounds/shutter.wav');
+        const arrayBuffer = await response.arrayBuffer();
+        const ctx = new (window.AudioContext || window.webkitAudioContext)();
+        _shutterBuffer = await ctx.decodeAudioData(arrayBuffer);
+        await ctx.close();
+    } catch (e) {}
+}
+loadShutterSound();
+
+function playShutterSound() {
+    try {
+        const ctx = new (window.AudioContext || window.webkitAudioContext)();
+        const source = ctx.createBufferSource();
+        source.buffer = _shutterBuffer;
+        source.connect(ctx.destination);
+        source.start(0, 0, 0.8);
+        source.onended = () => ctx.close();
+    } catch (e) {}
+}
+
 export function orderPrint(title, imageUrl, photoId) {
+    playShutterSound();
     showOrderForm(title, imageUrl, photoId);
 }
 
@@ -199,6 +224,7 @@ function showOrderForm(title, imageUrl, photoId) {
                 <div class="order-steps">
                     <span class="order-step order-step--active" id="orderStep1Dot"></span>
                     <span class="order-step" id="orderStep2Dot"></span>
+                    <span class="order-step" id="orderStep3Dot"></span>
                 </div>
                 <button class="order-modal__close" id="closeOrderForm" aria-label="Fermer">
                     <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
@@ -259,6 +285,21 @@ function showOrderForm(title, imageUrl, photoId) {
                     </form>
                 </div>
 
+                <!-- Étape 3 : Confirmation -->
+                <div class="order-step-panel order-step-panel--hidden" id="orderPanel3">
+                    <div style="text-align: center; padding: 20px 0 10px;">
+                        <div style="width: 56px; height: 56px; background: rgba(87,173,157,0.15); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 16px;">
+                            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#57ad9d" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <polyline points="20 6 9 17 4 12"/>
+                            </svg>
+                        </div>
+                        <p style="color: #57ad9d; font-size: var(--font-size-large); font-weight: var(--font-weight-medium); margin: 0 0 8px;">Commande envoyée !</p>
+                        <p style="color: var(--text-secondary); font-size: var(--font-size-small); margin: 0 0 4px;" id="orderConfirmName"></p>
+                        <p style="color: var(--text-muted); font-size: var(--font-size-small); margin: 0;">Je vous contacterai sous peu pour finaliser votre tirage.</p>
+                    </div>
+                    <button type="button" class="order-submit" id="orderCloseConfirmBtn" style="margin-top: 16px;">Fermer</button>
+                </div>
+
             </div>
         </div>
     `;
@@ -271,6 +312,7 @@ function showOrderForm(title, imageUrl, photoId) {
     }
 
     document.getElementById('closeOrderForm').addEventListener('click', closeForm);
+    document.getElementById('orderCloseConfirmBtn').addEventListener('click', closeForm);
     overlay.addEventListener('click', e => { if (e.target === overlay) closeForm(); });
 
     // Sélection format
@@ -300,42 +342,40 @@ function showOrderForm(title, imageUrl, photoId) {
     });
 
     function goToStep(step) {
-        const panel1 = document.getElementById('orderPanel1');
-        const panel2 = document.getElementById('orderPanel2');
+        const panels = [
+            document.getElementById('orderPanel1'),
+            document.getElementById('orderPanel2'),
+            document.getElementById('orderPanel3'),
+        ];
+        const dots = [
+            document.getElementById('orderStep1Dot'),
+            document.getElementById('orderStep2Dot'),
+            document.getElementById('orderStep3Dot'),
+        ];
         const backBtn = document.getElementById('orderBackBtn');
-        const dot1 = document.getElementById('orderStep1Dot');
-        const dot2 = document.getElementById('orderStep2Dot');
 
-        if (step === 2) {
-            panel1.classList.add('order-step-panel--exit');
-            panel1.addEventListener('transitionend', () => {
-                panel1.classList.add('order-step-panel--hidden');
-                panel1.classList.remove('order-step-panel--exit');
-                panel2.classList.remove('order-step-panel--hidden');
-                requestAnimationFrame(() => panel2.classList.add('order-step-panel--enter'));
-                requestAnimationFrame(() => {
-                    requestAnimationFrame(() => panel2.classList.remove('order-step-panel--enter'));
-                });
-                document.getElementById('orderName')?.focus();
-            }, { once: true });
-            backBtn.style.visibility = 'visible';
-            dot1.classList.remove('order-step--active');
-            dot2.classList.add('order-step--active');
-        } else {
-            panel2.classList.add('order-step-panel--exit-reverse');
-            panel2.addEventListener('transitionend', () => {
-                panel2.classList.add('order-step-panel--hidden');
-                panel2.classList.remove('order-step-panel--exit-reverse');
-                panel1.classList.remove('order-step-panel--hidden');
-                requestAnimationFrame(() => panel1.classList.add('order-step-panel--enter-reverse'));
-                requestAnimationFrame(() => {
-                    requestAnimationFrame(() => panel1.classList.remove('order-step-panel--enter-reverse'));
-                });
-            }, { once: true });
-            backBtn.style.visibility = 'hidden';
-            dot1.classList.add('order-step--active');
-            dot2.classList.remove('order-step--active');
-        }
+        const currentIndex = panels.findIndex(p => !p.classList.contains('order-step-panel--hidden'));
+        const nextIndex = step - 1;
+        if (currentIndex === nextIndex) return;
+
+        const forward = nextIndex > currentIndex;
+        const current = panels[currentIndex];
+        const next    = panels[nextIndex];
+
+        current.classList.add(forward ? 'order-step-panel--exit' : 'order-step-panel--exit-reverse');
+        current.addEventListener('transitionend', () => {
+            current.classList.add('order-step-panel--hidden');
+            current.classList.remove('order-step-panel--exit', 'order-step-panel--exit-reverse');
+            next.classList.remove('order-step-panel--hidden');
+            requestAnimationFrame(() => next.classList.add(forward ? 'order-step-panel--enter' : 'order-step-panel--enter-reverse'));
+            requestAnimationFrame(() => {
+                requestAnimationFrame(() => next.classList.remove('order-step-panel--enter', 'order-step-panel--enter-reverse'));
+            });
+            if (step === 2) document.getElementById('orderName')?.focus();
+        }, { once: true });
+
+        dots.forEach((d, i) => d.classList.toggle('order-step--active', i === nextIndex));
+        backBtn.style.visibility = step === 2 ? 'visible' : 'hidden';
     }
 
     // Soumission
@@ -353,8 +393,9 @@ function showOrderForm(title, imageUrl, photoId) {
         feedback.className = 'order-feedback';
 
         try {
+            const name = e.target.name.value.trim();
             await sendOrderEmail({
-                name: e.target.name.value.trim(),
+                name,
                 email: e.target.email.value.trim(),
                 phone: e.target.phone.value.trim(),
                 format,
@@ -364,9 +405,9 @@ function showOrderForm(title, imageUrl, photoId) {
                 photo_id: photoId,
                 photo_url: imageUrl,
             });
-            feedback.textContent = 'Votre commande a été envoyée. Je vous contacterai sous peu.';
-            feedback.className = 'order-feedback order-feedback--success';
-            btn.textContent = 'Commande envoyée !';
+            const confirmName = document.getElementById('orderConfirmName');
+            if (confirmName) confirmName.textContent = `Merci ${name}, votre demande a bien été reçue.`;
+            goToStep(3);
         } catch (err) {
             feedback.textContent = `Erreur : ${err.message}`;
             feedback.className = 'order-feedback order-feedback--error';

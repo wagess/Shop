@@ -12,7 +12,8 @@ import {
     findNodeById,
     selectGallery  // Importer selectGallery depuis gallery.js
 } from './gallery.js';
-import { openGallery, closeModal, orderPrint, initModalListeners } from './modal.js';
+import { openGallery, closeModal, orderPrint, initModalListeners, displayPhotos } from './modal.js';
+import { fetchGalleryPhotos } from './api.js';
 import { initSearchAutocomplete } from './search.js';  // Supprimer selectGallery d'ici
 import { loadThumbnailsForCollections } from './thumbnails.js';
 import { 
@@ -71,8 +72,9 @@ window.onload = () => {
 };
 
 async function loadHierarchy() {
-    const container = el('galleriesContainer');
-    if (!container) return;
+    const hasGalleriesContainer = !!el('galleriesContainer');
+    const hasFeaturedGrid = !!el('featuredPhotosGrid');
+    if (!hasGalleriesContainer && !hasFeaturedGrid) return;
 
     try {
         const hierarchyData = await fetchHierarchy();
@@ -114,17 +116,30 @@ async function loadHierarchy() {
 
         hideGalleriesLoader();
 
-        console.log('📚 Collections disponibles:', globalCollections.map(c => c.name));
-        await loadRandomImageFromCollectionByName("Scènes de vie", globalCollections);
-        
-        // Test direct pour afficher les infos
-        setTimeout(() => {
-            updateImageInfo("Scènes de vie", "Test Image");
-        }, 1000);
+        if (el('randomImage')) {
+            await loadRandomImageFromCollectionByName("Scènes de vie", globalCollections);
+            setTimeout(() => { updateImageInfo("Scènes de vie"); }, 1000);
+        }
+
+        // Album featured sur la page d'accueil
+        const featuredGrid = el('featuredPhotosGrid');
+        if (featuredGrid) {
+            const FEATURED_ALBUM_NAME = 'Scènes de vie';
+            const collection = shuffledCollections.find(c => c.name === FEATURED_ALBUM_NAME);
+            if (collection) {
+                try {
+                    const photos = (await fetchGalleryPhotos(collection.id)).slice(0, 6);
+                    await displayPhotos(photos, featuredGrid);
+                } catch (err) {
+                    featuredGrid.innerHTML = `<div class="error-message">Erreur chargement album : ${escapeHtml(err.message)}</div>`;
+                }
+            }
+        }
 
     } catch (err) {
         console.error('loadHierarchy error', err);
-        if (container) container.innerHTML = `<div class="error-message">Erreur: ${escapeHtml(err.message)}</div>`;
+        const errTarget = el('galleriesContainer') || el('featuredPhotosGrid');
+        if (errTarget) errTarget.innerHTML = `<div class="error-message">Erreur: ${escapeHtml(err.message)}</div>`;
     }
 }
 
@@ -137,7 +152,7 @@ function shuffleArray(array) {
 }
 
 function hideGalleriesLoader() {
-    const loader = document.querySelector('.right-panel .loading');
+    const loader = document.getElementById('galleriesLoader') || document.querySelector('.right-panel .loading');
     if (loader) {
         loader.classList.add('hidden');
     }
