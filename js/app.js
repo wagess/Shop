@@ -34,41 +34,6 @@ let globalCollections = [];
 
 window.onload = () => {
     loadHierarchy();
-    
-    // Ajouter la fonctionnalité au bouton de scroll
-    const scrollBtn = document.getElementById('scrollDownBtn');
-    if (scrollBtn) {
-        scrollBtn.addEventListener('click', () => {
-            // Sauvegarder le contenu original
-            const originalContent = scrollBtn.innerHTML;
-            
-            // Afficher le spinner
-            scrollBtn.innerHTML = `
-                <div style="width: 24px; height: 24px; border: 2px solid rgba(255,255,255,0.3); border-top: 2px solid white; border-radius: 50%; animation: spin 1s linear infinite;"></div>
-                <style>
-                    @keyframes spin {
-                        0% { transform: rotate(0deg); }
-                        100% { transform: rotate(360deg); }
-                    }
-                </style>
-            `;
-            scrollBtn.style.pointerEvents = 'none';
-            
-            const galleriesContainer = document.getElementById('galleriesContainer');
-            if (galleriesContainer) {
-                galleriesContainer.scrollIntoView({ 
-                    behavior: 'smooth', 
-                    block: 'start' 
-                });
-                
-                // Restaurer le contenu original après 1.5 secondes
-                setTimeout(() => {
-                    scrollBtn.innerHTML = originalContent;
-                    scrollBtn.style.pointerEvents = 'auto';
-                }, 1500);
-            }
-        });
-    }
 };
 
 async function loadHierarchy() {

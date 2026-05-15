@@ -1,2 +1,4 @@
 wplr-iptc-keywords.php
 .vscode/launch.json
+.env
+node_modules/
