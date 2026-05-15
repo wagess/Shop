@@ -79,9 +79,11 @@ $payload = json_encode([
 
 $auth = base64_encode('anystring:' . $apiKey);
 
-if (function_exists('curl_init')) {
-    $ch = curl_init($url);
+$ch = function_exists('curl_init') ? curl_init() : false;
+
+if ($ch !== false) {
     curl_setopt_array($ch, [
+        CURLOPT_URL            => $url,
         CURLOPT_RETURNTRANSFER => true,
         CURLOPT_POST           => true,
         CURLOPT_POSTFIELDS     => $payload,
@@ -90,6 +92,7 @@ if (function_exists('curl_init')) {
             'Authorization: Basic ' . $auth,
         ],
         CURLOPT_TIMEOUT        => 10,
+        CURLOPT_SSL_VERIFYPEER => true,
     ]);
     $response = curl_exec($ch);
     $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
