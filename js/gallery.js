@@ -328,8 +328,12 @@ export function renderFolders(folders) {
             // Ouvrir directement l'album de la collection
             window.openGallery(id, name);
         } else {
-            // Afficher le dossier
-            showFolder(id, name);
+            // Sur index.html, pas de galleriesContainer : rediriger vers la photothèque
+            if (!el('galleriesContainer')) {
+                window.location.href = '/phototheque.html';
+            } else {
+                showFolder(id, name);
+            }
         }
         
         // Restaurer le contenu original

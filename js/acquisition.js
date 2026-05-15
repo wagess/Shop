@@ -4,7 +4,7 @@
  * - Pop-up (déclenché après 30s ou 50% de scroll, une seule fois par session)
  */
 
-const SUBSCRIBE_URL = '/Shop/scripts/subscribe.php';
+const SUBSCRIBE_URL = 'scripts/subscribe.php';
 const POPUP_KEY = 'sw_popup_dismissed'; // localStorage
 
 // ─── Utilitaire d'inscription ────────────────────────────────────────────────
