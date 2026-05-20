@@ -15,6 +15,15 @@ jobs:
           host: pdx1-shared-a1-34.dreamhost.com
           username: wagess
           key: ${{ secrets.SSH_PRIVATE_KEY }}
+          envs: ANTHROPIC_API_KEY
           script: |
             cd /home/wagess/shop.stephanewagner.com
             git pull origin main
+            # Mettre à jour ANTHROPIC_API_KEY dans .env (créer si absent)
+            if [ -f .env ]; then
+              grep -q "^ANTHROPIC_API_KEY=" .env \
+                && sed -i "s|^ANTHROPIC_API_KEY=.*|ANTHROPIC_API_KEY=$ANTHROPIC_API_KEY|" .env \
+                || echo "ANTHROPIC_API_KEY=$ANTHROPIC_API_KEY" >> .env
+            else
+              echo "ANTHROPIC_API_KEY=$ANTHROPIC_API_KEY" > .env
+            fi
