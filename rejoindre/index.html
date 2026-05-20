@@ -323,12 +323,8 @@
 
             // JSONP — seule méthode cross-origin sans serveur pour Mailchimp
             const cbName = 'mc_cb_' + Date.now();
-            const params = new URLSearchParams({
-                EMAIL: email,
-                FNAME: fname,
-                'gdpr[297]': 'Y',
-                c: cbName,
-            });
+            const params = new URLSearchParams({ EMAIL: email, FNAME: fname, c: cbName });
+            const url = MC_URL + '&' + params.toString() + '&gdpr[297]=Y';
 
             window[cbName] = function(data) {
                 delete window[cbName];
@@ -349,7 +345,7 @@
             };
 
             const script = document.createElement('script');
-            script.src = MC_URL + '&' + params.toString();
+            script.src = url;
             script.onerror = function() {
                 delete window[cbName];
                 script.remove();

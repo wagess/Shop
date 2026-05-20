@@ -14,7 +14,8 @@ const MC_BASE = 'https://stephanewagner.us2.list-manage.com/subscribe/post-json'
 function subscribe(email, fname = '') {
     return new Promise((resolve, reject) => {
         const cbName = 'mc_cb_' + Date.now();
-        const params = new URLSearchParams({ EMAIL: email, FNAME: fname, 'gdpr[297]': 'Y', c: cbName });
+        const params = new URLSearchParams({ EMAIL: email, FNAME: fname, c: cbName });
+        const url = MC_BASE + '&' + params.toString() + '&gdpr[297]=Y';
 
         window[cbName] = function(data) {
             delete window[cbName];
@@ -27,7 +28,7 @@ function subscribe(email, fname = '') {
         };
 
         const script = document.createElement('script');
-        script.src = MC_BASE + '&' + params.toString();
+        script.src = url;
         script.onerror = () => { delete window[cbName]; script.remove(); reject(new Error('Erreur réseau')); };
         document.body.appendChild(script);
     });
