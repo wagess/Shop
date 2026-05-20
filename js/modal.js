@@ -56,19 +56,31 @@ export async function displayPhotos(photos, gridEl = null) {
         const kws = collectKeywords(photo);
         const kwsHtml = kws.length ? renderKeywordsLimited(kws) : `<span style="color:#999; font-size:12px;">Chargement mots-clés...</span>`;
 
+        const alreadySelected = (typeof triptyqueGet === 'function') ? triptyqueGet().some(p => p.id === photo.id) : false;
+
         return `
     <div class="photo-card" id="photo-card-${photo.id}">
-        <img src="${escapeHtml(imgUrl)}" alt="${escapeHtml(title)}" class="photo-img" 
+        <img src="${escapeHtml(imgUrl)}" alt="${escapeHtml(title)}" class="photo-img"
              onclick="openLightbox('${escapeJs(imgUrl)}', '${escapeJs(title)}', ${index})"
              onerror="this.style.background='linear-gradient(45deg,#ddd,#ccc)'; this.alt='Image non disponible';">
         <div class="photo-info">
             <div class="photo-title">${escapeHtml(title)}</div>
             <div class="photo-id">ID: ${photo.id}</div>
             <div class="keywords-container" id="keywords-${photo.id}">${kwsHtml}</div>
-            <button class="order-btn" onclick="event.stopPropagation(); window.orderPrint('${escapeJs(title)}','${escapeJs(imgUrl)}', ${photo.id});">${['🖨️ Commander l\'impression', '😍 Cool, acheter cette photo !', '❤️ j\'aime cette photo !'][Math.floor(Math.random() * 3)]}</button>
+            <div class="photo-actions">
+                <button class="order-btn" onclick="event.stopPropagation(); window.orderPrint('${escapeJs(title)}','${escapeJs(imgUrl)}', ${photo.id});">${['🖨️ Commander l\'impression', '😍 Cool, acheter cette photo !', '❤️ j\'aime cette photo !'][Math.floor(Math.random() * 3)]}</button>
+                <button class="triptyque-add-btn${alreadySelected ? ' triptyque-add-btn--selected' : ''}"
+                        id="triptyque-btn-${photo.id}"
+                        data-photo-id="${photo.id}"
+                        data-photo-title="${escapeHtml(title)}"
+                        data-photo-url="${escapeHtml(imgUrl)}"
+                        onclick="event.stopPropagation(); window.toggleTriptyquePhoto(this)"
+                        title="${alreadySelected ? 'Retirer du triptyque' : 'Ajouter au triptyque'}">+</button>
+            </div>
         </div>
     </div>
 `;
+
     }).join('');
 
     await Promise.allSettled(photos.map(async photo => {

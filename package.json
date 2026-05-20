@@ -1,0 +1,10 @@
+{
+  "name": "shop-stephanewagner",
+  "type": "module",
+  "scripts": {
+    "infolettre": "node scripts/send-newsletter.js"
+  },
+  "dependencies": {
+    "dotenv": "^16.0.0"
+  }
+}

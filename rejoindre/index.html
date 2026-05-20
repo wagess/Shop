@@ -277,6 +277,10 @@
                     <input type="text" id="fname" placeholder="Votre prénom (optionnel)" autocomplete="given-name">
                     <input type="email" id="email" placeholder="Votre adresse courriel" required autocomplete="email">
                 </div>
+                <!-- Honeypot anti-spam Mailchimp -->
+                <div style="position:absolute;left:-5000px;" aria-hidden="true">
+                    <input type="text" id="mc-honeypot" name="b_9e13300aa07c637eb257e4db1_185ed965aa" tabindex="-1" value="">
+                </div>
                 <button type="submit" class="btn-submit" id="submitBtn">Rejoindre la liste</button>
                 <div class="form-note">
                     Aucun spam. Désabonnement en un clic. Fréquence : une photo à la fois.
@@ -298,38 +302,63 @@
         const msgSuccess = document.getElementById('msgSuccess');
         const msgError = document.getElementById('msgError');
 
-        form.addEventListener('submit', async (e) => {
+        const MC_URL = 'https://stephanewagner.us2.list-manage.com/subscribe/post-json' +
+                       '?u=9e13300aa07c637eb257e4db1&id=185ed965aa&f_id=00c5f7e3f0';
+
+        form.addEventListener('submit', (e) => {
             e.preventDefault();
+
+            // Anti-spam honeypot
+            if (document.getElementById('mc-honeypot').value) return;
+
             const email = document.getElementById('email').value.trim();
             const fname = document.getElementById('fname').value.trim();
+
+            if (!email) return;
 
             submitBtn.disabled = true;
             submitBtn.textContent = 'Inscription en cours…';
             msgSuccess.style.display = 'none';
             msgError.style.display = 'none';
 
-            try {
-                const res = await fetch('../scripts/subscribe.php', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ email, fname }),
-                });
-                const data = await res.json();
+            // JSONP — seule méthode cross-origin sans serveur pour Mailchimp
+            const cbName = 'mc_cb_' + Date.now();
+            const params = new URLSearchParams({
+                EMAIL: email,
+                FNAME: fname,
+                'gdpr[297]': 'Y',
+                c: cbName,
+            });
 
-                if (data.success) {
-                    msgSuccess.textContent = '✓ ' + data.message + ' Merci !';
+            window[cbName] = function(data) {
+                delete window[cbName];
+                script.remove();
+
+                if (data.result === 'success') {
+                    msgSuccess.textContent = '✓ ' + data.msg.replace(/<[^>]+>/g, '') + ' Merci !';
                     msgSuccess.style.display = 'block';
                     form.reset();
                     submitBtn.textContent = 'Vous êtes inscrit !';
                 } else {
-                    throw new Error(data.error || 'Erreur inconnue');
+                    const msg = data.msg.replace(/<[^>]+>/g, '').replace(/^\d+ - /, '');
+                    msgError.textContent = '✗ ' + msg;
+                    msgError.style.display = 'block';
+                    submitBtn.disabled = false;
+                    submitBtn.textContent = 'Rejoindre la liste';
                 }
-            } catch (err) {
-                msgError.textContent = '✗ ' + err.message;
+            };
+
+            const script = document.createElement('script');
+            script.src = MC_URL + '&' + params.toString();
+            script.onerror = function() {
+                delete window[cbName];
+                script.remove();
+                msgError.textContent = '✗ Erreur réseau. Veuillez réessayer.';
                 msgError.style.display = 'block';
                 submitBtn.disabled = false;
                 submitBtn.textContent = 'Rejoindre la liste';
-            }
+            };
+            document.body.appendChild(script);
         });
     </script>
 

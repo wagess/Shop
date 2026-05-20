@@ -4,20 +4,33 @@
  * - Pop-up (déclenché après 30s ou 50% de scroll, une seule fois par session)
  */
 
-const SUBSCRIBE_URL = 'scripts/subscribe.php';
 const POPUP_KEY = 'sw_popup_dismissed'; // localStorage
 
-// ─── Utilitaire d'inscription ────────────────────────────────────────────────
+const MC_BASE = 'https://stephanewagner.us2.list-manage.com/subscribe/post-json' +
+                '?u=9e13300aa07c637eb257e4db1&id=185ed965aa&f_id=00c5f7e3f0';
 
-async function subscribe(email, fname = '') {
-    const res = await fetch(SUBSCRIBE_URL, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, fname }),
+// ─── Utilitaire d'inscription (JSONP — cross-origin sans serveur) ─────────────
+
+function subscribe(email, fname = '') {
+    return new Promise((resolve, reject) => {
+        const cbName = 'mc_cb_' + Date.now();
+        const params = new URLSearchParams({ EMAIL: email, FNAME: fname, 'gdpr[297]': 'Y', c: cbName });
+
+        window[cbName] = function(data) {
+            delete window[cbName];
+            script.remove();
+            if (data.result === 'success') {
+                resolve({ message: data.msg.replace(/<[^>]+>/g, '') });
+            } else {
+                reject(new Error(data.msg.replace(/<[^>]+>/g, '').replace(/^\d+ - /, '')));
+            }
+        };
+
+        const script = document.createElement('script');
+        script.src = MC_BASE + '&' + params.toString();
+        script.onerror = () => { delete window[cbName]; script.remove(); reject(new Error('Erreur réseau')); };
+        document.body.appendChild(script);
     });
-    const data = await res.json();
-    if (!res.ok && !data.success) throw new Error(data.error || 'Erreur inconnue');
-    return data;
 }
 
 // ─── Footer form ─────────────────────────────────────────────────────────────
