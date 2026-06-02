@@ -797,13 +797,13 @@ export function closeLightbox() {
 export function initModalListeners() {
     const closeBtn = el('closeModalBtn');
     if (closeBtn) closeBtn.addEventListener('click', () => {
-        closeModal();
+        window.closeModal ? window.closeModal() : closeModal();
         window.displayCollectionsView();
     });
-    document.addEventListener('keydown', e => { 
+    document.addEventListener('keydown', e => {
         if (e.key === 'Escape') {
             closeLightbox();
-            closeModal();
+            window.closeModal ? window.closeModal() : closeModal();
             window.displayCollectionsView();
         } else if (e.key === 'ArrowLeft') {
             navigateToPhoto('prev');

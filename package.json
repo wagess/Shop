@@ -2,9 +2,15 @@
   "name": "shop-stephanewagner",
   "type": "module",
   "scripts": {
-    "infolettre": "node scripts/send-newsletter.js"
+    "watch": "node scripts/watch.js",
+    "preview": "node scripts/build-preview.js && open http://localhost:8888/infolettre/preview.html",
+    "infolettre": "node scripts/send-newsletter.js",
+    "infolettre:draft": "node scripts/send-newsletter.js --draft"
   },
   "dependencies": {
     "dotenv": "^16.0.0"
+  },
+  "devDependencies": {
+    "browser-sync": "^3.0.4"
   }
 }

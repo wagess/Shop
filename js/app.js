@@ -22,11 +22,23 @@ import {
 } from './images.js';
 
 // Expose global functions for onclick handlers
-window.openGallery = openGallery;
-window.closeModal = closeModal;
+window.openGallery = function(id, name) {
+    location.hash = `album-${id}`;
+    return openGallery(id, name);
+};
+window.closeModal = function() {
+    history.replaceState(null, '', location.pathname);
+    return closeModal();
+};
 window.orderPrint = orderPrint;
-window.showFolder = showFolder;
-window.displayCollectionsView = displayCollectionsView;
+window.showFolder = function(id, name) {
+    location.hash = `folder-${id}`;
+    return showFolder(id, name);
+};
+window.displayCollectionsView = function() {
+    history.replaceState(null, '', location.pathname);
+    return displayCollectionsView();
+};
 window.selectGallery = selectGallery;
 
 // Variable globale pour stocker les collections - la rendre accessible globalement
@@ -80,6 +92,7 @@ async function loadHierarchy() {
         initModalListeners();
 
         hideGalleriesLoader();
+        restoreFromHash(shuffledCollections, hierarchyData);
 
         if (el('randomImage')) {
             await loadRandomImageFromCollectionByName("Scènes de vie", globalCollections);
@@ -105,6 +118,23 @@ async function loadHierarchy() {
         console.error('loadHierarchy error', err);
         const errTarget = el('galleriesContainer') || el('featuredPhotosGrid');
         if (errTarget) errTarget.innerHTML = `<div class="error-message">Erreur: ${escapeHtml(err.message)}</div>`;
+    }
+}
+
+function restoreFromHash(collections, hierarchyData) {
+    const hash = location.hash.slice(1); // retire le #
+    if (!hash) return;
+
+    const albumMatch = hash.match(/^album-(.+)$/);
+    const folderMatch = hash.match(/^folder-(.+)$/);
+
+    if (albumMatch) {
+        const id = albumMatch[1];
+        const gallery = collections.find(c => String(c.id) === id);
+        if (gallery) openGallery(gallery.id, gallery.name);
+    } else if (folderMatch) {
+        const id = folderMatch[1];
+        showFolder(id, '');
     }
 }
 
