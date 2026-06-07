@@ -1,13 +1,14 @@
 #!/usr/bin/env node
-// Hot reload — surveille contenu.md + index.html, reconstruit preview.html et recharge le navigateur
+// Hot reload — surveille tous les contenu-XX.md + index.html
 
-import { watch } from 'node:fs';
+import { watch, readdirSync } from 'node:fs';
 import { spawn } from 'node:child_process';
 import { resolve, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import bs from 'browser-sync';
 
-const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '..');
+const ROOT      = resolve(dirname(fileURLToPath(import.meta.url)), '..');
+const INFOLETTRE = resolve(ROOT, 'infolettre');
 
 function build() {
     return new Promise((res, rej) => {
@@ -19,11 +20,11 @@ function build() {
 // Build initial
 await build();
 
-// Démarrer browser-sync sur un port dédié qui proxy MAMP
+// Démarrer browser-sync
 const server = bs.create();
 server.init({
     proxy: 'localhost:8888',
-    startPath: '/infolettre/preview.html',
+    startPath: '/Shop/infolettre/index-previews.html',
     port: 3000,
     open: true,
     notify: false,
@@ -37,15 +38,25 @@ function onChange(filename) {
         console.log(`♻️  ${filename} modifié — reconstruction...`);
         try {
             await build();
-            server.reload('infolettre/preview.html');
+            server.reload();
             console.log('✅  Rechargé');
         } catch (e) {
             console.error('❌ ', e.message);
         }
-    }, 150);
+    }, 200);
 }
 
-watch(resolve(ROOT, 'infolettre/contenu-01.md'),  () => onChange('contenu-01.md'));
-watch(resolve(ROOT, 'infolettre/index.html'),  () => onChange('index.html'));
+// Surveiller index.html (template)
+watch(resolve(INFOLETTRE, 'index.html'), () => onChange('index.html'));
 
-console.log('👁  Surveillance active — http://localhost:3000/infolettre/preview.html');
+// Surveiller tous les contenu-XX.md existants + nouveaux
+function watchContenuFiles() {
+    const files = readdirSync(INFOLETTRE).filter(f => /^contenu-\d+\.md$/.test(f));
+    files.forEach(f => {
+        watch(resolve(INFOLETTRE, f), () => onChange(f));
+    });
+    console.log(`👁  Surveillance active sur ${files.length} fichiers contenu + index.html`);
+}
+
+watchContenuFiles();
+console.log('🌐  http://localhost:3000/Shop/infolettre/index-previews.html');

@@ -48,19 +48,39 @@ window.onload = () => {
     loadHierarchy();
 };
 
+async function loadVisibilityConfig() {
+    try {
+        const resp = await fetch('./collections-visibility.json');
+        if (resp.ok) return await resp.json();
+    } catch {}
+    return { collections: {}, folders: {} };
+}
+
+function applyVisibility(collections, folders, config) {
+    const isVisible = (type, id) => (config[type] || {})[String(id)] !== false;
+    return {
+        collections: collections.filter(c => isVisible('collections', c.id)),
+        folders:     folders.filter(f => isVisible('folders', f.id)),
+    };
+}
+
 async function loadHierarchy() {
     const hasGalleriesContainer = !!el('galleriesContainer');
     const hasFeaturedGrid = !!el('featuredPhotosGrid');
     if (!hasGalleriesContainer && !hasFeaturedGrid) return;
 
     try {
-        const hierarchyData = await fetchHierarchy();
+        const [hierarchyData, visibilityConfig] = await Promise.all([
+            fetchHierarchy(),
+            loadVisibilityConfig(),
+        ]);
         
         console.log('🔍 Hierarchy brute:', JSON.stringify(hierarchyData, null, 2));
         
         const nodes = extractGalleryIds(hierarchyData);
-        const collections = nodes.filter(n => n.id != null && n.type !== 'folder');
-        const folders = nodes.filter(n => n.type === 'folder');
+        const allCollections = nodes.filter(n => n.id != null && n.type !== 'folder');
+        const allFolders     = nodes.filter(n => n.type === 'folder');
+        const { collections, folders } = applyVisibility(allCollections, allFolders, visibilityConfig);
 
         // Calculer le count pour chaque folder directement depuis hierarchyData
         folders.forEach(folder => {

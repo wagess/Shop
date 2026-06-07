@@ -120,6 +120,36 @@ async function main() {
         ? `${SHOP_URL}/phototheque.html#album-${collId}`
         : (meta.cta_url || SHOP_URL);
 
+    // Boutons optionnels
+    const btn = (url, label) => url && !url.includes('[')
+        ? `<a href="${url}" style="display:inline-block;margin:0 8px 8px;padding:14px 28px;background:#1a1a1a;color:#ffffff;text-decoration:none;font-size:13px;letter-spacing:2px;text-transform:uppercase;">${label}</a>`
+        : '';
+
+    const social = `<p style="margin:20px 0 8px;font-size:10px;letter-spacing:2px;text-transform:uppercase;color:#1a1a1a;opacity:0.5;">Partager</p>
+              <a href="https://www.facebook.com/sharer/sharer.php?u=${ctaUrl}" style="display:inline-block;margin:0 4px;padding:7px 14px;border:1px solid rgba(0,0,0,0.25);color:#1a1a1a;text-decoration:none;font-size:11px;letter-spacing:1px;text-transform:uppercase;">Facebook</a>
+              <a href="https://x.com/intent/tweet?url=${ctaUrl}&text=${encodeURIComponent(meta.titre || '')}" style="display:inline-block;margin:0 4px;padding:7px 14px;border:1px solid rgba(0,0,0,0.25);color:#1a1a1a;text-decoration:none;font-size:11px;letter-spacing:1px;text-transform:uppercase;">X</a>
+              <a href="https://pinterest.com/pin/create/button/?url=${ctaUrl}&media=${encodeURIComponent(photoUrl)}&description=${encodeURIComponent(meta.titre || '')}" style="display:inline-block;margin:0 4px;padding:7px 14px;border:1px solid rgba(0,0,0,0.25);color:#1a1a1a;text-decoration:none;font-size:11px;letter-spacing:1px;text-transform:uppercase;">Pinterest</a>`;
+
+    const sondageBlock = (url) => {
+        if (!url || url.includes('[')) {
+            return `<tr>
+            <td style="padding:24px 40px;text-align:center;background:#f5c842;">
+              ${social}
+            </td>
+          </tr>`;
+        }
+        return `<tr>
+            <td style="padding:24px 40px;text-align:center;background:#f5c842;">
+              <p style="margin:0 0 12px;font-size:12px;letter-spacing:1px;color:#1a1a1a;">Participez au sondage et obtenez un rabais exclusif sur votre prochaine commande.</p>
+              ${btn(url, 'Répondre au sondage')}
+              ${social}
+            </td>
+          </tr>`;
+    };
+
+    // CTA texte avec nom de série
+    const ctaTexte = meta.cta_texte || 'Voir la série';
+
     // Injecter les placeholders
     html = html
         .replace(/{{SUJET}}/g,      meta.sujet      || '')
@@ -128,10 +158,14 @@ async function main() {
         .replace(/{{NUMERO}}/g,     meta.numero     || '')
         .replace(/{{PHOTO_URL}}/g,  photoUrl)
         .replace(/{{PHOTO_ALT}}/g,  photoAlt)
-        .replace(/{{CTA_TEXTE}}/g,       meta.cta_texte       || '')
+        .replace(/{{CTA_TEXTE}}/g,       ctaTexte)
         .replace(/{{CTA_URL}}/g,         ctaUrl)
+        .replace(/{{ARTICLE_BTN}}/g,     meta.article_url && !meta.article_url.includes('[')
+            ? `<a href="${meta.article_url}" style="display:inline-block;margin:0 8px 8px;padding:14px 28px;background:transparent;color:#1a1a1a;text-decoration:none;font-size:13px;letter-spacing:2px;text-transform:uppercase;border:1px solid #1a1a1a;">Lire la suite sur le blog →</a>`
+            : '')
+        .replace(/{{SONDAGE_BTN}}/g,     sondageBlock(meta.sondage_url))
         .replace(/{{INSCRIPTION_URL}}/g, meta.inscription_url || '#')
-        .replace(/{{CORPS}}/g,      bodyToHtml(body));
+        .replace(/{{CORPS}}/g,      bodyToHtml(meta.corps || body));
 
     console.log(`📋  Résumé :`);
     console.log(`   Objet    : ${meta.sujet}`);
