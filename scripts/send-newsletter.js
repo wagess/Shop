@@ -24,6 +24,35 @@ import { fileURLToPath } from 'node:url';
 
 const __dir = dirname(fileURLToPath(import.meta.url));
 const ROOT  = resolve(__dir, '..');
+const HIER_CACHE = resolve(ROOT, 'infolettre/.hierarchy-cache.json');
+const WPLR_API   = 'https://www.photographie.stephanewagner.com/wp-json/wplr/v1';
+const WPLR_TOKEN = 'EDNusnA0Q8TW';
+
+let _hierCache = null;
+async function getCollectionName(collectionId) {
+    if (!collectionId || collectionId.includes('[')) return null;
+    if (!_hierCache) {
+        try {
+            const { readFileSync, existsSync, writeFileSync } = await import('node:fs');
+            if (existsSync(HIER_CACHE)) {
+                _hierCache = JSON.parse(readFileSync(HIER_CACHE, 'utf8'));
+            } else {
+                const resp = await fetch(`${WPLR_API}/hierarchy`, { headers: { Authorization: `Bearer ${WPLR_TOKEN}` } });
+                const data = await resp.json();
+                _hierCache = {};
+                function walk(node) {
+                    if (Array.isArray(node)) { node.forEach(walk); return; }
+                    if (!node || typeof node !== 'object') return;
+                    if (node.id && node.name) _hierCache[String(node.id)] = node.name;
+                    for (const k of ['children','items','galleries','collections']) if (node[k]) walk(node[k]);
+                }
+                walk(data);
+                writeFileSync(HIER_CACHE, JSON.stringify(_hierCache, null, 2));
+            }
+        } catch { _hierCache = {}; }
+    }
+    return _hierCache[String(collectionId)] || null;
+}
 
 const { MAILCHIMP_API_KEY, MAILCHIMP_LIST_ID, MAILCHIMP_FROM_NAME, MAILCHIMP_FROM_EMAIL } = process.env;
 
@@ -50,28 +79,49 @@ async function mailchimp(method, path, body) {
     return json;
 }
 
-// Parse frontmatter YAML simple (clé: valeur)
+// Parse frontmatter — supporte blocs multilignes (intro:, corps:)
 function parseFrontmatter(raw) {
-    const match = raw.match(/^---\n([\s\S]*?)\n---\n([\s\S]*)$/);
+    const match = raw.match(/^---\n([\s\S]*?)\n---(?:\n([\s\S]*))?$/);
     if (!match) throw new Error('Frontmatter introuvable dans contenu.md');
     const meta = {};
-    for (const line of match[1].split('\n')) {
-        const [key, ...rest] = line.split(':');
-        if (key) meta[key.trim()] = rest.join(':').trim();
+    const lines = match[1].split('\n');
+    let i = 0;
+    while (i < lines.length) {
+        const line = lines[i];
+        const colonIdx = line.indexOf(':');
+        if (colonIdx === -1) { i++; continue; }
+        const key   = line.slice(0, colonIdx).trim();
+        const value = line.slice(colonIdx + 1).trim();
+        if (value === '|' || value === '') {
+            const block = [];
+            i++;
+            while (i < lines.length && (lines[i].match(/^ {2,}/) || lines[i] === '')) {
+                block.push(lines[i].replace(/^ {2,}/, ''));
+                i++;
+            }
+            meta[key] = block.join('\n').trim() || value;
+        } else {
+            meta[key] = value;
+            i++;
+        }
     }
-    const body = match[2].trim();
+    const body = (match[2] || '').trim();
     return { meta, body };
 }
 
+function mdInline(text) {
+    return text
+        .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
+        .replace(/\*(.+?)\*/g,     '<em>$1</em>');
+}
+
 // Convertit les paragraphes Markdown en <p> HTML
-function bodyToHtml(body) {
-    return body
-        .split(/\n\n+/)
-        .map((p, i, arr) => {
-            const style = i < arr.length - 1 ? 'margin:0 0 16px;' : 'margin:0;';
-            return `<p style="${style}">${p.replace(/\n/g, ' ')}</p>`;
-        })
-        .join('\n                ');
+function bodyToHtml(text) {
+    if (!text || !text.trim()) return '';
+    return text.trim().split(/\n\n+/).map((p, i, arr) => {
+        const style = i < arr.length - 1 ? 'margin:0 0 16px;' : 'margin:0;';
+        return `<p style="${style}">${mdInline(p.replace(/\n/g, ' '))}</p>`;
+    }).join('\n                ');
 }
 
 async function main() {
@@ -147,8 +197,11 @@ async function main() {
           </tr>`;
     };
 
-    // CTA texte avec nom de série
-    const ctaTexte = meta.cta_texte || 'Voir la série';
+    // CTA texte avec nom de collection
+    const albumName = await getCollectionName(meta.collection_id);
+    const ctaTexte  = albumName
+        ? `Voir la série "${albumName}" sur Shop`
+        : (meta.cta_texte || 'Voir la série');
 
     // Injecter les placeholders
     html = html
@@ -156,6 +209,7 @@ async function main() {
         .replace(/{{SERIE}}/g,      meta.serie      || '')
         .replace(/{{TITRE}}/g,      meta.titre      || '')
         .replace(/{{NUMERO}}/g,     meta.numero     || '')
+        .replace(/{{INTRO}}/g,      bodyToHtml(meta.intro || ''))
         .replace(/{{PHOTO_URL}}/g,  photoUrl)
         .replace(/{{PHOTO_ALT}}/g,  photoAlt)
         .replace(/{{CTA_TEXTE}}/g,       ctaTexte)

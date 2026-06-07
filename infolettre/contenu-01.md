@@ -1,5 +1,5 @@
 ---
-sujet: La série de l'été
+sujet: La série de l'été, escapades virtuelles
 apercu: Un instant volé au programme du jour.
 serie: Scènes de vie
 titre: La chaise d'écolier
@@ -20,8 +20,5 @@ sondage_url: https://us2.list-manage.com/survey?u=9e13300aa07c637eb257e4db1&id=b
 cta_url: https://us2.list-manage.com/survey?u=9e13300aa07c637eb257e4db1&id=b32e594eb8&e=*|UNIQID|*
 inscription_url: https://shop.stephanewagner.com/rejoindre/
 corps:
-    Je vous propose la première immersion d'une micro-série dédiée au voyage, aux rencontres et à la chasse aux trésors oubliés. Direction une petite bourgade isolée du Vermont, aux États-Unis, où s'entassent des vieilleries inusitées, des fermettes transformées en Airbnb et des remorques désuètes.
-    Mon regard, toujours en quête de détails intrigants, s'arrête sur une remorque mystérieuse. Ses fentes sombres laissent entrevoir un capharnaüm de restants poussiéreux. Quelle n'est pas ma surprise de découvrir, caché là, un banc d'écolier d'un autre temps !
-
-    Ces moments discrets, presque secrets, regorgent de poésie visuelle. Je vous invite à les explorer avec moi à travers cette série.
+    Je trouve la symbolique de cette scène très forte au moment où l'intelligence artificielle domine le paysage médiatique, technologique et scolaire ! Elle évoque de manière assez évidente cette tendance à reléguer notre propre intelligence au banc d’une école désuète où les médias remplacent les professeurs, où le savoir perd en consistance et le sens critique est de plus en plus léger. Se pose alors une simple question ... “Qui va apprendre de qui ?”
 ---
