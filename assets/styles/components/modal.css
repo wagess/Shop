@@ -460,6 +460,26 @@
     box-shadow: var(--shadow-hover);
 }
 
+.photo-image-container {
+    position: relative;
+    width: 100%;
+    height: 200px;
+    overflow: hidden;
+}
+
+.photo-image-container .gallery-loading {
+    position: absolute;
+    z-index: 2;
+}
+
+.photo-image-container .photo-img {
+    position: relative;
+    z-index: 1;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
 .photo-img {
     width: 100%;
     height: var(--img-height);
