@@ -1,213 +1,146 @@
-/* ==================== Search Container ==================== */
-.search-container {
-    position: relative;
-    width: 100%;
-    max-width: 500px;
-    margin: 20px auto;
+/* ==========================================================================
+   Search Field — Sigma Design System
+   Figma : node 1585-17155 — /Home/Components/Navigation and search/Search field
+   ========================================================================== */
+
+.search-field {
+  display: flex;
+  align-items: center;
+  height: 56px;
+  width: 100%;
+  max-width: 500px;
+  margin: 20px auto;
+
+  background: var(--color-bg-secondary);
+  border: 1px solid var(--color-border-tertiary);
+  border-radius: var(--radius-circular);
+  overflow: visible;
+  position: relative;
+  transition: border-color 0.15s ease;
 }
 
-/* ==================== Modern Search Styles ==================== */
-.search-container-modern {
-    margin: 20px auto;
-    width: 100%;
-    z-index: 10;
+.search-field:focus-within {
+  border-color: var(--color-border-secondary);
 }
 
-.search-input-wrapper {
-    background: rgba(255, 255, 255, 0.1);
-    border-radius: 10px;
-    padding: 10px;
-    backdrop-filter: blur(10px);
-    border: 1px solid rgba(255, 255, 255, 0.2);
-    display: grid;
-    grid-template-columns: auto 1fr auto;
-    grid-template-areas: 'leading input trailing';
-    align-items: center;
-    gap: 0px;
-    transition: all 0.3s ease;
+/* Icône loupe gauche */
+.search-field__icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 6px 0 6px 16px;
+  flex-shrink: 0;
+  color: var(--color-text-primary);
 }
 
-.search-input-wrapper:hover {
-    background: rgba(255, 255, 255, 0.15);
-    border-color: rgba(255, 255, 255, 0.3);
+/* Zone centrale — input + hint */
+.search-field__body {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  min-width: 0;
+  padding-left: 12px;
+  position: relative;
 }
 
-.search-input-wrapper:focus-within {
-    background: rgba(255, 255, 255, 0.2);
-    border-color: rgba(255, 255, 255, 0.4);
-    box-shadow: 0 0 20px rgba(255, 255, 255, 0.1);
+.search-field__input {
+  background: transparent;
+  border: none;
+  outline: none;
+  width: 100%;
+  font-family: var(--font-family-base);
+  font-size: var(--font-headline-body-size);       /* 16px */
+  font-weight: var(--font-headline-body-weight);   /* 500 */
+  line-height: var(--font-headline-body-line-height); /* 20px */
+  letter-spacing: var(--font-headline-body-letter-spacing);
+  color: var(--color-text-primary);
 }
 
-.search-leading {
-    grid-area: leading;
+.search-field__input::placeholder {
+  color: var(--color-text-tertiary);
+  font-weight: 450;
 }
 
-.search-input-container {
-    grid-area: input;
-    position: relative;
-    flex: 1;
+.search-field__hint {
+  font-family: var(--font-family-base);
+  font-size: 12px;
+  font-weight: 450;
+  line-height: 16px;
+  letter-spacing: -0.02em;
+  color: var(--color-text-tertiary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  pointer-events: none;
 }
 
-.search-trailing {
-    grid-area: trailing;
-    display: flex;
-    align-items: center;
-    gap: 4px;
+/* Masquer le hint quand l'input a du contenu */
+.search-field__input:not(:placeholder-shown) + .search-field__hint {
+  display: none;
 }
 
-.search-input-container input {
-    width: 100%;
-    background: transparent;
-    border: none;
-    outline: none;
-    color: white;
-    font-size: 16px;
-    padding: 8px 12px;
-    border-radius: 20px;
+/* Bouton flèche droite */
+.search-field__action {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  padding: 6px 8px 6px 0;
+  flex-shrink: 0;
 }
 
-.search-input-container input::placeholder {
-    color: rgba(255, 255, 255, 0.6);
+.search-field__btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border-radius: var(--radius-circular);
+  border: none;
+  background: var(--color-bg-primary);
+  color: var(--color-text-primary);
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: background 0.15s ease;
 }
 
-.search-btn {
-    background: transparent;
-    border: none;
-    border-radius: 50%;
-    width: 36px;
-    height: 36px;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: rgba(255, 255, 255, 0.7);
+.search-field__btn:hover {
+  background: var(--color-bg-active);
 }
 
-.search-btn:hover {
-    background: rgba(255, 255, 255, 0.1);
-    color: white;
-    transform: scale(1.05);
-}
-
-.search-submit {
-    background: rgba(255, 255, 255, 0.2);
-    color: white;
-}
-
-.search-submit:hover {
-    background: rgba(255, 255, 255, 0.3);
-}
-
-/* ==================== Search Suggestions ==================== */
+/* ==========================================================================
+   Suggestions — positionnement du conteneur
+   Le visuel est géré par .dropdown (dropdown.css)
+   ========================================================================== */
 #searchSuggestions {
-    position: absolute;
-    top: calc(100% + 16px);
-    left: 0;
-    right: 0;
-    width: 100%;
-    background: rgba(0, 0, 0, 1);
-    border-radius: 5px;
-    max-height: 200px;
-    overflow-y: auto;
-    z-index: 1000;
-    backdrop-filter: blur(15px);
-    border: 1px solid rgba(255, 255, 255, 0.3);
-    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
-    display: none;
-    padding: 8px;
+  position: absolute;
+  top: calc(100% + 16px);
+  left: -56px; /* compense l'icône + padding pour aligner sur le bord du wrapper */
+  right: -56px;
+  z-index: 1000;
+  display: none;
 }
 
-/* Version alternative plus simple pour mobile */
-@media (max-width: 768px) {
-    #searchSuggestions {
-        width: 100%;
-        left: 50%;
-        transform: translateX(-50%);
-    }
+/* Items cliquables dans le dropdown de suggestion */
+#searchSuggestions .dropdown__item {
+  cursor: pointer;
 }
 
-.suggestion-item {
-    padding: 12px 16px;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    border-radius: 12px;
-    transition: all 0.3s ease;
-    margin-bottom: 4px;
-}
-
-.suggestion-item:last-child {
-    margin-bottom: 0;
-}
-
-.suggestion-item:hover {
-    background: rgba(255, 255, 255, 0.2);
-    transform: translateY(-1px);
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
-}
-
-.suggestion-icon {
-    font-size: 18px;
-    opacity: 0.9;
-    color: white;
-}
-
-.suggestion-name {
-    flex: 1;
-    color: white;
-    font-weight: 500;
-    font-size: 15px;
-}
-
-.suggestion-count {
-    color: rgba(255, 255, 255, 0.8);
-    font-size: 12px;
-    background: rgba(255, 255, 255, 0.15);
-    padding: 4px 8px;
-    border-radius: 8px;
-    font-weight: 500;
-}
-
-/* ==================== Random Image ==================== */
+/* ==========================================================================
+   Random Image
+   ========================================================================== */
 #randomImage {
-    aspect-ratio: 3/2;
-    max-width: 100%;
-    max-height: 70%;
-    width: 100%;
-    height: auto;
-    object-fit: cover;
-    border-radius: 8px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    transition: opacity 0.3s ease-in-out;
-    background-color: #3a3a3a;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    position: relative;
-}
-    
-/* Cache le texte alt par défaut */
-#randomImage {
-    color: transparent;
-    text-indent: -9999px;
-    min-width: 90%;
-}
-
-/* Placeholder avant le chargement */
-#randomImage:not([src])::before,
-#randomImage[src=""]::before {
-    content: "📸 Chargement...";
-    color: rgba(255, 255, 255, 0.8);
-    font-size: 18px;
-    text-align: center;
-    position: absolute;
-    width: 100%;
-    height: 100%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background: #3a3a3a;
-    border-radius: 8px;
+  aspect-ratio: 3/2;
+  max-width: 100%;
+  max-height: 70%;
+  width: 100%;
+  height: auto;
+  object-fit: cover;
+  border-radius: var(--radius-firm);
+  transition: opacity 0.3s ease-in-out;
+  background-color: var(--color-bg-active);
+  position: relative;
+  color: transparent;
+  text-indent: -9999px;
+  min-width: 90%;
 }

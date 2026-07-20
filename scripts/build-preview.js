@@ -133,7 +133,7 @@ function buildOptionalBtn(meta, field, label, style = 'filled') {
     const url = meta[field];
     if (!url || url.includes('[')) return '';
     if (style === 'outline') {
-        return `<a href="${url}" style="display:inline-block;margin:0 8px 8px;padding:14px 28px;background:transparent;color:#1a1a1a;text-decoration:none;font-size:13px;letter-spacing:2px;text-transform:uppercase;border:1px solid #1a1a1a;">${label}</a>`;
+        return `<a href="${url}" style="display:block;padding:14px 28px;background:#ffffff;color:#1f1f1f;text-decoration:none;font-size:11px;letter-spacing:2px;text-transform:uppercase;border:1px solid #1f1f1f;text-align:center;font-family:'General Sans Variable','General Sans','Helvetica Neue',sans-serif;font-weight:500;border-radius:2px;">${label}</a>`;
     }
     return BTN(url, label);
 }
@@ -187,7 +187,7 @@ async function buildOne(contenFile) {
         .replace(/{{CORPS}}/g,           toHtml(meta.corps || body))
         .replace(/{{CTA_TEXTE}}/g,       ctaTexte)
         .replace(/{{CTA_URL}}/g,         ctaUrl)
-        .replace(/{{ARTICLE_BTN}}/g,     buildOptionalBtn(meta, 'article_url', 'Lire la suite sur le blog →', 'outline'))
+        .replace(/{{ARTICLE_BTN}}/g,     buildOptionalBtn(meta, 'article_url', `${meta.cta_episode || 'Lire l\'article'} — Épisode ${(meta.numero || '').replace(/^[^\d]*/, '')} →`, 'outline'))
         .replace(/{{SONDAGE_BTN}}/g,     buildSondageBlock(meta, ctaUrl, meta.titre || '', photo.url))
         .replace(/{{INSCRIPTION_URL}}/g, meta.inscription_url || '#');
 

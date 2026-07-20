@@ -1,10 +1,11 @@
 import { el, escapeHtml, escapeJs } from './utils.js';
-import { 
-    allGalleries, 
-    allSearchableItems, 
+import {
+    allGalleries,
+    allSearchableItems,
     displayGalleries,
     selectGallery  // Importer depuis gallery.js
 } from './gallery.js';
+import { createDropdown } from './components/dropdown.js';
 
 let searchTimeout;
 
@@ -119,14 +120,12 @@ function performSearchSimple(value, searchInput, suggestionsBox) {
 
         if (suggestionsBox) {
             if (filteredItems.length > 0) {
-                let html = '';
-                for (let index = 0; index < filteredItems.length; index++) {
-                    const g = filteredItems[index];
-                    if (!g) continue;
-                    
+                const items = filteredItems.map((g, index) => {
+                    if (!g) return null;
+
                     let icon = '🖼️';
                     let countLabel = '';
-                    
+
                     if (g.type === 'folder') {
                         icon = '📂';
                         const count = g.count || 0;
@@ -144,25 +143,24 @@ function performSearchSimple(value, searchInput, suggestionsBox) {
                         const count = parseInt(g.count) || 0;
                         countLabel = `${count} photo${count > 1 ? 's' : ''}`;
                     }
-                    
-                    const safeName = escapeHtml(g.name || 'Sans nom');
-                    
-                    const itemHtml = `
-                        <div class="suggestion-item" data-index="${index}" data-type="${g.type}" data-id="${g.id}" data-name="${safeName}">
-                            <span class="suggestion-icon">${icon}</span>
-                            <span class="suggestion-name">${safeName}</span>
-                            <span class="suggestion-count">${countLabel}</span>
-                        </div>
-                    `;
-                    
-                    html += itemHtml;
-                }
 
-                suggestionsBox.innerHTML = html;
-                addSafeSuggestionEventListeners(suggestionsBox, filteredItems);
+                    return {
+                        label: g.name || 'Sans nom',
+                        sublabel: countLabel,
+                        avatar: `<span style="font-size:24px;line-height:1;display:flex;align-items:center;justify-content:center;width:48px;height:48px;">${icon}</span>`,
+                        active: index === 0,
+                        onClick: () => _handleSuggestionClick(g, suggestionsBox),
+                    };
+                }).filter(Boolean);
+
+                suggestionsBox.innerHTML = '';
+                suggestionsBox.appendChild(createDropdown({ items }));
                 suggestionsBox.style.display = 'block';
             } else {
-                suggestionsBox.innerHTML = '<div class="suggestion-item" style="color:#999;">Aucun résultat trouvé</div>';
+                suggestionsBox.innerHTML = '';
+                suggestionsBox.appendChild(createDropdown({
+                    items: [{ label: 'Aucun résultat trouvé', sublabel: '' }],
+                }));
                 suggestionsBox.style.display = 'block';
             }
         }
@@ -178,63 +176,28 @@ function performSearchSimple(value, searchInput, suggestionsBox) {
     }
 }
 
-function addSafeSuggestionEventListeners(suggestionsBox, filteredItems) {
-    const suggestionItems = suggestionsBox.querySelectorAll('.suggestion-item[data-type]');
-    
-    suggestionItems.forEach((item, idx) => {
-        item.addEventListener('click', (e) => {
-            e.preventDefault();
-            e.stopPropagation();
-            
-            const index = parseInt(item.dataset.index);
-            const itemData = filteredItems[index];
-            
-            if (!itemData) {
-                console.warn('❌ Données item non trouvées');
-                return;
+function _handleSuggestionClick(itemData, suggestionsBox) {
+    const searchInput = el('searchInput');
+    if (searchInput) searchInput.value = '';
+    suggestionsBox.style.display = 'none';
+
+    try {
+        if (itemData.type === 'folder') {
+            if (window.showFolder) {
+                window.showFolder(itemData.id, itemData.name);
+            } else {
+                import('./gallery.js').then(({ showFolder }) => showFolder(itemData.id, itemData.name));
             }
-            
-            console.log('🎯 Clic sur:', itemData.name, 'Type:', itemData.type);
-            
-            // Nettoyer l'interface
-            const searchInput = el('searchInput');
-            if (searchInput) {
-                searchInput.value = '';
+        } else if (itemData.type === 'collection' || itemData.type === 'gallery' || itemData.type === 'album') {
+            if (window.openGallery) {
+                window.openGallery(itemData.id, itemData.name);
             }
-            
-            suggestionsBox.style.display = 'none';
-            
-            // Différencier le comportement selon le type
-            try {
-                if (itemData.type === 'folder') {
-                    console.log('📂 Ouverture du folder:', itemData.name);
-                    // Utiliser showFolder pour les dossiers
-                    if (window.showFolder) {
-                        window.showFolder(itemData.id, itemData.name);
-                    } else {
-                        // Import dynamique si nécessaire
-                        import('./gallery.js').then(({ showFolder }) => {
-                            showFolder(itemData.id, itemData.name);
-                        });
-                    }
-                } else if (itemData.type === 'collection' || itemData.type === 'gallery' || itemData.type === 'album') {
-                    console.log('📸 Ouverture de la galerie:', itemData.name);
-                    // Ouvrir directement la galerie de photos
-                    if (window.openGallery) {
-                        window.openGallery(itemData.id, itemData.name);
-                    } else {
-                        console.error('❌ openGallery non disponible');
-                    }
-                } else {
-                    console.log('❓ Type inconnu, utilisation de selectGallery');
-                    // Fallback pour les autres types
-                    selectGallery(itemData);
-                }
-            } catch (error) {
-                console.error('❌ Erreur lors de l\'ouverture:', error);
-            }
-        });
-    });
+        } else {
+            selectGallery(itemData);
+        }
+    } catch (error) {
+        console.error('❌ Erreur lors de l\'ouverture:', error);
+    }
 }
 
 function performFullSearch(query) {

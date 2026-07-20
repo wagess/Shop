@@ -1,0 +1,75 @@
+/* ==========================================================================
+   Footer — Sigma Design System
+   ========================================================================== */
+
+.site-footer {
+  background: var(--color-core-primary-a); /* #1f1f1f */
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
+  padding: 32px 24px;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.site-footer__inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  max-width: 1200px;
+  margin: 0 auto;
+  flex-wrap: wrap;
+}
+
+/* ── Brand ── */
+.site-footer__brand {
+  font-family: var(--font-family-base);
+  font-size: 14px;
+  font-weight: 500;
+  letter-spacing: -0.02em;
+  color: rgba(255, 255, 255, 0.4);
+  white-space: nowrap;
+}
+
+/* ── Nav ── */
+.site-footer__nav {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  flex-wrap: wrap;
+}
+
+.site-footer__link {
+  font-family: var(--font-family-base);
+  font-size: 14px;
+  font-weight: 450;
+  letter-spacing: -0.02em;
+  color: rgba(255, 255, 255, 0.55);
+  text-decoration: none;
+  transition: color 0.15s ease;
+  white-space: nowrap;
+}
+
+.site-footer__link:hover {
+  color: rgba(255, 255, 255, 0.9);
+}
+
+/* Admin — discret */
+.site-footer__link[href*="admin"] {
+  color: rgba(255, 255, 255, 0.25);
+}
+
+.site-footer__link[href*="admin"]:hover {
+  color: rgba(255, 255, 255, 0.6);
+}
+
+@media (max-width: 768px) {
+  .site-footer__inner {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 16px;
+  }
+
+  .site-footer__nav {
+    gap: 16px;
+  }
+}

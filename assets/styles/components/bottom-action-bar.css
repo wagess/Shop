@@ -1,0 +1,149 @@
+/* ==========================================================================
+   Bottom Action Bar — Sigma Design System
+   Figma : node 1585-15444 — /Home/Components/Selection and input/Bottom action bar
+   Hauteur : 80px — shadow : minShadow
+   ========================================================================== */
+
+.bottom-action-bar {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 8px;
+  height: 80px;
+  padding: 0 24px;
+  background: var(--color-bg-primary);
+  box-shadow:
+    0 1px 4px rgba(0, 0, 0, 0.04),
+    0 4px 12px rgba(0, 0, 0, 0.06);
+  overflow: hidden;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+/* ── Zone gauche — titre + lien ── */
+.bottom-action-bar__info {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  flex: 1;
+  min-width: 0;
+  height: 56px;
+  overflow: hidden;
+}
+
+.bottom-action-bar__title {
+  font-family: var(--font-family-base);
+  font-size: var(--font-headline-body-size);  /* 16px */
+  font-weight: 550;                           /* Semibold */
+  line-height: var(--font-headline-body-line-height);
+  letter-spacing: var(--font-headline-body-letter-spacing);
+  color: var(--color-text-primary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.bottom-action-bar__secondary {
+  font-family: var(--font-family-base);
+  font-size: var(--font-body-caption-size);   /* 14px */
+  font-weight: 500;
+  line-height: 20px;
+  letter-spacing: -0.02em;
+  color: var(--color-text-primary);
+  text-decoration: underline;
+  text-underline-position: from-font;
+  text-decoration-skip-ink: none;
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  text-align: left;
+  transition: color 0.15s ease;
+}
+
+.bottom-action-bar__secondary:hover {
+  color: var(--color-text-secondary);
+}
+
+/* ── Zone droite — bouton ── */
+.bottom-action-bar__action {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  flex: 1;
+  min-width: 0;
+  height: 56px;
+}
+
+.bottom-action-bar__btn {
+  flex: 1;
+  height: 56px;
+  padding: 16px 32px;
+  background: var(--color-bg-secondary);
+  color: var(--color-text-primary);
+  border: none;
+  border-radius: var(--radius-circular);
+  font-family: var(--font-family-base);
+  font-size: var(--font-headline-body-size);
+  font-weight: var(--font-headline-body-weight);
+  letter-spacing: var(--font-headline-body-letter-spacing);
+  white-space: nowrap;
+  cursor: pointer;
+  transition: background 0.15s ease;
+}
+
+.bottom-action-bar__btn:hover {
+  background: var(--color-bg-active);
+}
+
+/* ── Variante glass (onMaterial) ── */
+.bottom-action-bar--glass {
+  background: transparent;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.bottom-action-bar__glass {
+  position: absolute;
+  inset: 0;
+  background: rgba(128, 128, 128, 0.3);
+  backdrop-filter: blur(50px);
+  -webkit-backdrop-filter: blur(50px);
+  mix-blend-mode: luminosity;
+  pointer-events: none;
+}
+
+.bottom-action-bar--glass .bottom-action-bar__title,
+.bottom-action-bar--glass .bottom-action-bar__secondary {
+  color: rgba(255, 255, 255, 0.96);
+}
+
+.bottom-action-bar--glass .bottom-action-bar__btn {
+  position: relative;
+  background: transparent;
+  color: rgba(255, 255, 255, 0.96);
+  overflow: hidden;
+}
+
+.bottom-action-bar--glass .bottom-action-bar__btn::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: rgba(255, 255, 255, 0.07);
+  pointer-events: none;
+}
+
+.bottom-action-bar--glass .bottom-action-bar__btn::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: rgba(94, 94, 94, 0.18);
+  mix-blend-mode: color-dodge;
+  pointer-events: none;
+}
+
+.bottom-action-bar--glass .bottom-action-bar__btn:hover::before {
+  background: rgba(255, 255, 255, 0.14);
+}

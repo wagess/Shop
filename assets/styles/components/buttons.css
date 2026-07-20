@@ -1,18 +1,127 @@
-/* ==================== Buttons ==================== */
+/* ==========================================================================
+   Buttons — Sigma Design System
+   Figma : node 1585-15045 — /Home/Components/Selection and input/Buttons
+   ========================================================================== */
+
+/* --------------------------------------------------------------------------
+   Base commune
+   -------------------------------------------------------------------------- */
+.btn-primary,
+.btn-secondary,
+.btn-tertiary,
 .order-btn {
-    width: 100%;
-    padding: var(--padding-small);
-    background: var(--bg-gradient-success);
-    color: var(--white);
-    border: none;
-    border-radius: var(--border-radius-medium);
-    font-size: 16px;
-    font-weight: bold;
-    cursor: pointer;
-    transition: var(--transition-normal);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+
+  height: 56px;
+  padding: 16px 32px;
+  border-radius: var(--radius-circular);
+  overflow: hidden;
+
+  font-family: var(--font-family-base);
+  font-size: var(--font-headline-body-size);       /* 16px */
+  font-weight: var(--font-headline-body-weight);   /* 500 */
+  line-height: var(--font-headline-body-line-height); /* 20px */
+  letter-spacing: var(--font-headline-body-letter-spacing); /* -0.02em */
+  white-space: nowrap;
+
+  border: none;
+  cursor: pointer;
+  text-decoration: none;
+  transition: background 0.15s ease, border-color 0.15s ease, color 0.15s ease;
 }
 
+/* --------------------------------------------------------------------------
+   Primary — fond gris clair, hover fond active
+   -------------------------------------------------------------------------- */
+.btn-primary,
+.order-btn {
+  background: var(--color-core-primary-a);
+  color: var(--color-core-primary-b);
+  border: none;
+}
+
+.btn-primary:hover,
 .order-btn:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 5px 15px rgba(87, 173, 157, 0.4);
+  background: var(--color-text-secondary);
+}
+
+/* --------------------------------------------------------------------------
+   Secondary — bordure fine, transparent
+   -------------------------------------------------------------------------- */
+.btn-secondary {
+  background: transparent;
+  color: var(--color-text-primary);
+  border: 1px solid var(--color-border-tertiary);
+}
+
+.btn-secondary:hover {
+  border-color: var(--color-border-secondary);
+}
+
+/* --------------------------------------------------------------------------
+   Tertiary — texte souligné, aucun fond ni bordure
+   -------------------------------------------------------------------------- */
+.btn-tertiary {
+  background: transparent;
+  color: var(--color-text-primary);
+  border: none;
+  text-decoration: underline;
+  text-underline-position: from-font;
+  text-decoration-skip-ink: none;
+}
+
+.btn-tertiary:hover {
+  color: var(--color-text-secondary);
+}
+
+/* --------------------------------------------------------------------------
+   État désactivé
+   -------------------------------------------------------------------------- */
+.btn-primary:disabled,
+.btn-secondary:disabled,
+.btn-tertiary:disabled,
+.order-btn:disabled {
+  background: var(--color-bg-disabled);
+  color: var(--color-text-disabled);
+  border-color: transparent;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
+/* --------------------------------------------------------------------------
+   Sous-éléments (créés par le composant JS)
+   -------------------------------------------------------------------------- */
+.btn__icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 24px;
+  height: 24px;
+}
+
+.btn__icon svg {
+  width: 100%;
+  height: 100%;
+}
+
+.btn__label {
+  display: inline-block;
+}
+
+/* --------------------------------------------------------------------------
+   Tailles — Medium (48px) et Small (40px)
+   -------------------------------------------------------------------------- */
+.btn-md {
+  height: 48px;
+  padding: 12px 24px;
+}
+
+.btn-sm {
+  height: 40px;
+  padding: 10px 20px;
+  font-size: 14px;
 }

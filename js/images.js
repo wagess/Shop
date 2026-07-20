@@ -47,8 +47,12 @@ async function loadRandomImage() {
 
     try {
         const timestamp = Date.now();
-        const wordpressUrl = 'https://www.photographie.stephanewagner.com';
-        const response = await fetch(`${wordpressUrl}/wp-json/wplr-iptc/v1/random-image?size=large&t=${timestamp}`);
+        const IS_LOCAL = location.hostname === 'localhost' || location.hostname === '127.0.0.1';
+        const path = `/wp-json/wplr-iptc/v1/random-image?size=large&t=${timestamp}`;
+        const url = IS_LOCAL
+            ? `/proxy.php?path=${encodeURIComponent(path)}`
+            : `https://www.photographie.stephanewagner.com${path}`;
+        const response = await fetch(url);
         
         if (!response.ok) {
             console.error('❌ Erreur HTTP:', response.status, response.statusText);

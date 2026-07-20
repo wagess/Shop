@@ -1,0 +1,161 @@
+/* ==========================================================================
+   Sigma Design System — Design Tokens
+   Source: Figma QgM6d52yaLh6vkJCnTRsMa
+   ========================================================================== */
+
+:root {
+
+  /* --------------------------------------------------------------------------
+     Colors — Core (identiques light/dark sauf secondary_green)
+     -------------------------------------------------------------------------- */
+  --color-core-primary-a:         #1f1f1f;
+  --color-core-primary-b:         #ffffff;
+  --color-core-primary-blue:      #0d77d3;
+  --color-core-secondary-blue:    #61aaf2;
+  --color-core-primary-red:       #cf3030;
+  --color-core-secondary-red:     #f26161;
+  --color-core-primary-green:     #288556;
+  --color-core-secondary-green:   #39bf87;
+  --color-core-primary-yellow:    #ce8508;
+  --color-core-secondary-yellow:  #facd64;
+  --color-core-primary-orange:    #c2410b;
+  --color-core-secondary-orange:  #ff9966;
+  --color-core-primary-purple:    #7e24b2;
+  --color-core-secondary-purple:  #a985f2;
+  --color-core-primary-pink:      #d941bf;
+  --color-core-secondary-pink:    #f285c5;
+
+  /* --------------------------------------------------------------------------
+     Colors — Light Mode (défaut)
+     -------------------------------------------------------------------------- */
+
+  /* Texte */
+  --color-text-primary:           #1f1f1f;
+  --color-text-secondary:         #3d3d3d;
+  --color-text-tertiary:          #7a7a7a;
+  --color-text-disabled:          #b8b8b8;
+  --color-text-primary-b:         #ffffff;
+
+  /* Fond */
+  --color-bg-primary:             #ffffff;
+  --color-bg-secondary:           #f5f5f5;
+  --color-bg-tertiary:            #b6b6b6;
+  --color-bg-active:              #e0e0e0;
+  --color-bg-disabled:            #f5f5f5;
+
+  /* Bordure */
+  --color-border-primary:         #1f1f1f;
+  --color-border-secondary:       #b8b8b8;
+  --color-border-tertiary:        #e0e0e0;
+
+  /* Hover */
+  --color-hover-primary:          #e2e2e2;
+
+  /* --------------------------------------------------------------------------
+     Typography — Font family
+     -------------------------------------------------------------------------- */
+  --font-family-base:             "General Sans Variable", sans-serif;
+
+  /* --------------------------------------------------------------------------
+     Typography — Title M
+     -------------------------------------------------------------------------- */
+  --font-title-m-size:            32px;
+  --font-title-m-weight:          500;
+  --font-title-m-line-height:     40px;
+  --font-title-m-letter-spacing:  -0.02em;
+
+  /* --------------------------------------------------------------------------
+     Typography — Headline
+     -------------------------------------------------------------------------- */
+  --font-headline-size:           20px;
+  --font-headline-line-height:    24px;
+  --font-headline-letter-spacing: -0.02em;
+  --font-headline-weight-medium:  500;
+  --font-headline-weight-regular: 450;
+
+  /* --------------------------------------------------------------------------
+     Typography — Headline Body
+     -------------------------------------------------------------------------- */
+  --font-headline-body-size:        16px;
+  --font-headline-body-weight:      500;
+  --font-headline-body-line-height: 20px;
+  --font-headline-body-letter-spacing: -0.02em;
+
+  /* --------------------------------------------------------------------------
+     Typography — Body / Caption
+     -------------------------------------------------------------------------- */
+  --font-body-caption-size:           14px;
+  --font-body-caption-weight:         450;
+  --font-body-caption-line-height:    18px;
+  --font-body-caption-letter-spacing: -0.02em;
+
+  /* --------------------------------------------------------------------------
+     Border Radius
+     -------------------------------------------------------------------------- */
+  --radius-firm:      12px;
+  --radius-circular:  200px;
+}
+
+/* ==========================================================================
+   Dark Mode — préférence système
+   ========================================================================== */
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    /* Texte */
+    --color-text-primary:           #ffffff;
+    --color-text-secondary:         #b8b8b8;
+    --color-text-tertiary:          #7a7a7a;
+    --color-text-disabled:          #3d3d3d;
+    --color-text-primary-b:         #1f1f1f;
+
+    /* Fond */
+    --color-bg-primary:             #141414;
+    --color-bg-secondary:           #1f1f1f;
+    --color-bg-tertiary:            #7a7a7a;
+    --color-bg-active:              #3d3d3d;
+    --color-bg-disabled:            #1f1f1f;
+
+    /* Bordure */
+    --color-border-primary:         #7a7a7a;
+    --color-border-secondary:       #3d3d3d;
+    --color-border-tertiary:        #1f1f1f;
+
+    /* Hover */
+    --color-hover-primary:          #4c4c4c;
+
+    /* Core — secondary_green différent en dark */
+    --color-core-secondary-green:   #0dd6a4;
+  }
+}
+
+/* ==========================================================================
+   Dark Mode — forçage manuel via attribut [data-theme="dark"]
+   ========================================================================== */
+
+[data-theme="dark"] {
+  /* Texte */
+  --color-text-primary:           #ffffff;
+  --color-text-secondary:         #b8b8b8;
+  --color-text-tertiary:          #7a7a7a;
+  --color-text-disabled:          #3d3d3d;
+  --color-text-primary-b:         #1f1f1f;
+
+  /* Fond */
+  --color-bg-primary:             #141414;
+  --color-bg-secondary:           #1f1f1f;
+  --color-bg-tertiary:            #7a7a7a;
+  --color-bg-active:              #3d3d3d;
+  --color-bg-disabled:            #1f1f1f;
+
+  /* Bordure */
+  --color-border-primary:         #7a7a7a;
+  --color-border-secondary:       #3d3d3d;
+  --color-border-tertiary:        #1f1f1f;
+
+  /* Hover */
+  --color-hover-primary:          #4c4c4c;
+
+  /* Core — secondary_green différent en dark */
+  --color-core-secondary-green:   #0dd6a4;
+}

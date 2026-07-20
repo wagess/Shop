@@ -3,6 +3,23 @@
 const TRIPTYQUE_KEY = 'triptyque_photos';
 const TRIPTYQUE_MAX = 3;
 
+function _heartIcon(filled) {
+    return filled
+        ? `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>`
+        : `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>`;
+}
+
+function _setHeartBtnState(btn, selected) {
+    const iconSpan = btn.querySelector('.btn__icon');
+    if (iconSpan) {
+        iconSpan.innerHTML = _heartIcon(selected);
+        btn.classList.toggle('btn-primary', selected);
+        btn.classList.toggle('btn-secondary', !selected);
+    }
+    btn.classList.toggle('triptyque-add-btn--selected', selected);
+    btn.title = selected ? 'Retirer du triptyque' : 'Ajouter au triptyque';
+}
+
 function triptyqueGet() {
     try { return JSON.parse(localStorage.getItem(TRIPTYQUE_KEY)) || []; }
     catch { return []; }
@@ -12,6 +29,7 @@ function triptyqueSave(photos) {
     localStorage.setItem(TRIPTYQUE_KEY, JSON.stringify(photos));
     console.log('🎞️ Triptyque :', photos.map(p => p.title));
     triptyqueUpdateBadge();
+    triptyqueUpdateBar();
 }
 
 function triptyqueUpdateBadge() {
@@ -37,7 +55,7 @@ window.toggleTriptyquePhoto = function(btn) {
     if (idx >= 0) {
         photos.splice(idx, 1);
         triptyqueSave(photos);
-        btn.classList.remove('triptyque-add-btn--selected');
+        _setHeartBtnState(btn, false);
     } else {
         if (photos.length >= TRIPTYQUE_MAX) {
             triptyqueOpenModal();
@@ -45,7 +63,7 @@ window.toggleTriptyquePhoto = function(btn) {
         }
         photos.push(photo);
         triptyqueSave(photos);
-        btn.classList.add('triptyque-add-btn--selected');
+        _setHeartBtnState(btn, true);
         if (photos.length === TRIPTYQUE_MAX) triptyqueOpenModal();
     }
 };
@@ -98,7 +116,7 @@ function triptyqueOpenModal() {
     modal.querySelector('#tmodal-close').onclick  = closeModal;
     modal.querySelector('#tmodal-close2').onclick = function() {
         triptyqueSave([]);
-        document.querySelectorAll('.triptyque-add-btn--selected').forEach(b => b.classList.remove('triptyque-add-btn--selected'));
+        document.querySelectorAll('.triptyque-add-btn--selected').forEach(b => _setHeartBtnState(b, false));
         closeModal();
     };
     modal.onclick = function(e) { if (e.target === modal) closeModal(); };
@@ -108,7 +126,7 @@ function triptyqueOpenModal() {
             const id = parseInt(btn.dataset.id);
             triptyqueSave(triptyqueGet().filter(p => p.id !== id));
             const addBtn = document.getElementById('triptyque-btn-' + id);
-            if (addBtn) addBtn.classList.remove('triptyque-add-btn--selected');
+            if (addBtn) _setHeartBtnState(addBtn, false);
             closeModal();
         };
     });
@@ -269,6 +287,40 @@ async function triptyquePhase3(modal, keywordResults) {
             setTimeout(() => { btn.textContent = 'Partager cette histoire'; }, 2000);
         }
     };
+}
+
+function triptyqueUpdateBar() {
+    const photos = triptyqueGet();
+    let bar = document.getElementById('triptyque-page-bar');
+
+    if (photos.length === 0) {
+        if (bar) {
+            bar.classList.remove('triptyque-page-bar--visible');
+            setTimeout(() => bar?.remove(), 250);
+        }
+        return;
+    }
+
+    if (!bar) {
+        bar = document.createElement('div');
+        bar.id = 'triptyque-page-bar';
+        document.body.appendChild(bar);
+        requestAnimationFrame(() => bar.classList.add('triptyque-page-bar--visible'));
+    }
+
+    bar.innerHTML = '';
+
+    if (!window.createBottomActionBar) return;
+
+    const isComplete = photos.length === TRIPTYQUE_MAX;
+
+    bar.appendChild(window.createBottomActionBar({
+        title:       isComplete ? 'Triptyque complet' : `${photos.length}\u202f/\u202f${TRIPTYQUE_MAX} photos`,
+        secondary:   isComplete ? 'Modifier la sélection' : 'Voir la sélection',
+        onSecondary: triptyqueOpenModal,
+        actionLabel: isComplete ? 'Créer une histoire →' : 'Continuer la sélection',
+        onAction:    triptyqueOpenModal,
+    }));
 }
 
 // Init au chargement — liste vide

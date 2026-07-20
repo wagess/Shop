@@ -1,135 +1,356 @@
 <!DOCTYPE html>
-<html lang="fr">
+<html lang="fr" data-theme="dark">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Admin — Visibilité collections</title>
+<link rel="stylesheet" href="./docs/tokens.css">
+<link rel="stylesheet" href="./assets/styles/components/toggle.css">
 <style>
+  @import url('https://api.fontshare.com/v2/css?f[]=general-sans@400,500,600&display=swap');
+
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
-  :root {
-    --bg: #0e0e0e;
-    --surface: #1a1a1a;
-    --border: #2a2a2a;
-    --text: #e8e8e8;
-    --muted: #666;
-    --accent: #fff;
-    --danger: #e05555;
-    --success: #4caf7d;
-    --toggle-off: #333;
-    --toggle-on: #4caf7d;
+  body {
+    background: var(--color-bg-primary);
+    color: var(--color-text-primary);
+    font-family: var(--font-family-base);
+    font-size: var(--font-body-caption-size);
+    line-height: var(--font-body-caption-line-height);
+    min-height: 100vh;
   }
 
-  body { background: var(--bg); color: var(--text); font-family: 'Georgia', serif; min-height: 100vh; }
-
-  /* LOGIN */
+  /* ── Login ── */
   #login {
-    display: flex; align-items: center; justify-content: center; min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
   }
-  .login-box {
-    background: var(--surface); border: 1px solid var(--border);
-    padding: 48px; width: 360px; text-align: center;
-  }
-  .login-box h1 { font-size: 13px; letter-spacing: 3px; text-transform: uppercase; color: var(--muted); margin-bottom: 32px; font-weight: 400; }
-  .login-box input {
-    width: 100%; padding: 12px 16px; background: var(--bg); border: 1px solid var(--border);
-    color: var(--text); font-size: 14px; margin-bottom: 16px; outline: none; font-family: inherit;
-  }
-  .login-box input:focus { border-color: #555; }
-  .login-box button {
-    width: 100%; padding: 12px; background: var(--accent); color: #000;
-    border: none; font-size: 12px; letter-spacing: 2px; text-transform: uppercase; cursor: pointer; font-family: inherit;
-  }
-  .login-error { color: var(--danger); font-size: 12px; margin-top: 12px; min-height: 18px; }
 
-  /* DASHBOARD */
+  .login-box {
+    background: var(--color-bg-secondary);
+    border: 1px solid var(--color-border-secondary);
+    border-radius: var(--radius-firm);
+    padding: 48px;
+    width: 360px;
+    text-align: center;
+  }
+
+  .login-box h1 {
+    font-size: 11px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--color-text-tertiary);
+    margin-bottom: 32px;
+    font-weight: 500;
+  }
+
+  .login-box input {
+    width: 100%;
+    padding: 12px 16px;
+    background: var(--color-bg-primary);
+    border: 1px solid var(--color-border-secondary);
+    border-radius: var(--radius-firm);
+    color: var(--color-text-primary);
+    font-family: var(--font-family-base);
+    font-size: var(--font-body-caption-size);
+    margin-bottom: 12px;
+    outline: none;
+    transition: border-color 0.15s ease;
+  }
+
+  .login-box input:focus { border-color: var(--color-border-primary); }
+
+  .login-box button {
+    width: 100%;
+    padding: 14px;
+    background: var(--color-core-primary-b);
+    color: var(--color-core-primary-a);
+    border: none;
+    border-radius: var(--radius-circular);
+    font-family: var(--font-family-base);
+    font-size: var(--font-body-caption-size);
+    font-weight: 500;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: opacity 0.15s ease;
+  }
+
+  .login-box button:hover { opacity: 0.85; }
+
+  .login-error {
+    color: var(--color-core-secondary-red);
+    font-size: 12px;
+    margin-top: 12px;
+    min-height: 18px;
+  }
+
+  /* ── Dashboard ── */
   #dashboard { display: none; }
 
   .topbar {
-    position: sticky; top: 0; z-index: 100;
-    background: var(--surface); border-bottom: 1px solid var(--border);
-    padding: 16px 32px; display: flex; align-items: center; justify-content: space-between;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    background: var(--color-bg-secondary);
+    border-bottom: 1px solid var(--color-border-secondary);
+    padding: 16px 32px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
   }
+
   .topbar-left { display: flex; align-items: center; gap: 24px; }
-  .topbar h1 { font-size: 11px; letter-spacing: 3px; text-transform: uppercase; color: var(--muted); font-weight: 400; }
-  .stats { font-size: 12px; color: var(--muted); }
-  .stats span { color: var(--text); font-weight: bold; }
 
-  .topbar-right { display: flex; gap: 12px; align-items: center; }
+  .topbar h1 {
+    font-size: 11px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--color-text-tertiary);
+    font-weight: 500;
+  }
+
+  .stats {
+    font-size: 12px;
+    color: var(--color-text-tertiary);
+  }
+
+  .stats span {
+    color: var(--color-text-primary);
+    font-weight: 500;
+  }
+
+  .topbar-right { display: flex; gap: 8px; align-items: center; }
+
   .btn {
-    padding: 8px 20px; font-size: 11px; letter-spacing: 2px; text-transform: uppercase;
-    border: none; cursor: pointer; font-family: inherit; transition: opacity .2s;
+    height: 36px;
+    padding: 0 16px;
+    font-family: var(--font-family-base);
+    font-size: 12px;
+    font-weight: 500;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    border-radius: var(--radius-circular);
+    border: none;
+    cursor: pointer;
+    transition: opacity 0.15s ease;
   }
-  .btn:hover { opacity: .8; }
-  .btn-save { background: var(--accent); color: #000; }
-  .btn-save:disabled { background: #333; color: #666; cursor: default; opacity: 1; }
-  .btn-logout { background: transparent; color: var(--muted); border: 1px solid var(--border); }
-  .unsaved { font-size: 11px; color: #f0a500; letter-spacing: 1px; }
 
+  .btn:hover { opacity: 0.8; }
+
+  .btn-save {
+    background: var(--color-core-primary-b);
+    color: var(--color-core-primary-a);
+  }
+
+  .btn-save:disabled {
+    background: var(--color-bg-active);
+    color: var(--color-text-tertiary);
+    cursor: default;
+    opacity: 1;
+  }
+
+  .btn-logout {
+    background: transparent;
+    color: var(--color-text-tertiary);
+    border: 1px solid var(--color-border-secondary);
+  }
+
+  .unsaved {
+    font-size: 12px;
+    color: var(--color-core-primary-yellow);
+    letter-spacing: 0.02em;
+  }
+
+  /* ── Barre de recherche ── */
   .search-bar {
-    padding: 16px 32px; border-bottom: 1px solid var(--border);
+    padding: 12px 32px;
+    border-bottom: 1px solid var(--color-border-secondary);
   }
-  .search-bar input {
-    width: 100%; max-width: 400px; padding: 10px 16px;
-    background: var(--surface); border: 1px solid var(--border);
-    color: var(--text); font-size: 13px; outline: none; font-family: inherit;
-  }
-  .search-bar input:focus { border-color: #555; }
 
+  .search-bar input {
+    width: 100%;
+    max-width: 400px;
+    height: 40px;
+    padding: 0 16px;
+    background: var(--color-bg-secondary);
+    border: 1px solid var(--color-border-secondary);
+    border-radius: var(--radius-circular);
+    color: var(--color-text-primary);
+    font-family: var(--font-family-base);
+    font-size: var(--font-body-caption-size);
+    outline: none;
+    transition: border-color 0.15s ease;
+  }
+
+  .search-bar input:focus { border-color: var(--color-border-primary); }
+
+  .search-bar input::placeholder { color: var(--color-text-tertiary); }
+
+  /* ── Contenu ── */
   .main { padding: 24px 32px; }
 
-  .folder-section { margin-bottom: 8px; }
+  /* ── Dossiers ── */
+  .folder-section { margin-bottom: 6px; }
 
   .folder-header {
-    display: flex; align-items: center; justify-content: space-between;
-    padding: 12px 16px; background: var(--surface); border: 1px solid var(--border);
-    cursor: pointer; user-select: none; gap: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 16px;
+    background: var(--color-bg-secondary);
+    border: 1px solid var(--color-border-secondary);
+    border-radius: var(--radius-firm);
+    cursor: pointer;
+    user-select: none;
+    gap: 12px;
+    transition: border-color 0.15s ease;
   }
-  .folder-header:hover { border-color: #3a3a3a; }
-  .folder-header-left { display: flex; align-items: center; gap: 12px; flex: 1; }
-  .folder-chevron { font-size: 10px; color: var(--muted); transition: transform .2s; }
-  .folder-section.open .folder-chevron { transform: rotate(90deg); }
-  .folder-name { font-size: 13px; letter-spacing: 1px; }
-  .folder-count { font-size: 11px; color: var(--muted); }
 
-  .collections-list { border: 1px solid var(--border); border-top: none; display: none; }
+  .folder-header:hover { border-color: var(--color-border-primary); }
+
+  .folder-section.open .folder-header {
+    border-bottom-left-radius: 0;
+    border-bottom-right-radius: 0;
+  }
+
+  .folder-header-left { display: flex; align-items: center; gap: 12px; flex: 1; }
+
+  .folder-chevron {
+    font-size: 10px;
+    color: var(--color-text-tertiary);
+    transition: transform 0.2s ease;
+  }
+
+  .folder-section.open .folder-chevron { transform: rotate(90deg); }
+
+  .folder-name {
+    font-size: var(--font-headline-body-size);
+    font-weight: var(--font-headline-body-weight);
+    letter-spacing: var(--font-headline-body-letter-spacing);
+    color: var(--color-text-primary);
+  }
+
+  .folder-count {
+    font-size: 12px;
+    color: var(--color-text-tertiary);
+  }
+
+  /* ── Collections ── */
+  .collections-list {
+    border: 1px solid var(--color-border-secondary);
+    border-top: none;
+    border-radius: 0 0 var(--radius-firm) var(--radius-firm);
+    display: none;
+    overflow: hidden;
+  }
+
   .folder-section.open .collections-list { display: block; }
 
   .collection-row {
-    display: flex; align-items: center; justify-content: space-between;
-    padding: 10px 16px 10px 32px; border-bottom: 1px solid var(--border);
-    transition: background .15s;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 16px 10px 36px;
+    border-bottom: 1px solid var(--color-border-secondary);
+    transition: background 0.1s ease;
   }
+
   .collection-row:last-child { border-bottom: none; }
-  .collection-row:hover { background: rgba(255,255,255,.03); }
-  .collection-row.hidden-row { opacity: .45; }
 
-  .collection-name { font-size: 13px; }
-  .collection-id { font-size: 10px; color: var(--muted); margin-left: 8px; letter-spacing: 1px; }
+  .collection-row:hover { background: var(--color-hover-primary); }
 
-  /* Toggle */
-  .toggle { position: relative; width: 40px; height: 22px; flex-shrink: 0; }
-  .toggle input { opacity: 0; width: 0; height: 0; }
-  .toggle-slider {
-    position: absolute; inset: 0; background: var(--toggle-off);
-    border-radius: 22px; cursor: pointer; transition: background .2s;
+  .collection-row.hidden-row { opacity: 0.4; }
+
+  .collection-name {
+    font-size: var(--font-body-caption-size);
+    font-weight: var(--font-body-caption-weight);
+    color: var(--color-text-primary);
   }
-  .toggle-slider::before {
-    content: ''; position: absolute;
-    width: 16px; height: 16px; left: 3px; top: 3px;
-    background: #888; border-radius: 50%; transition: transform .2s, background .2s;
+
+  .collection-id {
+    font-size: 11px;
+    color: var(--color-text-tertiary);
+    margin-left: 8px;
+    letter-spacing: 0.05em;
   }
-  .toggle input:checked + .toggle-slider { background: var(--toggle-on); }
-  .toggle input:checked + .toggle-slider::before { transform: translateX(18px); background: #fff; }
 
-  .loader { padding: 48px; text-align: center; color: var(--muted); font-size: 13px; }
-  .empty { padding: 32px; text-align: center; color: var(--muted); font-size: 13px; }
+  /* ── Toggle Sigma — surcharge dark ── */
+  .toggle--off      { background: var(--color-bg-active); }
+  .toggle--on       { background: var(--color-core-primary-b); }
+  .toggle--on .toggle__thumb { background: var(--color-core-primary-a); }
+  .toggle--disabled { background: var(--color-bg-disabled); }
 
-  /* Standalone collections (no folder) */
-  .standalone-section { margin-bottom: 8px; }
+  /* ── États vides / loader ── */
+  .loader {
+    padding: 48px;
+    text-align: center;
+    color: var(--color-text-tertiary);
+  }
+
+  .empty {
+    padding: 32px;
+    text-align: center;
+    color: var(--color-text-tertiary);
+  }
+
+  /* ── Collection mise en avant ── */
+  .featured-bar {
+    padding: 12px 32px;
+    border-bottom: 1px solid var(--color-border-secondary);
+    display: flex;
+    align-items: center;
+    gap: 16px;
+  }
+
+  .featured-bar label {
+    font-size: 11px;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--color-text-tertiary);
+    white-space: nowrap;
+    font-weight: 500;
+  }
+
+  .featured-bar select {
+    height: 36px;
+    padding: 0 14px;
+    background: var(--color-bg-secondary);
+    border: 1px solid var(--color-border-secondary);
+    border-radius: var(--radius-circular);
+    color: var(--color-text-primary);
+    font-family: var(--font-family-base);
+    font-size: var(--font-body-caption-size);
+    outline: none;
+    cursor: pointer;
+    min-width: 220px;
+    transition: border-color 0.15s ease;
+  }
+
+  .featured-bar select:focus { border-color: var(--color-border-primary); }
+
+  .featured-hint {
+    font-size: 11px;
+    color: var(--color-text-tertiary);
+    margin-left: auto;
+  }
+
+  /* ── Collections sans dossier ── */
+  .standalone-section { margin-bottom: 6px; }
+
   .standalone-header {
-    padding: 10px 16px; font-size: 10px; letter-spacing: 2px;
-    text-transform: uppercase; color: var(--muted); border-bottom: 1px solid var(--border);
+    padding: 10px 16px;
+    font-size: 11px;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--color-text-tertiary);
+    border-bottom: 1px solid var(--color-border-secondary);
+    background: var(--color-bg-secondary);
+    border-radius: var(--radius-firm) var(--radius-firm) 0 0;
+    border: 1px solid var(--color-border-secondary);
   }
 </style>
 </head>
@@ -159,6 +380,14 @@
     </div>
   </div>
 
+  <div class="featured-bar">
+    <label for="featuredSelect">Collection mise en avant</label>
+    <select id="featuredSelect" onchange="setFeatured(this.value)">
+      <option value="">— Choisir —</option>
+    </select>
+    <span class="featured-hint" id="featuredHint"></span>
+  </div>
+
   <div class="search-bar">
     <input type="text" id="searchInput" placeholder="Rechercher une collection…" oninput="filterList()">
   </div>
@@ -168,13 +397,34 @@
   </div>
 </div>
 
+<script type="module">
+import { createToggle } from './js/components/toggle.js';
+window.createToggle = createToggle;
+</script>
+
 <script>
 const PASSWORD  = 'sw2024';
-const API_BASE  = 'https://www.photographie.stephanewagner.com/wp-json/wplr/v1';
+const WP_BASE   = 'https://www.photographie.stephanewagner.com';
+const IS_LOCAL  = ['localhost', '127.0.0.1', '0.0.0.0'].includes(location.hostname)
+               || location.hostname.endsWith('.local')
+               || location.port === '8888';
+const API_BASE  = IS_LOCAL
+  ? null
+  : `${WP_BASE}/wp-json/wplr/v1`;
 const TOKEN     = 'EDNusnA0Q8TW';
 const SAVE_URL  = './admin-save.php';
 
-let config     = { collections: {}, folders: {} };
+function adminFetch(path, options = {}) {
+  const url = IS_LOCAL
+    ? `/proxy.php?path=${encodeURIComponent(path)}`
+    : `${WP_BASE}${path}`;
+  if (!IS_LOCAL) {
+    options.headers = { ...options.headers, Authorization: `Bearer ${TOKEN}` };
+  }
+  return fetch(url, options);
+}
+
+let config     = { featured_collection: '', collections: {}, folders: {} };
 let hierarchy  = null;
 let isDirty    = false;
 
@@ -206,11 +456,11 @@ if (sessionStorage.getItem('admin_auth') === '1') {
 // --- INIT ---
 async function init() {
   const [hier, cfg] = await Promise.all([
-    fetch(`${API_BASE}/hierarchy`, { headers: { Authorization: `Bearer ${TOKEN}` } }).then(r => r.json()),
+    adminFetch('/wp-json/wplr/v1/hierarchy').then(r => r.json()),
     fetch(SAVE_URL).then(r => r.json()).catch(() => ({ collections: {}, folders: {} })),
   ]);
   hierarchy = hier;
-  config    = cfg;
+  config    = { featured_collection: '', collections: {}, folders: {}, ...cfg };
   renderDashboard();
 }
 
@@ -312,10 +562,7 @@ function renderDashboard() {
           <span class="folder-name">${folder.name || folder.id}</span>
           <span class="folder-count">${cols.length} collection${cols.length > 1 ? 's' : ''}</span>
         </div>
-        <label class="toggle" onclick="event.stopPropagation()">
-          <input type="checkbox" ${visible ? 'checked' : ''} onchange="toggleFolder('${folder.id}', this.checked)">
-          <span class="toggle-slider"></span>
-        </label>
+        <div class="toggle-mount" data-toggle-type="folder" data-toggle-id="${folder.id}" data-toggle-checked="${visible}" onclick="event.stopPropagation()"></div>
       </div>
       <div class="collections-list">
         ${cols.map(c => renderCollectionRow(c)).join('') || '<div class="empty">Aucune collection</div>'}
@@ -327,14 +574,43 @@ function renderDashboard() {
   if (standaloneC.length) {
     html += `<div class="standalone-section">
       <div class="standalone-header">Sans dossier</div>
-      <div class="collections-list" style="display:block;border:1px solid var(--border);">
+      <div class="collections-list" style="display:block;">
         ${standaloneC.map(c => renderCollectionRow(c)).join('')}
       </div>
     </div>`;
   }
 
   main.innerHTML = html || '<div class="empty">Aucune donnée.</div>';
+  mountToggles(main);
+  populateFeaturedSelect();
   updateStats();
+}
+
+async function mountToggles(container) {
+  // Attendre que le module toggle soit prêt (chargement asynchrone)
+  if (!window.createToggle) {
+    await new Promise(resolve => {
+      const check = setInterval(() => {
+        if (window.createToggle) { clearInterval(check); resolve(); }
+      }, 20);
+    });
+  }
+
+  container.querySelectorAll('.toggle-mount').forEach(mount => {
+    const type    = mount.dataset.toggleType;
+    const id      = mount.dataset.toggleId;
+    const checked = mount.dataset.toggleChecked === 'true';
+
+    const t = window.createToggle({
+      checked,
+      onChange: val => {
+        if (type === 'folder') toggleFolder(id, val);
+        else                   toggleCollection(id, val);
+      },
+    });
+
+    mount.replaceWith(t);
+  });
 }
 
 function renderCollectionRow(c) {
@@ -345,10 +621,7 @@ function renderCollectionRow(c) {
       <span class="collection-name">${c.name || c.title || 'Sans nom'}</span>
       <span class="collection-id">ID ${c.id}</span>
     </span>
-    <label class="toggle">
-      <input type="checkbox" ${visible ? 'checked' : ''} onchange="toggleCollection('${c.id}', this.checked)">
-      <span class="toggle-slider"></span>
-    </label>
+    <div class="toggle-mount" data-toggle-type="collection" data-toggle-id="${c.id}" data-toggle-checked="${visible}"></div>
   </div>`;
 }
 
@@ -366,6 +639,36 @@ function toggleCollection(id, value) {
   toggle('collections', id, value);
   const row = document.getElementById(`crow-${id}`);
   if (row) row.classList.toggle('hidden-row', !value);
+}
+
+// --- FEATURED ---
+function populateFeaturedSelect() {
+  const select = document.getElementById('featuredSelect');
+  if (!select) return;
+  const allCols = flatItems('collections')
+    .slice()
+    .sort((a, b) => (a.name || '').localeCompare(b.name || '', 'fr'));
+  select.innerHTML = '<option value="">— Choisir —</option>' +
+    allCols.map(c => {
+      const name = c.name || 'Sans nom';
+      const sel  = config.featured_collection === name ? ' selected' : '';
+      return `<option value="${name}"${sel}>${name}</option>`;
+    }).join('');
+  updateFeaturedHint();
+}
+
+function setFeatured(name) {
+  config.featured_collection = name;
+  markDirty();
+  updateFeaturedHint();
+}
+
+function updateFeaturedHint() {
+  const hint = document.getElementById('featuredHint');
+  if (!hint) return;
+  hint.textContent = config.featured_collection
+    ? `Affiché sur index.html`
+    : '';
 }
 
 // --- SEARCH ---
@@ -408,6 +711,10 @@ async function saveConfig() {
 window.addEventListener('beforeunload', e => {
   if (isDirty) e.preventDefault();
 });
+</script>
+<script>
+document.addEventListener('contextmenu', e => { if (e.target.tagName === 'IMG') e.preventDefault(); });
+document.addEventListener('dragstart',   e => { if (e.target.tagName === 'IMG') e.preventDefault(); });
 </script>
 </body>
 </html>

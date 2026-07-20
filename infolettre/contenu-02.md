@@ -1,21 +1,25 @@
 ---
-sujet: La lumière qui reste
-apercu: Quand le soleil hésite avant de disparaître.
-serie: Lumières du soir
-titre: La lumière qui reste
-numero: Série 2/10
-photo_id: 93045
-collection_id: 55
+sujet: La série de l'été, Escapade 2/10
+apercu: Une île sans forêt ne peut pas brûler.
+serie: Voyages
+titre: La sicile ancestrale
+numero: Épisode 2/10
+photo_id: 93313
+collection_id: 78
 intro:
+    Et si cet été, vous partiez à l’aventure sans quitter votre chaise longue ?
+
+    Je vous propose une série d’**escapades virtuelles** à travers un *sitcom photo unique*, une sélection d’images symboliques conçues pour éveiller votre curiosité et vous inviter à l’introspection. Chaque séquence est une invitation à voyager, à explorer, à vivre une expérience ou à partager un témoignage.
+
+    Prenez le temps, respirez un bon coup, et laissez-vous porter. Lisez, regardez… et surtout, **votez à la fin de votre lecture** – pour votre prochaine aventure.
+
+    Bonne exploration, et profitez bien de votre été ! 🌞
 cta_texte: Voir la série
-article_url:
-sondage_url: https://us2.list-manage.com/survey?u=9e13300aa07c637eb257e4db1&id=b32e594eb8&e=*|UNIQID|*
+cta_episode: Poursuivre l'aventure
+article_url: https://www.photographie.stephanewagner.com/la-mere-et-la-fille/
+sondage_url: 
 cta_url: https://shop.stephanewagner.com
 inscription_url: https://shop.stephanewagner.com/rejoindre/
 corps:
-    Il y a une fraction de seconde, juste après le coucher du soleil, où la lumière refuse de partir. Elle s'accroche aux façades, aux flaques d'eau, aux visages. C'est dans cet instant suspendu que j'ai déclenché.
-
-    Cette photo est née d'une longue attente. Deux heures assis sur un muret, à regarder la lumière évoluer. Le genre de patience que la ville décourage mais que la photographie exige.
-
-    Je vous invite à explorer cette série consacrée aux lumières du soir — ces teintes que les yeux voient mais que la mémoire peine à retenir.
+    On se demande parfois pourquoi, dans un monde si moderne, la vie n'est pas plus simple. En Sicile, j'y trouvais l'essentiel dans un chaos organisé. Sur cette île, au beau milieu du grand bleu, la force de l'âge impose le respect. Pour en savoir plus, **suivez le lien pour un petit périple méditerranéen.**
 ---

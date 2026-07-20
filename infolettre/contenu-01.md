@@ -14,6 +14,7 @@ intro:
     Prenez le temps, respirez un bon coup, et laissez-vous porter. Lisez, regardez… et surtout, **partagez vos impressions avec moi** – vos retours sont précieux pour nourrir cette aventure.
 
     Bonne exploration, et profitez bien de votre été ! 🌞
+cta_episode: Poursuivre l'aventure
 cta_texte: Voir la série
 article_url: https://www.photographie.stephanewagner.com/la-chaise/
 sondage_url: https://us2.list-manage.com/survey?u=9e13300aa07c637eb257e4db1&id=b32e594eb8&e=*|UNIQID|*

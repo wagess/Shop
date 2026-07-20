@@ -91,7 +91,8 @@
     margin-top: 24px;
 }
 
-.btn-primary, .btn-secondary {
+.spotify-modal-actions .btn-primary,
+.spotify-modal-actions .btn-secondary {
     padding: 12px 24px;
     border-radius: 50px;
     border: none;
@@ -102,26 +103,26 @@
     min-width: 120px;
 }
 
-.btn-primary {
+.spotify-modal-actions .btn-primary {
     background: linear-gradient(45deg, #1db954, #1ed760);
     color: white;
     box-shadow: 0 4px 15px rgba(29, 185, 84, 0.4);
 }
 
-.btn-primary:hover {
+.spotify-modal-actions .btn-primary:hover {
     background: linear-gradient(45deg, #1ed760, #21e065);
     transform: translateY(-2px);
     box-shadow: 0 6px 20px rgba(29, 185, 84, 0.6);
 }
 
-.btn-secondary {
+.spotify-modal-actions .btn-secondary {
     background: rgba(255, 255, 255, 0.1);
     color: white;
     border: 2px solid rgba(255, 255, 255, 0.2);
     backdrop-filter: blur(10px);
 }
 
-.btn-secondary:hover {
+.spotify-modal-actions .btn-secondary:hover {
     background: rgba(255, 255, 255, 0.2);
     border-color: rgba(255, 255, 255, 0.4);
     transform: translateY(-1px);
@@ -166,7 +167,8 @@
         gap: 12px;
     }
     
-    .btn-primary, .btn-secondary {
+    .spotify-modal-actions .btn-primary,
+    .spotify-modal-actions .btn-secondary {
         width: 100%;
         padding: 14px 24px;
     }

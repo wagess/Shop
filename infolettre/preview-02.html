@@ -3,26 +3,39 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>La lumière qui reste</title>
+<title>La série de l'été, Escapade 2/10</title>
 <style>
-  @keyframes promoPulse {
-    0%, 100% { background:#f5c842; }
-    50%       { background:#ffe066; }
+  @import url('https://fonts.cdnfonts.com/css/general-sans');
+
+  strong { font-weight:600 !important; }
+
+  @media only screen and (max-width:620px) {
+    .outer-wrap  { padding:0 !important; }
+    .inner-table { width:100% !important; }
+    .pad         { padding-left:20px !important; padding-right:20px !important; }
+    .pad-top     { padding-left:20px !important; padding-right:20px !important; padding-top:20px !important; }
+    .header-left,
+    .header-right { display:block !important; width:100% !important; text-align:center !important; }
+    .header-right { padding-top:4px !important; }
+    .title-h1    { font-size:20px !important; }
+    .corps-h2    { font-size:17px !important; }
+    .corps-pad   { padding:24px 20px 20px !important; }
+    .btn         { padding:12px 20px !important; font-size:11px !important; }
+    .social-btn  { padding:6px 10px !important; font-size:10px !important; }
   }
-  .promo-banner { animation: promoPulse 2s ease-in-out infinite; }
 </style>
 </head>
-<body style="margin:0;padding:0;background:#f4f4f0;font-family:'Georgia',serif;">
+<body style="margin:0;padding:0;background:#f5f5f5;font-family:'General Sans Variable','General Sans','Helvetica Neue',Helvetica,Arial,sans-serif;">
 
-  <table width="100%" cellpadding="0" cellspacing="0" style="background:#f4f4f0;padding:32px 0;">
+  <table width="100%" cellpadding="0" cellspacing="0" class="outer-wrap" style="background:#f5f5f5;padding:32px 0;">
     <tr>
       <td align="center">
-        <table width="600" cellpadding="0" cellspacing="0" style="background:#ffffff;max-width:600px;width:100%;">
+        <table width="600" cellpadding="0" cellspacing="0" class="inner-table" style="background:#ffffff;max-width:600px;width:100%;">
 
           <!-- Bannière promo -->
           <tr>
-            <td class="promo-banner" style="background:#f5c842;padding:14px 40px;text-align:center;">
-              <span style="font-size:12px;letter-spacing:3px;text-transform:uppercase;color:#1a1a1a;font-weight:bold;font-family:'Georgia',serif;">
+            <td class="promo-banner" style="background:linear-gradient(135deg, #f5c842 0%, #56b4d3 100%);padding:14px 40px;text-align:center;">
+              <span style="font-size:10px;letter-spacing:3px;text-transform:uppercase;color:#1f1f1f;font-weight:400;font-family:'General Sans Variable','General Sans','Helvetica Neue',sans-serif;">
                 ✦ &nbsp;−20 % sur votre première commande&nbsp; ✦
               </span>
             </td>
@@ -30,104 +43,89 @@
 
           <!-- En-tête -->
           <tr>
-            <td style="padding:32px 40px 0;">
+            <td style="padding:28px 40px 0;" class="pad-top">
               <table width="100%" cellpadding="0" cellspacing="0">
                 <tr>
-                  <td style="text-align:left;">
-                    <p style="margin:0;font-size:11px;letter-spacing:3px;text-transform:uppercase;color:#999;">Stéphane Wagner · Photographie</p>
+                  <td class="header-left" style="text-align:left;">
+                    <p style="margin:0;font-size:11px;letter-spacing:3px;text-transform:uppercase;color:#999999;font-family:'General Sans Variable','General Sans','Helvetica Neue',sans-serif;font-weight:500;">Stéphane Wagner · Photographie</p>
                   </td>
-                  <td style="text-align:right;">
-                    <p style="margin:0;font-size:10px;letter-spacing:2px;text-transform:uppercase;color:#bbb;">Série — Lumières du soir</p>
+                  <td class="header-right" style="text-align:right;">
+                    <p style="margin:0;font-size:10px;letter-spacing:2px;text-transform:uppercase;color:#b8b8b8;font-family:'General Sans Variable','General Sans','Helvetica Neue',sans-serif;">Voyages</p>
                   </td>
                 </tr>
               </table>
             </td>
           </tr>
 
-          <!-- Titre + numéro -->
+          <!-- Titre + numéro intégré -->
           <tr>
-            <td style="padding:24px 40px 0;">
-              <table width="100%" cellpadding="0" cellspacing="0">
-                <tr>
-                  <td style="text-align:left;vertical-align:baseline;">
-                    <h1 style="margin:0;font-size:26px;font-weight:400;color:#1a1a1a;line-height:1.3;">La série de l'été</h1>
-                  </td>
-                </tr>
-              </table>
+            <td style="padding:20px 40px 0;" class="pad">
+              <h1 class="title-h1" style="margin:0;font-size:24px;font-weight:500;color:#1f1f1f;line-height:1.3;font-family:'General Sans Variable','General Sans','Helvetica Neue',sans-serif;">
+                La série de l'été - Épisode 2/10
+              </h1>
             </td>
           </tr>
 
           <!-- Intro générale -->
           <tr>
-            <td style="padding:24px 40px 0;">
-              <div style="font-size:15px;line-height:1.8;color:#444;">
-                
+            <td style="padding:16px 40px 0;" class="pad">
+              <div style="font-size:15px;line-height:1.6;color:#3d3d3d;font-family:'General Sans Variable','General Sans','Helvetica Neue',sans-serif;">
+                <p style="margin:0 0 16px;">Et si cet été, vous partiez à l’aventure sans quitter votre chaise longue ?</p>
+                <p style="margin:0 0 16px;">Je vous propose une série d’<strong>escapades virtuelles</strong> à travers un <em>sitcom photo unique</em>, une sélection d’images symboliques conçues pour éveiller votre curiosité et vous inviter à l’introspection. Chaque séquence est une invitation à voyager, à explorer, à vivre une expérience ou à partager un témoignage.</p>
+                <p style="margin:0 0 16px;">Prenez le temps, respirez un bon coup, et laissez-vous porter. Lisez, regardez… et surtout, <strong>votez à la fin de votre lecture</strong> – pour votre prochaine aventure.</p>
+                <p style="margin:0;">Bonne exploration, et profitez bien de votre été ! 🌞</p>
               </div>
             </td>
           </tr>
 
           <!-- Photo principale -->
           <tr>
-            <td style="padding:24px 0 0;">
-              <img src="https://www.photographie.stephanewagner.com/wp-content/uploads/2024/08/lightroom-3-12.webp" alt="Watching the sun" width="600" style="display:block;width:100%;height:auto;max-height:420px;object-fit:cover;">
+            <td style="padding:20px 0 0;">
+              <img src="https://www.photographie.stephanewagner.com/wp-content/uploads/2024/09/lightroom-2-1.webp" alt="Le vrai parrain" width="600" style="display:block;width:100%;height:auto;max-height:420px;object-fit:cover;">
             </td>
           </tr>
 
           <!-- Corps de texte -->
           <tr>
-            <td style="padding:32px 40px 24px;">
-              <div style="display:flex;align-items:baseline;justify-content:space-between;">
-                <h2 style="margin:0;font-size:20px;font-weight:400;color:#1a1a1a;line-height:1.3;">La lumière qui reste</h2>
-                <span style="font-size:11px;letter-spacing:2px;text-transform:uppercase;color:#1a1a1a;">Série 2/10</span>
+            <td class="corps-pad" style="padding:28px 40px 20px;">
+              <div class="corps-head" style="display:flex;align-items:center;justify-content:space-between;">
+                <h2 class="corps-h2" style="margin:0;font-size:19px;font-weight:500;color:#1f1f1f;line-height:1.3;font-family:'General Sans Variable','General Sans','Helvetica Neue',sans-serif;">La sicile ancestrale</h2>
+                <span class="corps-num" style="flex-shrink:0;margin-left:16px;font-size:10px;letter-spacing:2px;text-transform:uppercase;color:#999999;font-family:'General Sans Variable','General Sans','Helvetica Neue',sans-serif;">Épisode 2/10</span>
               </div>
               <br>
-              <div style="font-size:15px;line-height:1.8;color:#444;">
-                <p style="margin:0 0 16px;">Il y a une fraction de seconde, juste après le coucher du soleil, où la lumière refuse de partir. Elle s'accroche aux façades, aux flaques d'eau, aux visages. C'est dans cet instant suspendu que j'ai déclenché.</p>
-                <p style="margin:0 0 16px;">Cette photo est née d'une longue attente. Deux heures assis sur un muret, à regarder la lumière évoluer. Le genre de patience que la ville décourage mais que la photographie exige.</p>
-                <p style="margin:0;">Je vous invite à explorer cette série consacrée aux lumières du soir — ces teintes que les yeux voient mais que la mémoire peine à retenir.</p>
+              <div style="font-size:17px;line-height:1.7;color:#3d3d3d;font-family:'General Sans Variable','General Sans','Helvetica Neue',sans-serif;">
+                <p style="margin:0;">On se demande parfois pourquoi, dans un monde si moderne, la vie n'est pas plus simple. En Sicile, j'y trouvais l'essentiel dans un chaos organisé. Sur cette île, au beau milieu du grand bleu, la force de l'âge impose le respect. Pour en savoir plus, <strong>suivez le lien pour un petit périple méditerranéen.</strong></p>
               </div>
             </td>
           </tr>
 
           <!-- CTA article -->
           <tr>
-            <td style="padding:0 40px 32px;text-align:center;">
-              
+            <td class="pad" style="padding:0 40px 28px;text-align:center;">
+              <a href="https://www.photographie.stephanewagner.com/la-mere-et-la-fille/" style="display:block;padding:14px 28px;background:#ffffff;color:#1f1f1f;text-decoration:none;font-size:11px;letter-spacing:2px;text-transform:uppercase;border:1px solid #1f1f1f;text-align:center;font-family:'General Sans Variable','General Sans','Helvetica Neue',sans-serif;font-weight:500;border-radius:2px;">Poursuivre l'aventure — Épisode 2/10 →</a>
             </td>
           </tr>
 
           <!-- Séparateur -->
           <tr>
-            <td style="padding:0 40px;">
+            <td class="pad" style="padding:0 40px;">
               <hr style="border:none;border-top:1px solid #eeeeee;margin:0;">
             </td>
           </tr>
 
           <!-- CTA série -->
           <tr>
-            <td style="padding:32px 40px 24px;text-align:center;">
-              <a href="https://shop.stephanewagner.com/phototheque.html#album-55" style="display:inline-block;padding:14px 28px;background:#1a1a1a;color:#ffffff;text-decoration:none;font-size:13px;letter-spacing:2px;text-transform:uppercase;">Voir la série "Mazunte" sur Shop</a>
-            </td>
-          </tr>
-
-          <!-- CTA sondage + partage social -->
-          <tr>
-            <td style="padding:24px 40px;text-align:center;background:#f5c842;">
-              <p style="margin:0 0 12px;font-size:12px;letter-spacing:1px;color:#1a1a1a;">Participez au sondage et obtenez un rabais exclusif sur votre prochaine commande.</p>
-              <a href="https://us2.list-manage.com/survey?u=9e13300aa07c637eb257e4db1&id=b32e594eb8&e=*|UNIQID|*" style="display:inline-block;margin:0 8px 8px;padding:14px 28px;background:#1a1a1a;color:#ffffff;text-decoration:none;font-size:13px;letter-spacing:2px;text-transform:uppercase;">Répondre au sondage</a>
-              <p style="margin:20px 0 8px;font-size:10px;letter-spacing:2px;text-transform:uppercase;color:#1a1a1a;opacity:0.5;">Partager</p>
-              <a href="https://www.facebook.com/sharer/sharer.php?u=https://shop.stephanewagner.com/phototheque.html#album-55" style="display:inline-block;margin:0 4px;padding:7px 14px;border:1px solid rgba(0,0,0,0.25);color:#1a1a1a;text-decoration:none;font-size:11px;letter-spacing:1px;text-transform:uppercase;">Facebook</a>
-              <a href="https://x.com/intent/tweet?url=https://shop.stephanewagner.com/phototheque.html#album-55&text=La%20lumi%C3%A8re%20qui%20reste" style="display:inline-block;margin:0 4px;padding:7px 14px;border:1px solid rgba(0,0,0,0.25);color:#1a1a1a;text-decoration:none;font-size:11px;letter-spacing:1px;text-transform:uppercase;">X</a>
-              <a href="https://pinterest.com/pin/create/button/?url=https://shop.stephanewagner.com/phototheque.html#album-55&media=https%3A%2F%2Fwww.photographie.stephanewagner.com%2Fwp-content%2Fuploads%2F2024%2F08%2Flightroom-3-12.webp&description=La%20lumi%C3%A8re%20qui%20reste" style="display:inline-block;margin:0 4px;padding:7px 14px;border:1px solid rgba(0,0,0,0.25);color:#1a1a1a;text-decoration:none;font-size:11px;letter-spacing:1px;text-transform:uppercase;">Pinterest</a>
+            <td class="pad" style="padding:28px 40px 20px;text-align:center;">
+              <a href="https://shop.stephanewagner.com/phototheque.html#album-78" class="btn" style="display:inline-block;padding:14px 28px;background:#1f1f1f;color:#ffffff;text-decoration:none;font-size:11px;letter-spacing:2px;text-transform:uppercase;font-family:'General Sans Variable','General Sans','Helvetica Neue',sans-serif;font-weight:500;border-radius:2px;">Voir la série "Sicile 2010" sur Shop</a>
             </td>
           </tr>
 
           <!-- Pied de page -->
           <tr>
-            <td style="padding:24px 40px;border-top:1px solid #eeeeee;text-align:center;">
-              <p style="margin:0;font-size:11px;color:#aaa;line-height:1.6;">
+            <td class="pad" style="padding:20px 40px;border-top:1px solid #eeeeee;text-align:center;">
+              <p style="margin:0;font-size:11px;color:#b8b8b8;line-height:1.6;font-family:'General Sans Variable','General Sans','Helvetica Neue',sans-serif;">
                 Vous recevez ce courriel car vous êtes abonné à la liste de Stéphane Wagner.<br>
-                <a href="*|UNSUB|*" style="color:#aaa;">Se désabonner</a>
+                <a href="*|UNSUB|*" style="color:#b8b8b8;">Se désabonner</a>
               </p>
             </td>
           </tr>

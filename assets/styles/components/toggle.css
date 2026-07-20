@@ -1,0 +1,98 @@
+/* ==========================================================================
+   Toggle — Sigma Design System
+   Figma : node 1585-15559 — /Home/Components/Selection and input/Toggle
+   Taille : 48×32px — thumb : 28×28px
+   ========================================================================== */
+
+.toggle {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  width: 48px;
+  height: 32px;
+  border-radius: 40px;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  flex-shrink: 0;
+  transition: background 0.2s ease;
+  outline-offset: 3px;
+}
+
+.toggle:focus-visible {
+  outline: 2px solid var(--color-core-primary-a);
+}
+
+/* ── Thumb ── */
+.toggle__thumb {
+  position: absolute;
+  top: 2px;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: var(--color-core-primary-b); /* blanc */
+  box-shadow:
+    0 1px 4px rgba(0, 0, 0, 0.12),
+    0 4px 12px rgba(0, 0, 0, 0.10);
+  transition: left 0.2s ease;
+}
+
+/* ── On ── */
+.toggle--on {
+  background: var(--color-core-primary-a); /* #1f1f1f */
+}
+
+.toggle--on .toggle__thumb {
+  left: 18px; /* 48 - 28 - 2 */
+}
+
+/* ── Off ── */
+.toggle--off {
+  background: var(--color-bg-active); /* #e0e0e0 */
+}
+
+.toggle--off .toggle__thumb {
+  left: 2px;
+}
+
+/* ── Disabled ── */
+.toggle--disabled {
+  background: var(--color-bg-disabled); /* #f5f5f5 */
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
+.toggle--disabled .toggle__thumb {
+  left: 2px;
+  background: var(--color-bg-active); /* #e0e0e0 */
+  box-shadow: none;
+}
+
+/* ── onMaterial (glass) ── */
+.toggle--on-material.toggle--on {
+  background: rgba(255, 255, 255, 0.07);
+  backdrop-filter: blur(50px);
+  -webkit-backdrop-filter: blur(50px);
+  box-shadow:
+    inset 0 1.5px 4px rgba(0, 0, 0, 0.08),
+    inset 0 -0.5px 1px rgba(255, 255, 255, 0.25);
+}
+
+.toggle--on-material.toggle--off {
+  background: rgba(214, 214, 214, 0.45);
+  backdrop-filter: blur(50px);
+  -webkit-backdrop-filter: blur(50px);
+}
+
+.toggle--on-material.toggle--disabled {
+  background: rgba(0, 0, 0, 0.1);
+  backdrop-filter: blur(50px);
+  -webkit-backdrop-filter: blur(50px);
+  box-shadow:
+    inset 0 1.5px 4px rgba(0, 0, 0, 0.10),
+    inset 0 -0.5px 1px rgba(255, 255, 255, 0.30);
+}
+
+.toggle--on-material .toggle__thumb {
+  background: #ffffff;
+}

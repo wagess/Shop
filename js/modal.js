@@ -1,5 +1,13 @@
 import { el, escapeHtml, escapeJs } from './utils.js';
 import { fetchGalleryPhotos, fetchPhotoKeywords, sendOrderEmail } from './api.js';
+import { createButton } from './components/button.js';
+import { createBottomActionBar } from './components/bottom-action-bar.js';
+
+const HEART_OUTLINE = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>`;
+const HEART_FILLED  = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>`;
+
+window.HEART_OUTLINE = HEART_OUTLINE;
+window.HEART_FILLED  = HEART_FILLED;
 
 export async function openGallery(galleryId, galleryName) {
     const modal = el('photosModal');
@@ -67,21 +75,57 @@ export async function displayPhotos(photos, gridEl = null) {
             <div class="photo-title">${escapeHtml(title)}</div>
             <div class="photo-id">ID: ${photo.id}</div>
             <div class="keywords-container" id="keywords-${photo.id}">${kwsHtml}</div>
-            <div class="photo-actions">
-                <button class="order-btn" onclick="event.stopPropagation(); window.orderPrint('${escapeJs(title)}','${escapeJs(imgUrl)}', ${photo.id});">${['🖨️ Commander l\'impression', '😍 Cool, acheter cette photo !', '❤️ j\'aime cette photo !'][Math.floor(Math.random() * 3)]}</button>
-                <button class="triptyque-add-btn${alreadySelected ? ' triptyque-add-btn--selected' : ''}"
-                        id="triptyque-btn-${photo.id}"
-                        data-photo-id="${photo.id}"
-                        data-photo-title="${escapeHtml(title)}"
-                        data-photo-url="${escapeHtml(imgUrl)}"
-                        onclick="event.stopPropagation(); window.toggleTriptyquePhoto(this)"
-                        title="${alreadySelected ? 'Retirer du triptyque' : 'Ajouter au triptyque'}">+</button>
+            <div class="photo-actions"
+                 data-order-target="${photo.id}"
+                 data-order-title="${escapeHtml(title)}"
+                 data-order-url="${escapeHtml(imgUrl)}"
+                 data-triptyque-selected="${alreadySelected}">
             </div>
         </div>
     </div>
 `;
 
     }).join('');
+
+    // Injection des boutons via le composant Sigma
+    grid.querySelectorAll('[data-order-target]').forEach(actionsEl => {
+        const photoId  = actionsEl.dataset.orderTarget;
+        const title    = actionsEl.dataset.orderTitle;
+        const imgUrl   = actionsEl.dataset.orderUrl;
+        const selected = actionsEl.dataset.triptyqueSelected === 'true';
+
+        // Bouton "Commander une impression"
+        const orderBtn = createButton({
+            label: 'Commander une impression',
+            variant: 'primary',
+            size: 'md',
+            onClick: (e) => {
+                e.stopPropagation();
+                window.orderPrint(title, imgUrl, photoId);
+            },
+        });
+        actionsEl.appendChild(orderBtn);
+
+        // Bouton wishlist triptyque (cœur)
+        const heartBtn = createButton({
+            label:     selected ? 'Retirer du triptyque' : 'Ajouter au triptyque',
+            variant:   selected ? 'primary' : 'secondary',
+            size:      'sm',
+            labelType: 'icon-only',
+            icon:      selected ? HEART_FILLED : HEART_OUTLINE,
+            className: 'triptyque-wish-btn',
+        });
+        heartBtn.id = `triptyque-btn-${photoId}`;
+        heartBtn.dataset.photoId    = photoId;
+        heartBtn.dataset.photoTitle = title;
+        heartBtn.dataset.photoUrl   = imgUrl;
+        if (selected) heartBtn.classList.add('triptyque-add-btn--selected');
+        heartBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            window.toggleTriptyquePhoto(heartBtn);
+        });
+        actionsEl.appendChild(heartBtn);
+    });
 
     await Promise.allSettled(photos.map(async photo => {
         const container = el(`keywords-${photo.id}`);
@@ -183,6 +227,10 @@ function collectKeywords(photo) {
     return Array.from(s).filter(k => k && k.length > 0);
 }
 
+export function setCurrentPhotos(photos) {
+    currentPhotos = photos;
+}
+
 export function closeModal() {
     const modal = el('photosModal');
     if (modal) modal.style.display = 'none';
@@ -253,13 +301,39 @@ function showOrderForm(title, imageUrl, photoId) {
                 <!-- Étape 1 : Format & papier -->
                 <div class="order-step-panel" id="orderPanel1">
                     <p class="order-step-label">Étape 1 — Format & finition</p>
-                    <div class="order-format-grid">
-                        ${['20×30 cm','30×40 cm','40×60 cm','50×70 cm','60×90 cm','Autre'].map((f, i) => `
-                        <label class="order-format-card${i === 2 ? ' order-format-card--selected' : ''}">
-                            <input type="radio" name="format" value="${f}"${i === 2 ? ' checked' : ''}>
-                            <span class="order-format-card__label">${f}</span>
+
+                    <!-- Orientation -->
+                    <div class="order-format-grid order-format-grid--2col">
+                        <label class="order-format-card order-format-card--selected">
+                            <input type="radio" name="orientation" value="Paysage" checked>
+                            <span class="order-orient-icon">
+                                <svg width="40" height="28" viewBox="0 0 40 28" fill="none"><rect x="0.75" y="0.75" width="38.5" height="26.5" rx="2.25" stroke="currentColor" stroke-width="1.5"/></svg>
+                            </span>
+                            <span class="order-format-card__label">Paysage</span>
+                        </label>
+                        <label class="order-format-card">
+                            <input type="radio" name="orientation" value="Portrait">
+                            <span class="order-orient-icon">
+                                <svg width="28" height="40" viewBox="0 0 28 40" fill="none"><rect x="0.75" y="0.75" width="26.5" height="38.5" rx="2.25" stroke="currentColor" stroke-width="1.5"/></svg>
+                            </span>
+                            <span class="order-format-card__label">Portrait</span>
+                        </label>
+                    </div>
+
+                    <!-- Taille -->
+                    <div class="order-paper-row">
+                        ${[
+                            { label: 'Petit',  sub: '20×30 cm' },
+                            { label: 'Moyen',  sub: '40×60 cm' },
+                            { label: 'Grand',  sub: '60×90 cm' },
+                        ].map((s, i) => `
+                        <label class="order-paper-chip${i === 1 ? ' order-paper-chip--selected' : ''}">
+                            <input type="radio" name="taille" value="${s.label}"${i === 1 ? ' checked' : ''}>
+                            ${s.label}<span class="order-chip-sub">${s.sub}</span>
                         </label>`).join('')}
                     </div>
+
+                    <!-- Finition -->
                     <div class="order-paper-row">
                         ${['Brillant','Mat','Fine Art'].map((p, i) => `
                         <label class="order-paper-chip${i === 1 ? ' order-paper-chip--selected' : ''}">
@@ -267,7 +341,6 @@ function showOrderForm(title, imageUrl, photoId) {
                             ${p}
                         </label>`).join('')}
                     </div>
-                    <button type="button" class="order-submit" id="orderNextBtn">Continuer →</button>
                 </div>
 
                 <!-- Étape 2 : Coordonnées -->
@@ -291,7 +364,6 @@ function showOrderForm(title, imageUrl, photoId) {
                             <textarea id="orderMessage" name="message" rows="3" placeholder="Précisions, questions..."></textarea>
                         </div>
                         <div class="order-feedback" id="orderFeedback"></div>
-                        <button type="submit" class="order-submit" id="orderSubmitBtn">Envoyer la commande</button>
                     </form>
                 </div>
 
@@ -307,10 +379,11 @@ function showOrderForm(title, imageUrl, photoId) {
                         <p style="color: var(--text-secondary); font-size: var(--font-size-small); margin: 0 0 4px;" id="orderConfirmName"></p>
                         <p style="color: var(--text-muted); font-size: var(--font-size-small); margin: 0;">Je vous contacterai sous peu pour finaliser votre tirage.</p>
                     </div>
-                    <button type="button" class="order-submit" id="orderCloseConfirmBtn" style="margin-top: 16px;">Fermer</button>
                 </div>
 
             </div>
+
+            <div id="orderBarMount"></div>
         </div>
     `;
     document.body.appendChild(overlay);
@@ -321,32 +394,53 @@ function showOrderForm(title, imageUrl, photoId) {
         overlay.addEventListener('transitionend', () => overlay.remove(), { once: true });
     }
 
+    function mountOrderBar(step) {
+        const mount = document.getElementById('orderBarMount');
+        if (!mount) return;
+        mount.innerHTML = '';
+
+        const configs = {
+            1: {
+                actionLabel: 'Continuer',
+                onAction: () => goToStep(2),
+            },
+            2: {
+                secondary: '← Retour',
+                onSecondary: () => goToStep(1),
+                actionLabel: 'Envoyer la commande',
+                onAction: () => document.getElementById('orderForm')?.requestSubmit(),
+            },
+            3: {
+                actionLabel: 'Fermer',
+                onAction: closeForm,
+            },
+        };
+
+        mount.appendChild(createBottomActionBar(configs[step] || configs[1]));
+    }
+
     document.getElementById('closeOrderForm').addEventListener('click', closeForm);
-    document.getElementById('orderCloseConfirmBtn').addEventListener('click', closeForm);
     overlay.addEventListener('click', e => { if (e.target === overlay) closeForm(); });
 
-    // Sélection format
+    // Sélection orientation (format-card)
     overlay.querySelectorAll('.order-format-card input').forEach(input => {
         input.addEventListener('change', () => {
-            overlay.querySelectorAll('.order-format-card').forEach(c => c.classList.remove('order-format-card--selected'));
+            overlay.querySelectorAll(`.order-format-card input[name="${input.name}"]`)
+                   .forEach(r => r.closest('.order-format-card').classList.remove('order-format-card--selected'));
             input.closest('.order-format-card').classList.add('order-format-card--selected');
         });
     });
 
-    // Sélection papier
+    // Sélection chips (taille + finition — scopé par name)
     overlay.querySelectorAll('.order-paper-chip input').forEach(input => {
         input.addEventListener('change', () => {
-            overlay.querySelectorAll('.order-paper-chip').forEach(c => c.classList.remove('order-paper-chip--selected'));
+            overlay.querySelectorAll(`.order-paper-chip input[name="${input.name}"]`)
+                   .forEach(r => r.closest('.order-paper-chip').classList.remove('order-paper-chip--selected'));
             input.closest('.order-paper-chip').classList.add('order-paper-chip--selected');
         });
     });
 
-    // Étape 1 → 2
-    document.getElementById('orderNextBtn').addEventListener('click', () => {
-        goToStep(2);
-    });
-
-    // Étape 2 → 1
+    // Retour étape 2 → 1 (bouton flèche dans le header)
     document.getElementById('orderBackBtn').addEventListener('click', () => {
         goToStep(1);
     });
@@ -386,19 +480,24 @@ function showOrderForm(title, imageUrl, photoId) {
 
         dots.forEach((d, i) => d.classList.toggle('order-step--active', i === nextIndex));
         backBtn.style.visibility = step === 2 ? 'visible' : 'hidden';
+        mountOrderBar(step);
     }
+
+    // Monter la bar initiale (étape 1)
+    mountOrderBar(1);
 
     // Soumission
     document.getElementById('orderForm').addEventListener('submit', async (e) => {
         e.preventDefault();
-        const btn = document.getElementById('orderSubmitBtn');
         const feedback = document.getElementById('orderFeedback');
+        const barBtn = document.querySelector('#orderBarMount .bottom-action-bar__btn');
 
-        const format = overlay.querySelector('input[name="format"]:checked')?.value || '';
-        const paper  = overlay.querySelector('input[name="paper"]:checked')?.value || '';
+        const orientation = overlay.querySelector('input[name="orientation"]:checked')?.value || '';
+        const taille      = overlay.querySelector('input[name="taille"]:checked')?.value || '';
+        const paper       = overlay.querySelector('input[name="paper"]:checked')?.value || '';
+        const format      = `${orientation} — ${taille}`;
 
-        btn.disabled = true;
-        btn.textContent = 'Envoi en cours...';
+        if (barBtn) { barBtn.disabled = true; barBtn.textContent = 'Envoi en cours…'; }
         feedback.textContent = '';
         feedback.className = 'order-feedback';
 
@@ -421,8 +520,7 @@ function showOrderForm(title, imageUrl, photoId) {
         } catch (err) {
             feedback.textContent = `Erreur : ${err.message}`;
             feedback.className = 'order-feedback order-feedback--error';
-            btn.disabled = false;
-            btn.textContent = 'Envoyer la commande';
+            if (barBtn) { barBtn.disabled = false; barBtn.textContent = 'Envoyer la commande'; }
         }
     });
 }
