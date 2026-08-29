@@ -20,6 +20,7 @@ jobs:
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           envs: ANTHROPIC_API_KEY
           script: |
+            set -e
             cd /home/wagess/shop.stephanewagner.com
             git pull origin main
             # Mettre à jour ANTHROPIC_API_KEY dans .env (créer si absent)
