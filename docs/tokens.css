@@ -26,30 +26,39 @@
   --color-core-secondary-pink:    #f285c5;
 
   /* --------------------------------------------------------------------------
-     Colors — Light Mode (défaut)
+     Colors — Light Mode (défaut — galerie & boutique)
      -------------------------------------------------------------------------- */
 
-  /* Texte */
-  --color-text-primary:           #1f1f1f;
-  --color-text-secondary:         #3d3d3d;
-  --color-text-tertiary:          #7a7a7a;
-  --color-text-disabled:          #b8b8b8;
-  --color-text-primary-b:         #ffffff;
-
   /* Fond */
-  --color-bg-primary:             #ffffff;
-  --color-bg-secondary:           #f5f5f5;
-  --color-bg-tertiary:            #b6b6b6;
-  --color-bg-active:              #e0e0e0;
-  --color-bg-disabled:            #f5f5f5;
+  --color-background:             #FAFAF8;
+  --color-surface:                #FFFFFF;
+  --color-surface-subtle:         #F3F2EF;
 
   /* Bordure */
-  --color-border-primary:         #1f1f1f;
-  --color-border-secondary:       #b8b8b8;
-  --color-border-tertiary:        #e0e0e0;
+  --color-border:                 #E4E2DD;
 
-  /* Hover */
-  --color-hover-primary:          #e2e2e2;
+  /* Texte */
+  --color-text-primary:           #181817;
+  --color-text-secondary:         #5F5E5A;
+  --color-text-tertiary:          #8A8882;
+  --color-text-disabled:          #C5C3BE;
+  --color-text-primary-b:         #FFFFFF;
+
+  /* Accent */
+  --color-accent:                 #6B4E3D;
+  --color-accent-hover:           #51392C;
+  --color-on-accent:              #FFFFFF;
+
+  /* Aliases Sigma (compatibilité composants existants) */
+  --color-bg-primary:             #FAFAF8;
+  --color-bg-secondary:           #F3F2EF;
+  --color-bg-tertiary:            #E4E2DD;
+  --color-bg-active:              #E4E2DD;
+  --color-bg-disabled:            #F3F2EF;
+  --color-border-primary:         #181817;
+  --color-border-secondary:       #C5C3BE;
+  --color-border-tertiary:        #E4E2DD;
+  --color-hover-primary:          #F3F2EF;
 
   /* --------------------------------------------------------------------------
      Typography — Font family
@@ -94,39 +103,6 @@
      -------------------------------------------------------------------------- */
   --radius-firm:      12px;
   --radius-circular:  200px;
-}
-
-/* ==========================================================================
-   Dark Mode — préférence système
-   ========================================================================== */
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    /* Texte */
-    --color-text-primary:           #ffffff;
-    --color-text-secondary:         #b8b8b8;
-    --color-text-tertiary:          #7a7a7a;
-    --color-text-disabled:          #3d3d3d;
-    --color-text-primary-b:         #1f1f1f;
-
-    /* Fond */
-    --color-bg-primary:             #141414;
-    --color-bg-secondary:           #1f1f1f;
-    --color-bg-tertiary:            #7a7a7a;
-    --color-bg-active:              #3d3d3d;
-    --color-bg-disabled:            #1f1f1f;
-
-    /* Bordure */
-    --color-border-primary:         #7a7a7a;
-    --color-border-secondary:       #3d3d3d;
-    --color-border-tertiary:        #1f1f1f;
-
-    /* Hover */
-    --color-hover-primary:          #4c4c4c;
-
-    /* Core — secondary_green différent en dark */
-    --color-core-secondary-green:   #0dd6a4;
-  }
 }
 
 /* ==========================================================================

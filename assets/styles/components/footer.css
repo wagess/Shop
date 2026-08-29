@@ -3,8 +3,8 @@
    ========================================================================== */
 
 .site-footer {
-  background: var(--color-core-primary-a); /* #1f1f1f */
-  border-top: 1px solid rgba(255, 255, 255, 0.06);
+  background: var(--color-surface-subtle);
+  border-top: 1px solid var(--color-border);
   padding: 32px 24px;
   width: 100%;
   box-sizing: border-box;
@@ -26,7 +26,7 @@
   font-size: 14px;
   font-weight: 500;
   letter-spacing: -0.02em;
-  color: rgba(255, 255, 255, 0.4);
+  color: var(--color-text-tertiary);
   white-space: nowrap;
 }
 
@@ -43,23 +43,23 @@
   font-size: 14px;
   font-weight: 450;
   letter-spacing: -0.02em;
-  color: rgba(255, 255, 255, 0.55);
+  color: var(--color-text-secondary);
   text-decoration: none;
   transition: color 0.15s ease;
   white-space: nowrap;
 }
 
 .site-footer__link:hover {
-  color: rgba(255, 255, 255, 0.9);
+  color: var(--color-text-primary);
 }
 
 /* Admin — discret */
 .site-footer__link[href*="admin"] {
-  color: rgba(255, 255, 255, 0.25);
+  color: var(--color-text-tertiary);
 }
 
 .site-footer__link[href*="admin"]:hover {
-  color: rgba(255, 255, 255, 0.6);
+  color: var(--color-text-secondary);
 }
 
 @media (max-width: 768px) {

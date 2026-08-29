@@ -38,14 +38,14 @@
    -------------------------------------------------------------------------- */
 .btn-primary,
 .order-btn {
-  background: var(--color-core-primary-a);
-  color: var(--color-core-primary-b);
+  background: var(--color-accent);
+  color: var(--color-on-accent);
   border: none;
 }
 
 .btn-primary:hover,
 .order-btn:hover {
-  background: var(--color-text-secondary);
+  background: var(--color-accent-hover);
 }
 
 /* --------------------------------------------------------------------------
