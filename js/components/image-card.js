@@ -10,7 +10,8 @@
  */
 export function createImageCard({ src = '', alt = '', variant = 'normal', onClick = null } = {}) {
     const card = document.createElement('div');
-    card.className = variant !== 'normal' ? `image-card image-card--${variant}` : 'image-card';
+    const base = variant !== 'normal' ? `image-card image-card--${variant}` : 'image-card';
+    card.className = src ? `${base} shimmer` : base;
 
     const img = document.createElement('img');
     img.src = src;
@@ -18,6 +19,10 @@ export function createImageCard({ src = '', alt = '', variant = 'normal', onClic
     img.className = 'image-card__img';
     img.draggable = false;
     img.loading = 'lazy';
+    img.onload = () => {
+        img.classList.add('is-loaded');
+        card.classList.remove('shimmer');
+    };
 
     card.appendChild(img);
     if (onClick) card.addEventListener('click', onClick);

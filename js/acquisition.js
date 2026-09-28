@@ -43,27 +43,24 @@ function subscribe(email, fname = '') {
     const msgEl = document.getElementById('footerMsg');
     if (!form) return;
 
-    // Focus: highlight border
-    emailInput.addEventListener('focus', () => { emailInput.style.borderColor = '#57ad9d'; });
-    emailInput.addEventListener('blur',  () => { emailInput.style.borderColor = 'rgba(255,255,255,0.12)'; });
-
     form.addEventListener('submit', async (e) => {
         e.preventDefault();
         const email = emailInput.value.trim();
         submitBtn.disabled = true;
         submitBtn.textContent = '…';
+        msgEl.classList.remove('is-success', 'is-error');
         msgEl.style.display = 'none';
 
         try {
             const data = await subscribe(email);
-            msgEl.style.color = '#7ecfc3';
+            msgEl.classList.add('is-success');
             msgEl.textContent = '✓ ' + data.message + ' Merci !';
             msgEl.style.display = 'block';
             form.reset();
             submitBtn.textContent = '✓';
-            submitBtn.style.background = '#4a9a8c';
+            submitBtn.classList.add('is-success');
         } catch (err) {
-            msgEl.style.color = '#e87878';
+            msgEl.classList.add('is-error');
             msgEl.textContent = '✗ ' + err.message;
             msgEl.style.display = 'block';
             submitBtn.disabled = false;
@@ -79,8 +76,6 @@ function subscribe(email, fname = '') {
     if (localStorage.getItem(POPUP_KEY)) return;
 
     const popup   = document.getElementById('signupPopup');
-    const overlay = document.getElementById('signupPopupOverlay');
-    const closeBtn = document.getElementById('closePopupBtn');
     const skipBtn  = document.getElementById('popupSkipBtn');
     const form     = document.getElementById('popupSignupForm');
     const emailInput = document.getElementById('popupEmail');
@@ -93,13 +88,11 @@ function subscribe(email, fname = '') {
     function showPopup() {
         if (shown) return;
         shown = true;
-        popup.style.display = 'flex';
-        // Petite animation d'entrée
-        popup.querySelector('div[style*="background:rgba(20"]').style.animation = 'popupIn 0.3s ease';
+        popup.open();
     }
 
     function dismissPopup() {
-        popup.style.display = 'none';
+        popup.close();
         localStorage.setItem(POPUP_KEY, '1');
     }
 
@@ -117,38 +110,32 @@ function subscribe(email, fname = '') {
     }
     window.addEventListener('scroll', onScroll, { passive: true });
 
-    // Fermeture
-    closeBtn.addEventListener('click', dismissPopup);
-    skipBtn.addEventListener('click',  dismissPopup);
-    overlay.addEventListener('click',  dismissPopup);
-
-    document.addEventListener('keydown', (e) => {
-        if (e.key === 'Escape' && shown) dismissPopup();
-    });
+    // Fermeture — overlay/bouton fermer/Échap gérés en interne par
+    // <popup-panel> (js/components/popup-panel.js), il ne reste que le
+    // bouton "Non merci", propre au contenu de cette popup.
+    skipBtn.addEventListener('click', dismissPopup);
 
     // Soumission
-    emailInput.addEventListener('focus', () => { emailInput.style.borderColor = '#57ad9d'; });
-    emailInput.addEventListener('blur',  () => { emailInput.style.borderColor = 'rgba(255,255,255,0.12)'; });
-
     form.addEventListener('submit', async (e) => {
         e.preventDefault();
         const email = emailInput.value.trim();
         submitBtn.disabled = true;
         submitBtn.textContent = 'Inscription en cours…';
+        msgEl.classList.remove('is-success', 'is-error');
         msgEl.style.display = 'none';
 
         try {
             const data = await subscribe(email);
-            msgEl.style.color = '#7ecfc3';
+            msgEl.classList.add('is-success');
             msgEl.textContent = '✓ ' + data.message + ' Bienvenue !';
             msgEl.style.display = 'block';
             submitBtn.textContent = '✓ Inscrit !';
-            submitBtn.style.background = '#4a9a8c';
+            submitBtn.classList.add('is-success');
             skipBtn.textContent = 'Fermer';
             form.reset();
             localStorage.setItem(POPUP_KEY, '1');
         } catch (err) {
-            msgEl.style.color = '#e87878';
+            msgEl.classList.add('is-error');
             msgEl.textContent = '✗ ' + err.message;
             msgEl.style.display = 'block';
             submitBtn.disabled = false;

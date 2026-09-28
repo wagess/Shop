@@ -24,16 +24,46 @@ function apiFetch(path, options = {}) {
 
 export { API_BASE, IPTC_API, BEARER_TOKEN };
 
-export async function fetchHierarchy() {
-    const resp = await apiFetch('/wp-json/wplr/v1/hierarchy');
-    if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
-    return await resp.json();
+// Caches en mémoire (durée de vie = la page) — évitent de refaire les mêmes
+// appels distants quand plusieurs modules (app.js, home-sections.js,
+// series-page.js…) ont besoin des mêmes données sur une même page.
+let _hierarchyPromise = null;
+const _galleryPhotosCache = new Map();
+let _visibilityConfigPromise = null;
+
+export function fetchHierarchy() {
+    if (!_hierarchyPromise) {
+        _hierarchyPromise = (async () => {
+            const resp = await apiFetch('/wp-json/wplr/v1/hierarchy');
+            if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
+            return await resp.json();
+        })().catch(err => { _hierarchyPromise = null; throw err; });
+    }
+    return _hierarchyPromise;
 }
 
-export async function fetchGalleryPhotos(galleryId) {
-    const resp = await apiFetch(`/wp-json/wplr/v1/gallery/${galleryId}`);
-    if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
-    return await resp.json();
+export function fetchGalleryPhotos(galleryId) {
+    const key = String(galleryId);
+    if (!_galleryPhotosCache.has(key)) {
+        const promise = (async () => {
+            const resp = await apiFetch(`/wp-json/wplr/v1/gallery/${galleryId}`);
+            if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
+            return await resp.json();
+        })().catch(err => { _galleryPhotosCache.delete(key); throw err; });
+        _galleryPhotosCache.set(key, promise);
+    }
+    return _galleryPhotosCache.get(key);
+}
+
+// collections-visibility.json — config admin (séries mises en avant,
+// vedettes, visibilité) : un seul fetch partagé par toute la page.
+export function fetchVisibilityConfig() {
+    if (!_visibilityConfigPromise) {
+        _visibilityConfigPromise = fetch('./collections-visibility.json', { cache: 'no-store' })
+            .then(resp => resp.ok ? resp.json() : {})
+            .catch(err => { _visibilityConfigPromise = null; throw err; });
+    }
+    return _visibilityConfigPromise;
 }
 
 export async function sendOrderEmail(data) {

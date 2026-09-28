@@ -135,10 +135,10 @@ function generateGallery() {
         card.setAttribute('data-story', storyId);
         card.innerHTML = `
             <div class="story-image" style="background-image: url('${story.images[0]}')"></div>
-            <div class="story-info">
-                <div class="story-title">${story.title}</div>
+            <div class="story-info p-4">
+                <div class="story-title mb-2">${story.title}</div>
                 <div class="story-description">${story.description}</div>
-                <div class="story-meta">
+                <div class="story-meta mt-3">
                     <span>📅 ${story.date}</span>
                     <span>📸 ${story.photos} photos</span>
                 </div>
@@ -162,24 +162,24 @@ function renderStorySlide(image, caption, template = 'default', title = '', inde
             return `
                 <div class="story-slide">
                     <img src="${image}" alt="${title} - Photo ${index + 1}">
-                    <div class="story-caption bottom">${caption || ''}</div>
+                    <div class="story-caption bottom mt-8 py-3 px-5">${caption || ''}</div>
                 </div>
             `;
         case 'caption-overlay':
             return `
                 <div class="story-slide overlay">
                     <img src="${image}" alt="${title} - Photo ${index + 1}">
-                    <div class="story-caption overlay">${caption || ''}</div>
+                    <div class="story-caption overlay mt-8 py-3 px-5">${caption || ''}</div>
                 </div>
             `;
         // ...dans renderStorySlide...
         case 'caption-paysage':
             return `
-                <div class="story-slide paysage">
-                    <div class="paysage-caption-container">
-                        ${caption ? `<div class="story-caption paysage">${caption}</div>` : ''}
+                <div class="story-slide paysage p-0">
+                    <div class="paysage-caption-container pt-8 px-8 pb-3">
+                        ${caption ? `<div class="story-caption paysage m-0 p-0">${caption}</div>` : ''}
                     </div>
-                    <div class="paysage-image-container">
+                    <div class="paysage-image-container pb-8">
                         <img src="${image}" alt="${title} - Photo ${index + 1}" class="paysage-img">
                     </div>
                 </div>
@@ -187,7 +187,7 @@ function renderStorySlide(image, caption, template = 'default', title = '', inde
         default:
             return `
                 <div class="story-slide">
-                    ${caption ? `<div class="story-caption">${caption}</div>` : ''}
+                    ${caption ? `<div class="story-caption mt-8 py-3 px-5">${caption}</div>` : ''}
                     <img src="${image}" alt="${title} - Photo ${index + 1}">
                 </div>
             `;

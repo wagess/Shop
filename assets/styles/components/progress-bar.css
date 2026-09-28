@@ -1,0 +1,62 @@
+/* ==========================================================================
+   Progress bar — Sigma Design System
+   Figma : node 1585-17232 — /Home/Components/Status/Progress bar
+
+   Contrairement à Figma (11 images pré-rendues par palier de 10 %), le
+   remplissage ici est une largeur en pourcentage : n'importe quelle valeur,
+   pas seulement des paliers de 10.
+   ========================================================================== */
+
+/* Spacing (gap-2) posé en classe utilitaire sur le HTML — voir
+   js/components/progress-bar.js. */
+.progress-bar {
+  display: flex;
+  align-items: center;
+  width: 100%;
+}
+
+.progress-bar__track {
+  flex: 1;
+  height: 8px;
+  border-radius: 4px;
+  background: var(--color-bg-disabled);
+  overflow: hidden;
+}
+
+.progress-bar__fill {
+  height: 100%;
+  border-radius: 4px;
+  background: var(--color-text-primary);
+  transition: width 0.3s ease;
+}
+
+.progress-bar__label {
+  flex-shrink: 0;
+  width: 40px;
+  text-align: right;
+  font-family: var(--font-family-base);
+  font-size: var(--font-body-caption-size);
+  font-weight: 500;
+  line-height: var(--font-body-caption-line-height);
+  letter-spacing: var(--font-body-caption-letter-spacing);
+  color: var(--color-text-primary);
+}
+
+/* --------------------------------------------------------------------------
+   On Material — barre posée sur une photo plutôt qu'un fond uni. Figma
+   superpose deux calques (blanc 7 % en fusion normale + gris 18 % en fusion
+   "color-dodge") pour un effet verre dépoli ; approximé ici par une seule
+   couche translucide, visuellement équivalente pour l'usage prévu.
+   -------------------------------------------------------------------------- */
+.progress-bar--on-material .progress-bar__track {
+  background: rgba(255, 255, 255, 0.16);
+}
+
+.progress-bar--on-material .progress-bar__fill {
+  background: rgba(255, 255, 255, 0.96);
+  mix-blend-mode: color-dodge;
+}
+
+.progress-bar--on-material .progress-bar__label {
+  color: rgba(255, 255, 255, 0.96);
+}

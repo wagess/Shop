@@ -4,6 +4,7 @@
    Taille : 48×32px — thumb : 28×28px
    ========================================================================== */
 
+/* Spacing (p-0) posé en classe utilitaire sur le HTML. */
 .toggle {
   position: relative;
   display: inline-flex;
@@ -13,7 +14,6 @@
   border-radius: 40px;
   border: none;
   cursor: pointer;
-  padding: 0;
   flex-shrink: 0;
   transition: background 0.2s ease;
   outline-offset: 3px;

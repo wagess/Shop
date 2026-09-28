@@ -16,7 +16,7 @@ export function createDropdown({
   className = '',
 } = {}) {
   const el = document.createElement('div');
-  el.className = ['dropdown', onMaterial ? 'dropdown--glass' : '', className]
+  el.className = ['dropdown', 'p-4', onMaterial ? 'dropdown--glass' : '', className]
     .filter(Boolean).join(' ');
   if (id) el.id = id;
 
@@ -33,7 +33,7 @@ export function createDropdown({
 
 function _createItem({ label = '', sublabel = '', avatar = null, active = false, accessory = null, onClick = null }, onMaterial) {
   const row = document.createElement('div');
-  row.className = ['dropdown__item', active ? 'dropdown__item--active' : ''].filter(Boolean).join(' ');
+  row.className = ['dropdown__item', 'gap-1 py-1 px-4', active ? 'dropdown__item--active' : ''].filter(Boolean).join(' ');
   if (onClick) {
     row.addEventListener('click', onClick);
     row.style.cursor = 'pointer';
@@ -42,7 +42,7 @@ function _createItem({ label = '', sublabel = '', avatar = null, active = false,
   // Avatar
   if (avatar) {
     const avatarWrap = document.createElement('div');
-    avatarWrap.className = 'dropdown__avatar';
+    avatarWrap.className = 'dropdown__avatar pr-4';
     if (typeof avatar === 'string' && avatar.startsWith('<')) {
       avatarWrap.innerHTML = avatar;
     } else if (typeof avatar === 'string') {

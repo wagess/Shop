@@ -4,3 +4,7 @@ wplr-iptc-keywords.php
 node_modules/
 docs/skills.md
 collections-visibility.json
+shutterstock-callback/
+shutterstock/
+infolettre/.hierarchy-cache.json
+infolettre/.photo-cache.json

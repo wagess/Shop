@@ -1,0 +1,695 @@
+/* ==========================================================================
+   Accueil — refonte éditoriale
+   Inspiré du Figma "Sans titre" (vDYe0oWfzs4InGstvpCxBk, node 1:2)
+
+   Couleurs : AUCUNE redéfinition ici. Cette page hérite intégralement des
+   vrais tokens Sigma déjà chargés site-wide (docs/tokens.css, vérifiés contre
+   la référence canonique Figma "Design System 2" — QgM6d52yaLh6vkJCnTRsMa,
+   node 1586:19456, section Colors / Light Mode) : --color-text-primary,
+   --color-bg-primary, --color-accent, etc. Pas de palette propre à cette page
+   — cohérence totale avec phototheque.html / admin.html.
+
+   Seuls des tokens réellement absents de Sigma sont ajoutés ici : la typo
+   éditoriale (Lora + DM Sans, Sigma ne fournit qu'un --font-family-base non
+   chargé sur le site).
+
+   Rayons des images/vignettes (2026-09-20) : unifiés sur --radius-firm (12px,
+   seul rayon "contenu" du design system Sigma) partout où une photo est
+   affichée — hero, cartes séries, spotlight, mosaïque, boutique, photothèque,
+   triptyque, lightbox. Les anciens --ac-radius-xl (28px) et --ac-radius-l
+   (20px) propres à cette page ont été retirés : gardaient une distinction
+   éditorial/catalogue documentée comme volontaire, explicitement annulée sur
+   demande du PO au profit d'un rayon unique site-wide.
+
+   Spacing (2026-09-23) : plus aucun padding/margin/gap dans ce fichier — posé
+   exclusivement via les classes utilitaires de spacing-utilities.css, sur le
+   HTML (index.html, a-propos.html, series.html) et le JS qui génère du
+   markup (spotlight-saga.js, shop-card.js, popup-panel.js, home-sections.js).
+   ========================================================================== */
+
+:root {
+  --font-family-base: 'DM Sans', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  --ac-font-serif:     'Lora', Georgia, 'Times New Roman', serif;
+  /* Le système visuel n'utilise aucune couleur (noir/gris/beige uniquement) :
+     succès/erreur se distinguent par le contraste (beige de marque vs.
+     noir/gris neutre), pas par la teinte. Le ✓/✗ du message porte le sens. */
+  --ac-color-success:  var(--color-accent);
+  --ac-color-error:    var(--color-text-primary);
+  /* Exception ponctuelle au système noir/gris/beige : couleur d'accent du
+     Figma node 42:111 (bloc "Séries thématiques"), à valider — voir réponse
+     accompagnant cette implémentation. */
+  --ac-accent-warm:    #F56A01;
+}
+
+/* .ac-page (classe de base partagée par presque toutes les pages) déplacée
+   vers assets/styles/layout.css (2026-09-22) — ce n'est pas une classe
+   propre à l'accueil. */
+
+.ac-eyebrow {
+  font-family: var(--font-family-base);
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 2.2px;
+  text-transform: uppercase;
+  color: var(--color-text-secondary);
+}
+
+.ac-placeholder {
+  color: var(--color-text-secondary);
+  font-style: italic;
+}
+
+/* ── Nav ──
+   Composant réutilisable : js/components/nav.js (createNav) +
+   assets/styles/components/nav.css — plus de règles ac-nav ici. */
+
+/* ── Hero ──
+   .ac-hero-viewport (index.html/serie.html) enveloppe le mount de la nav +
+   .ac-hero : colonne flex haute d'un écran (100dvh), nav en hauteur
+   naturelle, .ac-hero en flex:1 pour occuper le reste — le hero s'adapte
+   ainsi tout seul à la vraie hauteur rendue de la nav (padding, taille des
+   liens/boutons…), sans jamais dépendre d'un nombre de px recopié à la main.
+   Remplace un calc(100dvh - Npx) qui se désynchronisait silencieusement à
+   chaque changement de la classe py-* du nav (ex. py-12 → py-6) — découvert
+   le 2026-09-23 après une régression exactement de ce type. */
+.ac-hero-viewport {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+}
+
+@supports (height: 100dvh) {
+  .ac-hero-viewport {
+    /* dvh suit la hauteur réellement visible sur mobile (barre d'adresse
+       incluse/exclue), contrairement à vh qui reste fixe à son max. */
+    height: 100dvh;
+  }
+}
+
+/* L'image est un cadre centré, à coins arrondis, avec une marge autour
+   (comme le Figma) — pas une image plein cadre. */
+.ac-hero {
+  position: relative;
+  flex: 1 1 0;
+  min-height: 0;
+  background: var(--color-bg-primary);
+}
+
+.ac-hero__frame {
+  position: absolute;
+  /* Inset asymétrique (56px en haut, 28px sur les côtés/bas) — respire
+     davantage sous le nav, conforme au Figma (node 1:432, marge haute
+     ≈55px contre ≈28.5px sur les côtés). */
+  top: 56px; left: 28px; right: 28px; bottom: 0;
+  /* Exception au rayon uniforme (--radius-firm partout ailleurs, voir note
+     en tête de fichier) : le cadre touche le bas du hero (bottom:0, plus de
+     plancher/plafond depuis le passage à calc(100dvh - 65px) ci-dessus), un
+     rayon bas n'aurait donc plus de sens visuel — seuls les coins hauts sont
+     arrondis. Décision PO du 2026-09-23. */
+  border-top-left-radius: var(--radius-firm);
+  border-top-right-radius: var(--radius-firm);
+  overflow: hidden;
+  background: var(--color-surface-subtle);
+}
+
+.ac-hero__img {
+  position: absolute; inset: 0;
+  width: 100%; height: 100%;
+  object-fit: cover;
+  opacity: 0;
+  transition: opacity 0.4s ease;
+}
+
+.ac-hero__img.is-loaded {
+  opacity: 0.9;
+}
+
+.ac-hero__scrim {
+  position: absolute; inset: 0;
+  background: linear-gradient(0deg, rgba(10,10,10,0.75) 0%, rgba(10,10,10,0.05) 45%, rgba(0,0,0,0) 65%);
+}
+
+/* Uniformisé le 2026-09-23 sur les mêmes valeurs brutes que les autres
+   sections (px-6/pb-13 mobile, md:px-13/md:pb-16 desktop — pt-0 conservé,
+   l'image doit continuer à saigner sous la nav). Avant, le padding horizontal
+   était plus petit (8px/36px) pour compenser l'inset propre du cadre
+   (.ac-hero__frame, 16-28px) et retomber sur le même repère visuel que le
+   reste du site — ce calcul est abandonné : le texte du hero tombe
+   désormais plus loin du bord que le reste des sections (inset du cadre +
+   padding du texte, au lieu d'un seul des deux), choix assumé pour une
+   valeur de padding strictement identique partout. */
+.ac-hero__body {
+  position: absolute;
+  z-index: 2;
+  left: 0; right: 0; bottom: 0;
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  flex-wrap: wrap;
+}
+
+.ac-hero__collection {
+  font-family: var(--font-family-base);
+  font-size: 12px;
+  letter-spacing: 1px;
+  color: rgba(255,255,255,0.65);
+}
+
+.ac-hero__title {
+  font-family: var(--ac-font-serif);
+  font-weight: 400;
+  color: var(--color-on-accent);
+  font-size: clamp(40px, 6vw, 76px);
+  line-height: 1.05;
+}
+.ac-hero__title em { font-style: italic; }
+
+/* .ac-hero__links-row — rangée des 2 boutons pill (Figma node 1:446, gap
+   8px). Les boutons eux-mêmes réutilisent .btn-soft (buttons.css), déjà le
+   composant pill du design system — pas de style propre à recréer ici. */
+.ac-hero__links-row {
+  display: flex;
+  align-items: center;
+}
+
+@media (max-width: 700px) {
+  .ac-hero__frame { left: 16px; right: 16px; }
+}
+
+/* .ac-manifesto__rule est repris par .ac-quote__cite plus bas — seule règle
+   de ce bloc encore utilisée après la suppression des sections Démarche et
+   À propos. */
+.ac-manifesto__rule {
+  width: 32px; height: 1px;
+  background: var(--color-accent);
+}
+
+/* ── Series & Collections ──
+   .series-card reste un composant distinct de .gallery-card (gallery.css) :
+   ici la vitrine éditoriale de l'accueil (plein cadre, dégradé, badge), là-bas
+   le catalogue de la photothèque (carte bordée). Même rôle visuel, mise en
+   page différente — mais même rayon de coin (--radius-firm) que partout
+   ailleurs où une photo est affichée sur le site.
+
+   Padding : classes utilitaires sur le HTML depuis le 2026-09-23, uniformisé
+   le même jour sur py-13 px-6 md:py-16 md:px-13 — identique à
+   .ac-spotlight/.ac-quote/.ac-shop/.ac-newsletter (breakpoint 700px aligné),
+   sur les 3 instances (#featuredAlbumSection, #series, series.html). Le
+   96px/32px vertical et le 32px horizontal Figma-spécifique de #series ont
+   été abandonnés au profit de cette uniformisation — voir index.html. */
+
+.ac-series__head {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  flex-wrap: wrap;
+}
+
+.ac-series__title {
+  font-family: var(--ac-font-serif);
+  font-weight: 400;
+  font-size: 36px;
+  color: var(--color-text-primary);
+}
+
+.ac-series__grid {
+  display: flex;
+  min-height: 520px;
+}
+
+/* #series (bloc "Séries thématiques" embarqué dans l'accueil) : padding
+   identique aux autres sections depuis l'uniformisation — seule sa hauteur
+   de grille reste plus compacte (min-height réduite, contenu plus court). */
+#series .ac-series__grid { min-height: 0; }
+
+@media (max-width: 700px) {
+  .ac-series__grid { flex-direction: column; }
+}
+
+/* Variante « liste » (page /series.html) : autant de vignettes que de séries,
+   qui s'enchaînent sur plusieurs lignes plutôt que de se répartir sur une seule. */
+.ac-series__grid--wrap {
+  flex-wrap: wrap;
+  min-height: 0;
+}
+/* .series-card* déplacé vers assets/styles/components/series-cards.css
+   (2026-09-22) — composant partagé entre 3 pages, pas propre à l'accueil. */
+
+/* ── Collection Spotlight ──
+   <spotlight-saga> (js/components/spotlight-saga.js) : les custom elements
+   sont "display: inline" par défaut — sans ce reset, le padding/border-top
+   ci-dessous ne se comporterait pas comme un bloc pleine largeur.
+   Padding : py-13 px-6 lg:py-16 lg:px-13 sur le HTML — breakpoint 900px
+   (lg:) conservé tel quel, distinct du 700px (md:) des autres sections. */
+.ac-spotlight {
+  display: block;
+  border-top: 1px solid var(--color-border-tertiary);
+}
+
+.ac-spotlight__grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  align-items: start;
+}
+
+.ac-spotlight__content {
+  position: sticky;
+  top: 40px;
+}
+
+.ac-spotlight__eyebrow-row {
+  display: flex;
+  align-items: center;
+}
+
+/* Pastille primaire/secondaire — reprend la couleur de saga choisie en admin
+   (config.saga couleur, voir SAGA_COLORS dans admin.html). Neutre en
+   noir/gris tant qu'aucune couleur n'est choisie, cohérent avec la règle
+   "pas de couleur" ; devient la première application publique du champ. */
+.ac-spotlight__dot {
+  position: relative;
+  width: 20px;
+  height: 12px;
+  flex-shrink: 0;
+}
+.ac-spotlight__dot-primary,
+.ac-spotlight__dot-secondary {
+  position: absolute;
+  top: 0;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+}
+.ac-spotlight__dot-primary   { left: 0;  background: var(--color-border-primary); }
+.ac-spotlight__dot-secondary { left: 8px; background: var(--color-border-tertiary); }
+
+.ac-spotlight__dot[data-color="blue"]   .ac-spotlight__dot-primary   { background: var(--color-core-primary-blue); }
+.ac-spotlight__dot[data-color="blue"]   .ac-spotlight__dot-secondary { background: var(--color-core-secondary-blue); }
+.ac-spotlight__dot[data-color="red"]    .ac-spotlight__dot-primary   { background: var(--color-core-primary-red); }
+.ac-spotlight__dot[data-color="red"]    .ac-spotlight__dot-secondary { background: var(--color-core-secondary-red); }
+.ac-spotlight__dot[data-color="green"]  .ac-spotlight__dot-primary   { background: var(--color-core-primary-green); }
+.ac-spotlight__dot[data-color="green"]  .ac-spotlight__dot-secondary { background: var(--color-core-secondary-green); }
+.ac-spotlight__dot[data-color="yellow"] .ac-spotlight__dot-primary   { background: var(--color-core-primary-yellow); }
+.ac-spotlight__dot[data-color="yellow"] .ac-spotlight__dot-secondary { background: var(--color-core-secondary-yellow); }
+.ac-spotlight__dot[data-color="orange"] .ac-spotlight__dot-primary   { background: var(--color-core-primary-orange); }
+.ac-spotlight__dot[data-color="orange"] .ac-spotlight__dot-secondary { background: var(--color-core-secondary-orange); }
+.ac-spotlight__dot[data-color="purple"] .ac-spotlight__dot-primary   { background: var(--color-core-primary-purple); }
+.ac-spotlight__dot[data-color="purple"] .ac-spotlight__dot-secondary { background: var(--color-core-secondary-purple); }
+.ac-spotlight__dot[data-color="pink"]   .ac-spotlight__dot-primary   { background: var(--color-core-primary-pink); }
+.ac-spotlight__dot[data-color="pink"]   .ac-spotlight__dot-secondary { background: var(--color-core-secondary-pink); }
+
+.ac-spotlight__title {
+  font-family: var(--ac-font-serif);
+  font-weight: 400;
+  font-size: 48px;
+  color: var(--color-text-primary);
+}
+
+.ac-spotlight__desc {
+  font-size: 24px;
+  line-height: 32px;
+  letter-spacing: -0.02em;
+  color: var(--color-text-secondary);
+  max-width: 568px;
+}
+.ac-spotlight__desc:empty { display: none; }
+
+.ac-spotlight__note {
+  font-size: 20px;
+  line-height: 24px;
+  letter-spacing: -0.02em;
+  color: var(--color-text-tertiary);
+  max-width: 568px;
+}
+.ac-spotlight__note:empty { display: none; }
+
+.ac-spotlight__meta {
+  border-top: 1px solid var(--color-border-tertiary);
+  display: flex;
+  flex-direction: column;
+}
+
+.ac-spotlight__meta-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 13px;
+}
+.ac-spotlight__meta-row dt { color: var(--color-text-secondary); }
+.ac-spotlight__meta-row dd { color: var(--color-text-primary); }
+
+.ac-spotlight__actions {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.ac-spotlight__media {
+  display: flex;
+  flex-direction: column;
+}
+
+.ac-spotlight__main {
+  border-radius: var(--radius-firm);
+  overflow: hidden;
+  background: var(--color-bg-active);
+  aspect-ratio: 4/5;
+}
+.ac-spotlight__main img { width: 100%; height: 100%; object-fit: cover; display: block; }
+
+.ac-spotlight__secondary {
+  display: grid;
+  grid-template-columns: 4fr 3fr;
+}
+
+.ac-spotlight__secondary-img {
+  border-radius: var(--radius-firm);
+  overflow: hidden;
+  background: var(--color-bg-active);
+  aspect-ratio: 3/4;
+}
+.ac-spotlight__secondary-img img { width: 100%; height: 100%; object-fit: cover; display: block; }
+
+.ac-spotlight__tag {
+  background: var(--color-surface-subtle);
+  border-radius: var(--radius-firm);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+/* Avatars des séries composant la saga — vraies couvertures de collections
+   (pas d'illustration inventée), "+N" si plus de 3 séries. */
+.ac-spotlight__avatars {
+  display: flex;
+  align-items: center;
+  min-height: 48px;
+}
+.ac-spotlight__avatar {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  overflow: hidden;
+  background: var(--color-bg-active);
+  flex-shrink: 0;
+}
+.ac-spotlight__avatar img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.ac-spotlight__avatar:not(:first-child) {
+  border: 3px solid var(--color-surface-subtle);
+}
+
+.ac-spotlight__tag-label {
+  font-size: 11px;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  color: var(--color-text-secondary);
+}
+.ac-spotlight__tag-value {
+  font-family: var(--ac-font-serif);
+  font-style: italic;
+  font-size: 18px;
+  color: var(--color-text-primary);
+  line-height: 1.35;
+}
+
+@media (max-width: 900px) {
+  .ac-spotlight__grid { grid-template-columns: 1fr; }
+  .ac-spotlight__content { position: static; }
+  .ac-spotlight__desc, .ac-spotlight__note { max-width: 100%; }
+}
+
+/* ── Pull quote ──
+   Padding : py-13 px-6 md:py-16 md:px-13 sur le HTML (breakpoint 700px). */
+.ac-quote {
+  background: var(--color-surface-subtle);
+  text-align: center;
+}
+
+.ac-quote__inner { max-width: 768px; }
+
+.ac-quote__mark {
+  width: 32px; height: 24px;
+  color: var(--color-accent);
+}
+
+.ac-quote__text {
+  font-family: var(--ac-font-serif);
+  font-style: italic;
+  font-size: 28px;
+  line-height: 1.5;
+  color: var(--color-text-primary);
+}
+
+.ac-quote__cite {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.ac-quote__cite span {
+  font-size: 12px;
+  letter-spacing: 1.8px;
+  text-transform: uppercase;
+  color: var(--color-text-secondary);
+}
+
+@media (max-width: 700px) {
+  .ac-quote__text { font-size: 22px; }
+}
+
+/* ── Shop ──
+   Padding : py-13 px-6 lg:py-16 lg:px-13 sur le HTML (breakpoint 900px,
+   comme .ac-spotlight). */
+.ac-shop {
+  border-top: 1px solid var(--color-border-tertiary);
+  background: var(--color-surface-subtle);
+}
+
+.ac-shop__title {
+  font-family: var(--ac-font-serif);
+  font-weight: 400;
+  font-size: 40px;
+  color: var(--color-text-primary);
+}
+
+.ac-shop__grid {
+  display: flex;
+  align-items: stretch;
+}
+
+.ac-shop__grid > shop-card {
+  flex: 1 1 0;
+  min-width: 0;
+}
+
+.ac-shop-card {
+  background: var(--color-bg-primary);
+  border: 1px solid var(--color-border-tertiary);
+  border-radius: var(--radius-firm);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.ac-shop-card__media {
+  aspect-ratio: 4/3;
+  background: var(--color-surface-subtle);
+  position: relative;
+}
+.ac-shop-card__media img { width: 100%; height: 100%; object-fit: cover; display: block; }
+
+.ac-shop-card__media--placeholder {
+  border: 1px dashed var(--color-border-tertiary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--color-text-secondary);
+  font-size: 12px;
+  text-align: center;
+}
+
+.ac-shop-card__body {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+}
+
+.ac-shop-card__title {
+  font-family: var(--ac-font-serif);
+  font-weight: 400;
+  font-size: 22px;
+  color: var(--color-text-primary);
+}
+
+.ac-shop-card__desc {
+  font-size: 13px;
+  line-height: 1.6;
+  color: var(--color-text-secondary);
+}
+
+.ac-shop-card__note {
+  border-top: 1px solid var(--color-border-tertiary);
+  font-size: 13px;
+  color: var(--color-text-secondary);
+}
+
+/* Tableau de prix par format — formats/éditions/tarifs réels non définis,
+   voir index.html (placeholders [à définir]/[prix]). */
+.ac-shop-card__prices {
+  display: flex;
+  flex-direction: column;
+  border-top: 1px solid var(--color-border-tertiary);
+}
+
+.ac-shop-card__price-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.ac-shop-card__price-row dt {
+  font-size: 13px;
+  color: var(--color-text-primary);
+}
+
+.ac-shop-card__price-row dd {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--color-text-primary);
+}
+
+.ac-shop-card__edition {
+  font-size: 11px;
+  color: var(--color-text-secondary);
+}
+
+.ac-shop-card__price-row dd.ac-placeholder,
+.ac-shop-card__price-row dt .ac-placeholder {
+  color: var(--color-text-secondary);
+  font-style: italic;
+}
+
+.ac-shop-card__cta {
+  width: 100%;
+}
+
+.ac-shop__footnote {
+  text-align: center;
+  font-size: 12px;
+  color: var(--color-text-secondary);
+}
+
+@media (max-width: 900px) {
+  .ac-shop__grid { flex-direction: column; }
+}
+
+/* ── Newsletter (footer) ──
+   Formulaire réutilisé tel quel par la popup d'inscription (.ac-popup__form
+   ci-dessous) : mêmes classes .ac-newsletter__form/__input, même bouton
+   .btn-primary — un seul formulaire stylé, pas deux.
+   Padding : py-13 px-6 md:py-16 md:px-13 sur le HTML (breakpoint 700px). */
+.ac-newsletter {
+  border-top: 1px solid var(--color-border-tertiary);
+  text-align: center;
+}
+.ac-newsletter__title {
+  font-family: var(--ac-font-serif);
+  font-weight: 400;
+  font-size: 1.3rem;
+  color: var(--color-text-primary);
+}
+.ac-newsletter__subtitle {
+  font-size: 13px;
+  color: var(--color-text-secondary);
+}
+.ac-newsletter__form {
+  display: flex; justify-content: center; flex-wrap: wrap;
+  max-width: 440px;
+}
+.ac-newsletter__input {
+  flex: 1; min-width: 220px;
+  background: var(--color-surface-subtle); border: 1px solid var(--color-border-tertiary); border-radius: var(--radius-firm);
+  color: var(--color-text-primary); font-family: var(--font-family-base); font-size: 14px; outline: none;
+}
+.ac-newsletter__input:focus {
+  border-color: var(--color-accent);
+}
+.ac-newsletter__msg {
+  font-size: 13px;
+}
+.ac-newsletter__msg.is-success { color: var(--ac-color-success); }
+.ac-newsletter__msg.is-error   { color: var(--ac-color-error); }
+
+.btn-primary.is-success {
+  /* Le bouton part déjà du beige d'accent au repos : passer au noir plein
+     rend le changement d'état visible sans recourir à une couleur. */
+  background: var(--color-text-primary);
+}
+
+.ac-newsletter__note {
+  font-size: 11px;
+  color: var(--color-text-secondary);
+}
+.ac-newsletter__note a { text-decoration: underline; }
+
+/* ── Signup popup ──
+   Même palette et mêmes tokens que le reste de la page (light mode) — avant,
+   cette popup était codée en dur sur un fond sombre, hérité d'avant la
+   migration light mode et jamais retouché. */
+.ac-popup {
+  position: fixed;
+  inset: 0;
+  z-index: 9000;
+  align-items: center;
+  justify-content: center;
+}
+.ac-popup__overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(4px);
+}
+.ac-popup__panel {
+  position: relative;
+  z-index: 1;
+  background: var(--color-bg-primary);
+  border: 1px solid var(--color-border-tertiary);
+  border-radius: var(--radius-firm);
+  max-width: 440px;
+  width: 100%;
+  text-align: center;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
+}
+.ac-popup__close {
+  position: absolute;
+  top: 14px; right: 16px;
+  background: none;
+  border: none;
+  color: var(--color-text-secondary);
+  font-size: 20px;
+  cursor: pointer;
+  line-height: 1;
+}
+.ac-popup__title {
+  font-family: var(--ac-font-serif);
+  font-size: 1.35rem;
+  font-weight: 400;
+  color: var(--color-text-primary);
+  line-height: 1.4;
+}
+.ac-popup__text {
+  font-size: 13px;
+  color: var(--color-text-secondary);
+  line-height: 1.6;
+}
+.ac-popup__form {
+  flex-direction: column;
+}
+.ac-popup__submit { width: 100%; }
+.ac-popup__skip {
+  background: none;
+  border: none;
+  color: var(--color-text-secondary);
+  font-size: 12px;
+  cursor: pointer;
+  text-decoration: underline;
+}

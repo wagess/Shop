@@ -1,0 +1,56 @@
+/* ==========================================================================
+   Page /politique-confidentialite.html — contenu légal en prose longue.
+   Premier usage de ce pattern sur le site (aucune page de ce type
+   n'existait avant) : largeur de lecture contrainte + rythme de titres,
+   réutilise les tokens Sigma existants (accueil.css : --ac-font-serif,
+   --font-family-base, .ac-eyebrow) plutôt que d'en inventer de nouveaux.
+   ========================================================================== */
+
+.legal-content {
+  max-width: 720px;
+}
+
+.legal-intro {
+  max-width: 720px;
+  color: var(--color-text-secondary);
+  font-size: 16px;
+  line-height: 1.6;
+}
+
+.legal-content h2 {
+  font-family: var(--ac-font-serif);
+  font-weight: 400;
+  font-size: 24px;
+  color: var(--color-text-primary);
+}
+
+.legal-content p,
+.legal-content li {
+  font-family: var(--font-family-base);
+  font-size: 16px;
+  line-height: 1.7;
+  color: var(--color-text-secondary);
+}
+
+.legal-content strong {
+  color: var(--color-text-primary);
+  font-weight: 500;
+}
+
+.legal-content a {
+  text-decoration: underline;
+  text-underline-position: from-font;
+}
+
+.legal-content ul {
+  list-style: disc;
+  padding-left: var(--space-20);
+}
+
+.legal-content li + li {
+  margin-top: var(--space-8);
+}
+
+.legal-content section + section {
+  border-top: 1px solid var(--color-border-tertiary);
+}

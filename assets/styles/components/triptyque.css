@@ -1,9 +1,9 @@
 /* ==================== Bouton wishlist sur vignette ==================== */
 
+/* Spacing (gap-2) posé en classe utilitaire sur le HTML — voir js/modal.js. */
 .photo-actions {
     display: flex;
     align-items: center;
-    gap: 8px;
 }
 
 .photo-actions > button:first-child { flex: 1; }
@@ -21,6 +21,9 @@
 
 /* ==================== Cart dans la nav ==================== */
 
+/* .triptyque-cart n'a aucun usage dans le HTML/JS actuel (le bouton panier
+   utilise .btn-soft.ac-nav__shop — vérifié) : padding laissé en CSS, à
+   convertir si cette classe est un jour instanciée. */
 .triptyque-cart {
     position: relative;
     background: none;
@@ -30,20 +33,21 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    padding: 4px;
+    padding: var(--space-4);
     opacity: 0.7;
     transition: opacity 0.15s;
 }
 
 .triptyque-cart:hover { opacity: 1; }
 
+/* Spacing (px-1) posé en classe utilitaire sur le HTML — voir
+   js/components/nav.js. */
 .triptyque-cart__badge {
     position: absolute;
     top: -4px;
     right: -6px;
     min-width: 18px;
     height: 18px;
-    padding: 0 4px;
     border-radius: 9px;
     background: var(--color-accent);
     color: var(--color-on-accent);
@@ -57,6 +61,7 @@
 
 /* ==================== Modale triptyque ==================== */
 
+/* Spacing (p-5) posé en classe utilitaire sur le HTML — voir js/triptyque.js. */
 .tmodal-overlay {
     position: fixed;
     inset: 0;
@@ -65,7 +70,6 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    padding: 20px;
     opacity: 0;
     transition: opacity 0.2s ease;
 }
@@ -73,11 +77,11 @@
 .tmodal-overlay--visible { opacity: 1; }
 .tmodal-overlay--visible .tmodal { transform: translateY(0); }
 
+/* Spacing (p-6 gap-4) posé en classe utilitaire sur le HTML. */
 .tmodal {
     background: var(--color-surface);
     border: 1px solid var(--color-border);
     border-radius: var(--radius-firm);
-    padding: 24px;
     width: 100%;
     max-width: 420px;
     position: relative;
@@ -85,9 +89,9 @@
     transition: transform 0.2s ease;
     display: flex;
     flex-direction: column;
-    gap: 16px;
 }
 
+/* Spacing (p-2) posé en classe utilitaire sur le HTML. */
 .tmodal__close {
     position: absolute;
     top: 14px;
@@ -97,7 +101,6 @@
     border-radius: var(--radius-firm);
     color: var(--color-text-primary);
     cursor: pointer;
-    padding: 6px;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -105,24 +108,24 @@
 
 .tmodal__close:hover { background: var(--color-border); }
 
+/* Spacing (m-0) posé en classe utilitaire sur le HTML. */
 .tmodal__label {
     color: var(--color-text-tertiary);
     font-size: 11px;
     text-transform: uppercase;
     letter-spacing: 0.12em;
-    margin: 0;
 }
 
+/* Spacing (gap-3) posé en classe utilitaire sur le HTML. */
 .tmodal__slots {
     display: flex;
-    gap: 10px;
 }
 
+/* Spacing (gap-2) posé en classe utilitaire sur le HTML. */
 .tmodal__slot {
     flex: 1;
     display: flex;
     flex-direction: column;
-    gap: 6px;
     position: relative;
 }
 
@@ -134,6 +137,7 @@
     display: block;
 }
 
+/* Spacing (p-0) posé en classe utilitaire sur le HTML. */
 .tmodal__slot-remove {
     position: absolute;
     top: 5px;
@@ -150,7 +154,6 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    padding: 0;
     opacity: 0;
     transition: opacity 0.15s;
 }
@@ -168,16 +171,16 @@
     -webkit-box-orient: vertical;
 }
 
+/* Spacing (m-0) posé en classe utilitaire sur le HTML. */
 .tmodal__hint {
     color: var(--color-text-tertiary);
     font-size: 12px;
     text-align: center;
-    margin: 0;
 }
 
+/* Spacing (p-3) posé en classe utilitaire sur le HTML. */
 .tmodal__generate {
     width: 100%;
-    padding: 12px;
     background: var(--color-accent);
     color: var(--color-on-accent);
     border: none;
@@ -194,9 +197,10 @@
     box-shadow: 0 4px 14px rgba(107, 78, 61, 0.3);
 }
 
+/* Spacing (p-3, 10px arrondi à l'index 3 de l'échelle) posé en classe
+   utilitaire sur le HTML. */
 .tmodal__secondary {
     width: 100%;
-    padding: 10px;
     background: transparent;
     color: var(--color-text-tertiary);
     border: none;
@@ -207,91 +211,15 @@
 
 .tmodal__secondary:hover { color: var(--color-text-secondary); }
 
-/* ==================== Phase 2 — mots-clés ==================== */
+/* ==================== Commande (3/3 photos) ====================
+   Pas de génération d'histoire ni de mots-clés IPTC — retiré le 2026-09-22,
+   voir mémoire projet_triptyque.md. Pas de tarifs/paiement en ligne pour
+   l'instant : message honnête "à venir", même traitement que le bouton
+   "Imprimer une série" ailleurs sur le site. */
 
-.tmodal__loading {
-    color: var(--color-text-tertiary);
-    font-size: var(--font-body-caption-size);
-    text-align: center;
-    padding: 20px 0;
-}
-
-.tmodal__kw-list {
-    display: flex;
-    flex-direction: column;
-    gap: 14px;
-}
-
-.tmodal__kw-row {
-    display: flex;
-    align-items: flex-start;
-    gap: 12px;
-}
-
-.tmodal__kw-thumb {
-    flex-shrink: 0;
-    width: 52px;
-    height: 52px;
-    border-radius: var(--radius-firm);
-    overflow: hidden;
-}
-
-.tmodal__kw-thumb img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    display: block;
-}
-
-.tmodal__kw-tags {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 6px;
-    align-content: flex-start;
-}
-
-.tmodal__kw {
-    background: var(--color-surface-subtle);
-    color: var(--color-text-secondary);
-    font-size: 11px;
-    padding: 3px 8px;
-    border-radius: 20px;
-    line-height: 1.4;
-}
-
-.tmodal__kw--empty {
-    color: var(--color-text-tertiary);
-    background: none;
-}
-
-/* ==================== Phase 3 — histoire ==================== */
-
-.tmodal__story-loader {
-    display: flex;
-    justify-content: center;
-    gap: 8px;
-    padding: 24px 0;
-}
-
-.tmodal__story-loader span {
-    width: 8px;
-    height: 8px;
-    border-radius: 50%;
-    background: var(--color-accent);
-    animation: tmodal-pulse 1.2s ease-in-out infinite;
-}
-
-.tmodal__story-loader span:nth-child(2) { animation-delay: 0.2s; }
-.tmodal__story-loader span:nth-child(3) { animation-delay: 0.4s; }
-
-@keyframes tmodal-pulse {
-    0%, 80%, 100% { transform: scale(0.6); opacity: 0.3; }
-    40%            { transform: scale(1);   opacity: 1; }
-}
-
+/* Spacing (gap-2) posé en classe utilitaire sur le HTML. */
 .tmodal__story-thumbs {
     display: flex;
-    gap: 6px;
     justify-content: center;
 }
 
@@ -304,13 +232,112 @@
     flex-shrink: 0;
 }
 
-.tmodal__story-text {
-    font-family: Georgia, serif;
-    font-size: 15px;
-    line-height: 1.75;
+/* Spacing (m-0) posé en classe utilitaire sur le HTML. */
+.tmodal__order-text {
+    font-size: var(--font-body-caption-size);
+    line-height: 1.6;
+    color: var(--color-text-secondary);
+    text-align: center;
+}
+
+/* ==================== Modale "hub" boutique (WIREFRAME) ====================
+   Bouton Shop (nav) + bouton Commander (heroes) ouvrent tous les deux cette
+   modale — demande PO du 2026-09-24, "à designer plus précisément" plus
+   tard. Volontairement grossier ("mode wireframe") : réutilise le shell
+   .tmodal existant (pas un nouveau système de modale), juste plus large
+   pour un layout à 2 colonnes. Panneau de droite = bloc pointillé, pas
+   d'illustration/couleur inventée — même convention que "[prix]" ailleurs
+   sur le site pour signaler un contenu non défini. */
+.tmodal.shub {
+    max-width: 720px;
+}
+
+.shub__grid {
+    display: grid;
+    grid-template-columns: 1.3fr 1fr;
+    align-items: stretch;
+}
+
+.shub__content {
+    display: flex;
+    flex-direction: column;
+}
+
+.shub__title {
+    font-family: var(--font-family-base);
+    font-size: 24px;
+    font-weight: 500;
     color: var(--color-text-primary);
-    margin: 0;
-    white-space: pre-wrap;
+}
+
+.shub__text {
+    font-size: var(--font-body-caption-size);
+    color: var(--color-text-secondary);
+    line-height: 1.5;
+}
+
+.shub__option {
+    display: flex;
+    flex-direction: column;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-firm);
+}
+
+.shub__option-title {
+    font-size: var(--font-headline-body-size);
+    font-weight: var(--font-headline-body-weight);
+    color: var(--color-text-primary);
+}
+
+.shub__option-text {
+    font-size: var(--font-body-caption-size);
+    color: var(--color-text-secondary);
+}
+
+.shub__shop-link {
+    width: auto;
+    align-self: flex-start;
+    text-decoration: underline;
+}
+
+.shub__visual {
+    border: 1px dashed var(--color-border);
+    border-radius: var(--radius-firm);
+    background: var(--color-surface-subtle);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 220px;
+}
+
+.shub__visual-label {
+    color: var(--color-text-tertiary);
+    font-size: var(--font-body-caption-size);
+    font-style: italic;
+}
+
+/* Variante "impression unique" (2026-09-24) : vraie photo, pas un
+   placeholder — bordure pleine au lieu de pointillée, image en cover. */
+.shub__visual--photo {
+    border-style: solid;
+    background: none;
+    overflow: hidden;
+}
+
+.shub__visual--photo img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}
+
+@media (max-width: 640px) {
+    .shub__grid {
+        grid-template-columns: 1fr;
+    }
+    .shub__visual {
+        display: none;
+    }
 }
 
 /* ==================== Bottom Action Bar — triptyque page ==================== */

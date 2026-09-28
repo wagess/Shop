@@ -9,10 +9,10 @@
  */
 export function createFooter({ brand = '', links = [] } = {}) {
   const footer = document.createElement('footer');
-  footer.className = 'site-footer';
+  footer.className = 'site-footer py-8 px-6';
 
   const inner = document.createElement('div');
-  inner.className = 'site-footer__inner';
+  inner.className = 'site-footer__inner gap-4 md:gap-6 mx-auto';
 
   // ── Brand ──────────────────────────────────────────────────────────────────
   const brandEl = document.createElement('span');
@@ -22,7 +22,7 @@ export function createFooter({ brand = '', links = [] } = {}) {
 
   // ── Nav links ──────────────────────────────────────────────────────────────
   const nav = document.createElement('nav');
-  nav.className = 'site-footer__nav';
+  nav.className = 'site-footer__nav gap-4 md:gap-6';
   nav.setAttribute('aria-label', 'Liens secondaires');
 
   links.forEach(({ label, href, external = false }) => {

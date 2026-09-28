@@ -1,6 +1,17 @@
 # PHOTO PRODUCT
 
-## 1. Mission du projet
+## 1. Mission et objectifs du projet
+
+### Objectifs
+
+* Se démarquer et challenger toutes les plateformes de vente photo en ligne ;
+* s'inspirer de l'expérience d'achat des services d'impression (pas du print-on-demand générique) ;
+* faire de mon shop l'unique point de référence pour ma photothèque ;
+* raconter une histoire à travers mes séries et mon portfolio, en développant un narratif à travers le matériel visuel ;
+* générer et fructifier un auditoire ;
+* vendre des packs de photos ou des impressions d'art, éventuellement d'autres produits (livres).
+
+### Mission
 
 **PHOTO PRODUCT** est mon laboratoire personnel de conception de produit numérique.
 

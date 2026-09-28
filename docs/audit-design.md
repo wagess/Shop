@@ -128,3 +128,11 @@ Avant de modifier quoi que ce soit :
 > **Clarifier le modèle commercial.** Le parcours d'achat actuel est un formulaire de contact déguisé. Il manque : prix, délais, conditions. Ces éléments doivent être définis avant de repenser l'UX.
 
 Question clé : *Quel est le vrai produit — une commande en ligne ou une prise de contact pour une commande sur-mesure ?*
+
+---
+
+## 7. Suivi — 2026-09-24
+
+**Ligne 94 (localStorage triptyque réinitialisé) :** résolu depuis le 2026-09-22, indépendamment de cet audit — le triptyque est devenu un vrai panier persistant entre les pages (pivot PO, voir mémoire `project_triptyque.md`). N'était donc pas involontaire : comportement d'origine cohérent avec l'usage éphémère de l'époque ("une histoire à la fois"), changé quand l'usage a changé.
+
+**Sur la question clé ci-dessus :** toujours pas totalement tranchée, mais une direction est prise. Décision PO (2026-09-24) : les 3 points d'entrée d'achat du site (bouton Shop nav → panier triptyque, bouton Commander Heroes → jusqu'ici `#shop`, bouton "Commander une impression" par photo → vrai formulaire `orderPrint`) doivent converger vers **une seule modale**, réunissant boutique + panier d'achat + impression (à l'unité ou en lot). Premier wireframe posé (`window.openShopModal()`, `js/triptyque.js`) — design visuel final et modèle commercial (prix, délais) toujours à clarifier avant d'aller plus loin. Détail complet dans `idees.md` ("Modale boutique unifiée").

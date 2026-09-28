@@ -43,7 +43,22 @@ export function createButton({
     sm: 'btn-sm', // 40px
   }[size] ?? '';
 
-  btn.className = [variantClass, sizeClass, className].filter(Boolean).join(' ');
+  // Spacing en classes utilitaires (assets/styles/spacing-utilities.css).
+  // Longhands (pt/pb/pr/pl) plutôt que les raccourcis p/px/py pour les
+  // variantes icon-* : deux classes utilitaires de même spécificité se
+  // départagent par leur ordre dans le fichier source, pas par labelType —
+  // en longhand chaque propriété n'est fixée que par une seule classe.
+  const sizePadding = { lg: { y: 4, x: 8 }, md: { y: 3, x: 6 }, sm: { y: 3, x: 5 } }[size]
+    ?? { y: 4, x: 8 };
+  const iconOnlyPadding = { lg: 4, md: 3, sm: 2 }[size] ?? 4;
+
+  const spacingClass = {
+    'icon-only': `gap-2 p-${iconOnlyPadding}`,
+    'icon-left': `gap-2 pt-${sizePadding.y} pb-${sizePadding.y} pr-${sizePadding.x} pl-6`,
+    'icon-right': `gap-2 pt-${sizePadding.y} pb-${sizePadding.y} pl-${sizePadding.x} pr-6`,
+  }[labelType] ?? `gap-2 py-${sizePadding.y} px-${sizePadding.x}`;
+
+  btn.className = [variantClass, sizeClass, spacingClass, className].filter(Boolean).join(' ');
 
   if (id)       btn.id = id;
   if (disabled) btn.disabled = true;
@@ -54,18 +69,15 @@ export function createButton({
     case 'icon-only':
       if (icon) btn.innerHTML = _wrapIcon(icon);
       btn.setAttribute('aria-label', label);
-      btn.style.setProperty('padding', _iconPadding(size));
       btn.style.setProperty('width', _iconSize(size));
       break;
 
     case 'icon-left':
       btn.innerHTML = (icon ? _wrapIcon(icon) : '') + _wrapLabel(label);
-      btn.style.setProperty('padding-left', '24px');
       break;
 
     case 'icon-right':
       btn.innerHTML = _wrapLabel(label) + (icon ? _wrapIcon(icon) : '');
-      btn.style.setProperty('padding-right', '24px');
       break;
 
     default: // 'text'
@@ -86,10 +98,6 @@ function _wrapLabel(text) {
 
 function _wrapIcon(svg) {
   return `<span class="btn__icon" aria-hidden="true">${svg}</span>`;
-}
-
-function _iconPadding(size) {
-  return { lg: '16px', md: '12px', sm: '8px' }[size] ?? '16px';
 }
 
 function _iconSize(size) {

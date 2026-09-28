@@ -7,28 +7,8 @@ function updateOrderBtn(title, imageUrl, photoId) {
     btn.style.display = '';
     btn.onclick = (e) => {
         e.stopPropagation();
-        window.orderPrint(title, imageUrl, photoId);
+        window.openShopModal({ mode: 'unique', photo: { id: photoId, title, url: imageUrl } });
     };
-}
-
-/**
- * Met à jour l'image d'arrière-plan dynamiquement
- */
-function updateBackgroundImage(imageUrl) {
-    const style = document.createElement('style');
-    style.textContent = `
-        body::before {
-            background-image: url('${imageUrl}') !important;
-        }
-    `;
-    
-    const oldStyle = document.getElementById('dynamic-background');
-    if (oldStyle) {
-        oldStyle.remove();
-    }
-    
-    style.id = 'dynamic-background';
-    document.head.appendChild(style);
 }
 
 /**
@@ -63,15 +43,12 @@ async function loadRandomImage() {
         console.log('📨 Image reçue:', imageData.title, imageData.url);
         
         if (imageData.url) {
-            updateBackgroundImage(imageData.url);
-            
-            randomImageEl.style.opacity = '0.3';
-            
             randomImageEl.onload = () => {
                 console.log('✅ Image chargée avec succès');
-                randomImageEl.style.opacity = '1';
+                randomImageEl.classList.add('is-loaded');
+                randomImageEl.parentElement?.classList.remove('shimmer');
             };
-            
+
             randomImageEl.src = imageData.url;
             randomImageEl.alt = imageData.alt || imageData.title || 'Image aléatoire';
             updateOrderBtn(imageData.title || '', imageData.url, imageData.id);
@@ -113,20 +90,17 @@ async function loadRandomImageFromCollection(collectionId) {
         }
 
         console.log('📨 Photo aléatoire sélectionnée:', randomPhoto.title || randomPhoto.name);
-        
-        updateBackgroundImage(imageUrl);
-        
-        randomImageEl.style.opacity = '0.3';
-        
+
         randomImageEl.onload = () => {
             console.log('✅ Image de collection chargée avec succès');
-            randomImageEl.style.opacity = '1';
+            randomImageEl.classList.add('is-loaded');
+            randomImageEl.parentElement?.classList.remove('shimmer');
         };
-        
+
         randomImageEl.onerror = () => {
             console.error('❌ Erreur de chargement de l\'image:', imageUrl);
         };
-        
+
         randomImageEl.src = imageUrl;
         randomImageEl.alt = randomPhoto.alt || randomPhoto.title || randomPhoto.name || 'Image de collection';
         updateOrderBtn(randomPhoto.title || randomPhoto.name || '', imageUrl, randomPhoto.id);
@@ -191,18 +165,15 @@ async function loadRandomImageFromCollectionByName(collectionName, collections) 
         }
 
         console.log('📨 Photo aléatoire sélectionnée:', randomPhoto.title || randomPhoto.name);
-        
-        updateBackgroundImage(imageUrl);
-        
+
         const randomImageEl = el('randomImage');
         if (randomImageEl) {
-            randomImageEl.style.opacity = '0.3';
-            
             randomImageEl.onload = () => {
                 console.log('✅ Image de collection chargée avec succès');
-                randomImageEl.style.opacity = '1';
+                randomImageEl.classList.add('is-loaded');
+                randomImageEl.parentElement?.classList.remove('shimmer');
             };
-            
+
             randomImageEl.src = imageUrl;
             randomImageEl.alt = randomPhoto.alt || randomPhoto.title || randomPhoto.name || 'Image de collection';
             updateOrderBtn(randomPhoto.title || randomPhoto.name || '', imageUrl, randomPhoto.id);
@@ -219,6 +190,5 @@ async function loadRandomImageFromCollectionByName(collectionName, collections) 
 export {
     loadRandomImage,
     loadRandomImageFromCollection,
-    loadRandomImageFromCollectionByName,
-    updateBackgroundImage
+    loadRandomImageFromCollectionByName
 };

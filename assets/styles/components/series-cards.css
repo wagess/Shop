@@ -1,0 +1,83 @@
+/* ==========================================================================
+   Series card — Sigma Design System
+   Composant JS partagé : js/components/series-cards.js (createSeriesCard)
+   Consommé par : js/home-sections.js (accueil), js/series-page.js
+   (/series.html), js/serie-page.js (/serie.html).
+   Déplacé depuis assets/styles/pages/accueil.css (2026-09-22) — ces styles
+   n'étaient pas propres à la page d'accueil, ils servent 3 pages.
+   Dépend des tokens --ac-font-serif / --ac-accent-warm définis dans
+   assets/styles/pages/accueil.css (:root) — chargé sur les 3 pages ci-dessus.
+   ========================================================================== */
+
+.series-card {
+  position: relative;
+  flex: 1;
+  min-width: 0;
+  border-radius: var(--radius-firm);
+  overflow: hidden;
+  background: var(--color-bg-active);
+  display: block;
+  height: 500px;
+}
+
+.series-card__image {
+  position: absolute; inset: 0;
+}
+.series-card__image img {
+  width: 100%; height: 100%; object-fit: cover; display: block;
+  transition: transform 0.4s ease;
+}
+.series-card:hover .series-card__image img { transform: scale(1.03); }
+
+.series-card__gradient {
+  position: absolute; inset: 0;
+  background: linear-gradient(0deg, rgba(13,13,13,0.6) 0%, rgba(13,13,13,0) 50%);
+}
+
+/* Spacing (py-2 px-3) posé en classe utilitaire sur le HTML. */
+.series-card__badge {
+  position: absolute;
+  top: 20px; left: 20px;
+  border-radius: var(--radius-circular);
+  background: rgba(255,255,255,0.1);
+  backdrop-filter: blur(8px);
+  color: rgba(255,255,255,0.6);
+  font-size: 11px;
+  letter-spacing: 2.2px;
+}
+
+/* Spacing (p-8) posé en classe utilitaire sur le HTML. */
+.series-card__content {
+  position: absolute;
+  left: 0; right: 0; bottom: 0;
+  color: var(--color-on-accent);
+}
+
+/* Spacing (m-0) posé en classe utilitaire sur le HTML. */
+.series-card__meta {
+  font-size: 11px;
+  letter-spacing: 1.65px;
+  text-transform: uppercase;
+  color: var(--ac-accent-warm);
+}
+
+/* Spacing (mt-2) posé en classe utilitaire sur le HTML. */
+.series-card__title {
+  font-family: var(--ac-font-serif);
+  font-size: 22px;
+  line-height: 1.2;
+  font-weight: 400;
+}
+
+.series-card--lg .series-card__title {
+  font-size: 28px;
+}
+
+/* .series-card__cta : plus de règle CSS, spacing (mt-5) posé en classe
+   utilitaire directement sur le HTML — voir js/components/series-cards.js. */
+
+/* Intégration dans la grille "toutes les séries" (/series.html) — voir
+   .ac-series__grid--wrap dans pages/accueil.css. */
+.ac-series__grid--wrap .series-card {
+  flex: 1 1 340px;
+}

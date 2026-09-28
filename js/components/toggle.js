@@ -48,6 +48,7 @@ export function createToggle({
 function _applyClasses(btn, checked, disabled, onMaterial, extra) {
   btn.className = [
     'toggle',
+    'p-0',
     checked    ? 'toggle--on'          : 'toggle--off',
     disabled   ? 'toggle--disabled'    : '',
     onMaterial ? 'toggle--on-material' : '',

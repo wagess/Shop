@@ -32,17 +32,51 @@
     100% { transform: rotate(360deg); }
 }
 
+/* Spacing (p-5 m-5) posé en classe utilitaire sur le HTML. */
 .error-message {
     background: rgba(244, 67, 54, 0.2);
     color: var(--error-color);
-    padding: var(--gap-medium);
     border-radius: var(--border-radius-medium);
     text-align: center;
-    margin: var(--gap-medium);
 }
 
 .stats {
     text-align: center;
     color: var(--white);
     font-size: 1.2em;
+}
+
+/* ==================== Shimmer (placeholder pendant le chargement d'une image) ====================
+   À poser sur le conteneur d'une image le temps de son chargement, puis à retirer
+   (côté JS, sur l'évènement `load` de l'<img>) une fois l'image réellement affichée.
+   Implémenté en surcouche (::after) plutôt qu'en changeant le `background` de
+   l'élément : ça évite toute guerre de cascade avec le background propre du
+   composant (ex. pages/accueil.css, chargé après styles.css/utilities.css). */
+.shimmer {
+    position: relative;
+    overflow: hidden;
+}
+
+.shimmer::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(
+        100deg,
+        transparent 30%,
+        rgba(255, 255, 255, 0.55) 50%,
+        transparent 70%
+    );
+    background-size: 200% 100%;
+    animation: shimmer-sweep 1.6s ease-in-out infinite;
+    pointer-events: none;
+}
+
+@keyframes shimmer-sweep {
+    0%   { background-position: 200% 0; }
+    100% { background-position: -200% 0; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .shimmer::after { animation: none; }
 }

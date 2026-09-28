@@ -6,6 +6,11 @@
 /* --------------------------------------------------------------------------
    Base commune
    -------------------------------------------------------------------------- */
+/* Spacing (gap, padding) posé en classes utilitaires sur le HTML :
+   gap-2 py-4 px-8 — voir js/components/button.js (createButton) pour
+   .btn-primary/.btn-secondary/.btn-tertiary. .order-btn n'a aucun usage
+   dans le HTML/JS actuel (vérifié) : pas de classes à poser, à surveiller
+   si ce bouton est un jour instancié. */
 .btn-primary,
 .btn-secondary,
 .btn-tertiary,
@@ -13,10 +18,8 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 8px;
 
   height: 56px;
-  padding: 16px 32px;
   border-radius: var(--radius-circular);
   overflow: hidden;
 
@@ -46,6 +49,37 @@
 .btn-primary:hover,
 .order-btn:hover {
   background: var(--color-accent-hover);
+}
+
+/* --------------------------------------------------------------------------
+   Commander — variante noire du primary, réservée au CTA d'achat (nav + hero)
+   pour le distinguer des autres actions primary du site. Le système visuel
+   n'utilise aucune couleur (noir/gris/beige uniquement) : la distinction se
+   fait par le contraste noir plein vs. beige de l'accent, pas par la teinte.
+   -------------------------------------------------------------------------- */
+.btn-commander {
+  background: var(--color-text-primary);
+  color: var(--color-on-accent);
+}
+
+.btn-commander:hover {
+  background: var(--color-text-secondary);
+}
+
+/* `.ac-page a { color: inherit }` (layout.css) a la même spécificité qu'un
+   simple `.btn-primary`/`.btn-commander` (une classe) et peut écraser leur
+   couleur selon l'ordre de chargement — même bug que celui corrigé sur
+   `.ac-nav__link` (nav.css, 2026-09-21). Resté invisible jusqu'ici : ces
+   deux variantes n'avaient jamais été posées sur un `<a>` (juste des
+   `<button>` via createButton()) ; .btn-soft/.btn-secondary/.btn-tertiary,
+   eux, s'en sortent "par accident" car leur couleur voulue est justement
+   --color-text-primary, la même que récupère le `inherit`. Bug révélé et
+   corrigé le 2026-09-24 en posant .btn-commander sur les CTA `<a>` des
+   Heroes (texte noir sur fond noir sans ce correctif). Sélecteur qualifié
+   pour regagner la priorité, peu importe l'ordre des fichiers. */
+.ac-page a.btn-primary,
+.ac-page a.btn-commander {
+  color: var(--color-on-accent);
 }
 
 /* --------------------------------------------------------------------------
@@ -115,13 +149,49 @@
 /* --------------------------------------------------------------------------
    Tailles — Medium (48px) et Small (40px)
    -------------------------------------------------------------------------- */
+/* Spacing (py-3 px-6 / py-3 px-5) posé en classes utilitaires sur le HTML —
+   voir js/components/button.js. */
 .btn-md {
   height: 48px;
-  padding: 12px 24px;
 }
 
 .btn-sm {
   height: 40px;
-  padding: 10px 20px;
   font-size: 14px;
+}
+
+/* --------------------------------------------------------------------------
+   Soft — pastille pleine gris clair, utilisée pour les CTA secondaires
+   compacts (ex. "Voir la collection" sur une carte, "Toutes les séries").
+   Figma : node 23:966 / 1045:5382 — Sans-titre (vDYe0oWfzs4InGstvpCxBk, 1:2)
+   -------------------------------------------------------------------------- */
+/* Spacing (gap-2 py-0 pr-4 pl-6) posé en classe utilitaire sur chaque
+   instance HTML (voir index.html, serie.html, js/components/*.js). */
+.btn-soft {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: 40px;
+  border-radius: var(--radius-circular);
+  background: var(--color-bg-secondary);
+  color: var(--color-text-primary);
+  font-family: var(--font-family-base);
+  font-size: 14px;
+  font-weight: 500;
+  letter-spacing: -0.02em;
+  white-space: nowrap;
+  border: none;
+  cursor: pointer;
+  text-decoration: none;
+  transition: background 0.15s ease;
+}
+
+.btn-soft:hover {
+  background: var(--color-bg-active);
+}
+
+.btn-soft svg {
+  width: 20px;
+  height: 20px;
+  flex-shrink: 0;
 }

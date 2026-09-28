@@ -19,7 +19,7 @@ const VARIANTS = ['tall', 'normal', 'normal', 'wide', 'wide', 'normal', 'normal'
 
 export function createMasonryGrid({ photos = [], gap = 8, onPhotoClick = null } = {}) {
     const grid = document.createElement('div');
-    grid.className = 'masonry-grid';
+    grid.className = 'masonry-grid gap-2';
     grid.style.setProperty('--masonry-gap', `${gap}px`);
 
     photos.forEach((photo, index) => {

@@ -5,10 +5,12 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Admin — Visibilité collections</title>
 <link rel="stylesheet" href="./docs/tokens.css">
+<link rel="stylesheet" href="./assets/styles/spacing-utilities.css">
 <link rel="stylesheet" href="./assets/styles/components/toggle.css">
 <style>
   @import url('https://api.fontshare.com/v2/css?f[]=general-sans@400,500,600&display=swap');
 
+  /* Reset universel : même exception que reset.css (racine du site). */
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
   body {
@@ -28,43 +30,43 @@
     min-height: 100vh;
   }
 
+  /* Spacing (p-12) posé en classe utilitaire sur le HTML. */
   .login-box {
     background: var(--color-bg-secondary);
     border: 1px solid var(--color-border-secondary);
     border-radius: var(--radius-firm);
-    padding: 48px;
     width: 360px;
     text-align: center;
   }
 
+  /* Spacing (mb-8) posé en classe utilitaire sur le HTML. */
   .login-box h1 {
     font-size: 11px;
     letter-spacing: 0.2em;
     text-transform: uppercase;
     color: var(--color-text-tertiary);
-    margin-bottom: 32px;
     font-weight: 500;
   }
 
+  /* Spacing (py-3 px-4 mb-3) posé en classe utilitaire sur le HTML. */
   .login-box input {
     width: 100%;
-    padding: 12px 16px;
     background: var(--color-bg-primary);
     border: 1px solid var(--color-border-secondary);
     border-radius: var(--radius-firm);
     color: var(--color-text-primary);
     font-family: var(--font-family-base);
     font-size: var(--font-body-caption-size);
-    margin-bottom: 12px;
     outline: none;
     transition: border-color 0.15s ease;
   }
 
   .login-box input:focus { border-color: var(--color-border-primary); }
 
+  /* Spacing (p-4 — 14px arrondi à l'index 4/16px) posé en classe utilitaire
+     sur le HTML. */
   .login-box button {
     width: 100%;
-    padding: 14px;
     background: var(--color-core-primary-b);
     color: var(--color-core-primary-a);
     border: none;
@@ -80,30 +82,30 @@
 
   .login-box button:hover { opacity: 0.85; }
 
+  /* Spacing (mt-3) posé en classe utilitaire sur le HTML. */
   .login-error {
     color: var(--color-core-secondary-red);
     font-size: 12px;
-    margin-top: 12px;
     min-height: 18px;
   }
 
   /* ── Dashboard ── */
   #dashboard { display: none; }
 
+  /* Spacing (py-4 px-8 gap-4) posé en classe utilitaire sur le HTML. */
   .topbar {
     position: sticky;
     top: 0;
     z-index: 100;
     background: var(--color-bg-secondary);
     border-bottom: 1px solid var(--color-border-secondary);
-    padding: 16px 32px;
     display: flex;
     align-items: center;
     justify-content: space-between;
-    gap: 16px;
   }
 
-  .topbar-left { display: flex; align-items: center; gap: 24px; }
+  /* Spacing (gap-6) posé en classe utilitaire sur le HTML. */
+  .topbar-left { display: flex; align-items: center; }
 
   .topbar h1 {
     font-size: 11px;
@@ -123,16 +125,21 @@
     font-weight: 500;
   }
 
-  .topbar-right { display: flex; gap: 8px; align-items: center; }
+  /* Spacing (gap-2) posé en classe utilitaire sur le HTML. */
+  .topbar-right { display: flex; align-items: center; }
 
+  /* Spacing (px-4) posé en classe utilitaire sur le HTML. */
   .btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
     height: 36px;
-    padding: 0 16px;
     font-family: var(--font-family-base);
     font-size: 12px;
     font-weight: 500;
     letter-spacing: 0.05em;
     text-transform: uppercase;
+    text-decoration: none;
     border-radius: var(--radius-circular);
     border: none;
     cursor: pointer;
@@ -165,17 +172,19 @@
     letter-spacing: 0.02em;
   }
 
-  /* ── Barre de recherche ── */
+  /* ── Barre de recherche ── Spacing (py-3 px-8 gap-3) posé en classe
+     utilitaire sur le HTML. */
   .search-bar {
-    padding: 12px 32px;
     border-bottom: 1px solid var(--color-border-secondary);
+    display: flex;
+    align-items: center;
   }
 
+  /* Spacing (px-4) posé en classe utilitaire sur le HTML. */
   .search-bar input {
     width: 100%;
     max-width: 400px;
     height: 40px;
-    padding: 0 16px;
     background: var(--color-bg-secondary);
     border: 1px solid var(--color-border-secondary);
     border-radius: var(--radius-circular);
@@ -190,23 +199,22 @@
 
   .search-bar input::placeholder { color: var(--color-text-tertiary); }
 
-  /* ── Contenu ── */
-  .main { padding: 24px 32px; }
+  /* ── Contenu ── .main : spacing (py-6 px-8) posé en classe utilitaire
+     directement sur le HTML, plus de règle CSS. */
 
-  /* ── Dossiers ── */
-  .folder-section { margin-bottom: 6px; }
+  /* ── Dossiers ── .folder-section : spacing (mb-2) posé en classe
+     utilitaire directement sur le HTML, plus de règle CSS. */
 
+  /* Spacing (py-3 px-4 gap-3) posé en classe utilitaire sur le HTML. */
   .folder-header {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 12px 16px;
     background: var(--color-bg-secondary);
     border: 1px solid var(--color-border-secondary);
     border-radius: var(--radius-firm);
     cursor: pointer;
     user-select: none;
-    gap: 12px;
     transition: border-color 0.15s ease;
   }
 
@@ -217,7 +225,8 @@
     border-bottom-right-radius: 0;
   }
 
-  .folder-header-left { display: flex; align-items: center; gap: 12px; flex: 1; }
+  /* Spacing (gap-3) posé en classe utilitaire sur le HTML. */
+  .folder-header-left { display: flex; align-items: center; flex: 1; }
 
   .folder-chevron {
     font-size: 10px;
@@ -232,6 +241,20 @@
     font-weight: var(--font-headline-body-weight);
     letter-spacing: var(--font-headline-body-letter-spacing);
     color: var(--color-text-primary);
+  }
+
+  /* ── Pastille de couleur de saga (2026-09-21) ──
+     Affichée sur la ligne du dossier/saga elle-même, et sur chaque collection
+     rattachée (dossier physique ou rattachement manuel) pour repérer d'un
+     coup d'œil à quelle saga colorée elle appartient. */
+  /* Spacing (ml-2) posé en classe utilitaire sur le HTML. */
+  .admin-saga-dot {
+    display: inline-block;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    flex-shrink: 0;
+    vertical-align: middle;
   }
 
   .folder-count {
@@ -250,11 +273,12 @@
 
   .folder-section.open .collections-list { display: block; }
 
+  /* Spacing (py-3 pr-4 pl-9 — 10px arrondi à l'index 3/12px) posé en classe
+     utilitaire sur le HTML. */
   .collection-row {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 10px 16px 10px 36px;
     border-bottom: 1px solid var(--color-border-secondary);
     transition: background 0.1s ease;
   }
@@ -271,10 +295,10 @@
     color: var(--color-text-primary);
   }
 
+  /* Spacing (ml-2) posé en classe utilitaire sur le HTML. */
   .collection-id {
     font-size: 11px;
     color: var(--color-text-tertiary);
-    margin-left: 8px;
     letter-spacing: 0.05em;
   }
 
@@ -284,26 +308,25 @@
   .toggle--on .toggle__thumb { background: var(--color-core-primary-a); }
   .toggle--disabled { background: var(--color-bg-disabled); }
 
-  /* ── États vides / loader ── */
+  /* ── États vides / loader ── Spacing (p-12) posé en classe utilitaire
+     sur le HTML. */
   .loader {
-    padding: 48px;
     text-align: center;
     color: var(--color-text-tertiary);
   }
 
+  /* Spacing (p-8) posé en classe utilitaire sur le HTML. */
   .empty {
-    padding: 32px;
     text-align: center;
     color: var(--color-text-tertiary);
   }
 
-  /* ── Collection mise en avant ── */
+  /* ── Collection mise en avant ── Spacing (py-3 px-8 gap-4) posé en
+     classe utilitaire sur le HTML. */
   .featured-bar {
-    padding: 12px 32px;
     border-bottom: 1px solid var(--color-border-secondary);
     display: flex;
     align-items: center;
-    gap: 16px;
   }
 
   .featured-bar label {
@@ -315,10 +338,14 @@
     font-weight: 500;
   }
 
+  /* Spacing (pl-4 pr-10 — 14px/36px arrondis aux index 4/10) posé en
+     classe utilitaire sur le HTML. pr-10 (au lieu de px-4 symétrique) :
+     nécessaire pour loger le chevron custom ci-dessous sans qu'il ne
+     déborde de la silhouette courbe du conteneur en pilule (même bug que
+     .search-field__btn, corrigé le même jour — voir search.css). */
   .featured-bar select {
     height: 36px;
-    padding: 0 14px;
-    background: var(--color-bg-secondary);
+    background-color: var(--color-bg-secondary);
     border: 1px solid var(--color-border-secondary);
     border-radius: var(--radius-circular);
     color: var(--color-text-primary);
@@ -328,21 +355,297 @@
     cursor: pointer;
     min-width: 220px;
     transition: border-color 0.15s ease;
+    /* Flèche native remplacée : son espace réservé par le navigateur ne
+       correspond à aucun padding CSS qu'on contrôle, d'où le même
+       "espace étrange" — chevron custom + pr-10 à la place. Couleur en
+       dur (#7a7a7a = --color-text-tertiary en mode sombre, docs/tokens.css)
+       : un data URI ne peut pas lire une variable CSS. */
+    appearance: none;
+    -webkit-appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 20 20' fill='none'%3E%3Cpath d='M5 8L10 13L15 8' stroke='%237a7a7a' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 14px center;
   }
 
   .featured-bar select:focus { border-color: var(--color-border-primary); }
 
+  /* Spacing (ml-auto) posé en classe utilitaire sur le HTML. */
   .featured-hint {
     font-size: 11px;
     color: var(--color-text-tertiary);
-    margin-left: auto;
   }
 
-  /* ── Collections sans dossier ── */
-  .standalone-section { margin-bottom: 6px; }
+  /* ── Toggles multiples sur une ligne ── Spacing (gap-5 / gap-2) posé en
+     classe utilitaire sur le HTML. */
+  .row-toggles { display: flex; align-items: center; }
+  .row-toggle-item { display: flex; align-items: center; }
+  .row-toggle-label {
+    font-size: 11px;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    color: var(--color-text-tertiary);
+  }
+  .row-toggle-state {
+    font-size: 11px;
+    color: var(--color-text-tertiary);
+    min-width: 42px;
+  }
+  .row-toggle-state.is-active { color: var(--color-text-primary); }
 
+  /* ── Checkbox — visibilité d'une collection (Figma Design System 2,
+     node 1585-15621, /Home/Components/Selection and input/Check box) ── */
+  .admin-checkbox {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+  }
+  .admin-checkbox input {
+    position: absolute;
+    width: 0;
+    height: 0;
+    opacity: 0;
+  }
+  .admin-checkbox__box {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 20px;
+    height: 20px;
+    border-radius: 4px;
+    border: 1px solid var(--color-border-secondary);
+    color: var(--color-text-primary-b);
+    transition: background 0.15s ease, border-color 0.15s ease;
+  }
+  .admin-checkbox:hover .admin-checkbox__box { border-color: var(--color-border-primary); }
+  .admin-checkbox__check { opacity: 0; transition: opacity 0.1s ease; }
+  .admin-checkbox input:checked + .admin-checkbox__box {
+    background: var(--color-text-primary);
+    border-color: transparent;
+  }
+  .admin-checkbox input:checked + .admin-checkbox__box .admin-checkbox__check { opacity: 1; }
+
+  /* ── Collection sans dossier : appartenance à une saga ── Spacing
+     (pl-3 pr-8 — 10px/28px arrondis aux index 3/8) posé en classe
+     utilitaire sur le HTML. Même correctif chevron custom que
+     .featured-bar select ci-dessus (asymétrie nécessaire, pas juste
+     symétrique par principe — voir son commentaire). */
+  .collection-saga-select {
+    height: 32px;
+    background-color: var(--color-bg-secondary);
+    border: 1px solid var(--color-border-secondary);
+    border-radius: var(--radius-circular);
+    color: var(--color-text-primary);
+    font-family: var(--font-family-base);
+    font-size: 12px;
+    outline: none;
+    cursor: pointer;
+    appearance: none;
+    -webkit-appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 20 20' fill='none'%3E%3Cpath d='M5 8L10 13L15 8' stroke='%237a7a7a' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 10px center;
+    min-width: 160px;
+    transition: border-color 0.15s ease;
+  }
+
+  .collection-saga-select:focus { border-color: var(--color-border-primary); }
+
+  /* ── Sagas éditoriales sans dossier (Option B) ── Spacing (gap-3 py-4
+     px-8 — 10px arrondi à l'index 3/12px) posé en classe utilitaire sur
+     le HTML. */
+  .custom-sagas-bar {
+    display: none;
+    flex-direction: column;
+    align-items: stretch;
+    border-bottom: 1px solid var(--color-border-secondary);
+  }
+  .custom-sagas-bar.has-items { display: flex; }
+  .custom-sagas-bar > label {
+    font-size: 11px;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    color: var(--color-text-tertiary);
+  }
+  /* Spacing (py-2 px-3) posé en classe utilitaire sur le HTML. */
+  .custom-saga-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: var(--color-bg-secondary);
+    border: 1px solid var(--color-border-secondary);
+    border-radius: var(--radius-firm);
+  }
+  /* Sélecteur de fratrie (+) : pas convertible en classe HTML sans logique
+     JS conditionnelle (seul le non-premier élément doit avoir la marge) —
+     laissé en CSS, exception au même titre que le reset universel. */
+  .custom-saga-row + .custom-saga-row { margin-top: var(--space-8); }
+  .custom-saga-row .collection-name { font-size: 13px; }
+
+  /* ── Couleur de saga (accent des séries enfants) ── Spacing (gap-2 mt-1)
+     posé en classe utilitaire sur le HTML. */
+  .saga-color-swatches { display: flex; align-items: center; }
+  /* Spacing (p-0) posé en classe utilitaire sur le HTML. */
+  .saga-color-swatch {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    border: 2px solid transparent;
+    cursor: pointer;
+    transition: transform 0.15s ease, border-color 0.15s ease;
+  }
+  .saga-color-swatch:hover { transform: scale(1.08); }
+  .saga-color-swatch.is-selected { border-color: var(--color-text-primary); }
+  .saga-color-swatch--none {
+    background: var(--color-bg-secondary);
+    border-color: var(--color-border-secondary);
+    color: var(--color-text-tertiary);
+    font-size: 14px;
+    line-height: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .saga-color-swatch--none.is-selected { border-color: var(--color-text-primary); }
+
+  /* ── Bouton "+" — ouvre la modale de détails d'une série ou d'une saga ── */
+  .content-edit-btn {
+    display: none; /* affiché en JS quand la ligne est une série, toujours pour une saga (dossier) */
+    align-items: center;
+    justify-content: center;
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    border: 1px solid var(--color-border-secondary);
+    background: var(--color-bg-secondary);
+    color: var(--color-text-tertiary);
+    font-size: 15px;
+    line-height: 1;
+    cursor: pointer;
+    transition: border-color 0.15s ease, color 0.15s ease;
+  }
+
+  .content-edit-btn:hover {
+    border-color: var(--color-border-primary);
+    color: var(--color-text-primary);
+  }
+
+  .content-edit-btn.has-content {
+    background: var(--color-core-primary-b);
+    color: var(--color-core-primary-a);
+    border-color: transparent;
+  }
+
+  .content-edit-btn.is-visible { display: flex; }
+
+  .content-edit-btn:disabled {
+    opacity: 0.35;
+    cursor: not-allowed;
+    pointer-events: none;
+  }
+
+  /* ── Modale (détails d'une série ou d'une saga) ── Spacing (p-6) posé en
+     classe utilitaire sur le HTML. */
+  .modal-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.6);
+    z-index: 1000;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .modal-overlay.open { display: flex; }
+
+  .modal-box {
+    background: var(--color-bg-primary);
+    border: 1px solid var(--color-border-secondary);
+    border-radius: var(--radius-firm);
+    width: 100%;
+    max-width: 520px;
+    max-height: 88vh;
+    overflow-y: auto;
+  }
+
+  /* Spacing (gap-4 py-5 px-6) posé en classe utilitaire sur le HTML. */
+  .modal-header {
+    position: sticky;
+    top: 0;
+    background: var(--color-bg-primary);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-bottom: 1px solid var(--color-border-secondary);
+  }
+
+  .modal-header h2 {
+    font-size: var(--font-headline-body-size);
+    font-weight: var(--font-headline-body-weight);
+    color: var(--color-text-primary);
+  }
+
+  .modal-close {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    border: none;
+    background: var(--color-bg-secondary);
+    color: var(--color-text-tertiary);
+    font-size: 16px;
+    cursor: pointer;
+    flex-shrink: 0;
+  }
+
+  .modal-close:hover { color: var(--color-text-primary); }
+
+  /* Spacing (pt-5 px-6 pb-6 gap-4 — 14px arrondi à l'index 4/16px) posé en
+     classe utilitaire sur le HTML. */
+  .modal-body {
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* Spacing (mb-2) posé en classe utilitaire sur le HTML. */
+  .modal-body label {
+    display: block;
+    font-size: 11px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--color-text-tertiary);
+    font-weight: 500;
+  }
+
+  /* Spacing (py-3 px-4 — 10px/14px arrondis à l'index 3/12px) posé en
+     classe utilitaire sur le HTML. */
+  .modal-body input,
+  .modal-body textarea {
+    width: 100%;
+    background: var(--color-bg-secondary);
+    border: 1px solid var(--color-border-secondary);
+    border-radius: var(--radius-firm);
+    color: var(--color-text-primary);
+    font-family: var(--font-family-base);
+    font-size: var(--font-body-caption-size);
+    outline: none;
+    transition: border-color 0.15s ease;
+  }
+
+  .modal-body input:focus,
+  .modal-body textarea:focus { border-color: var(--color-border-primary); }
+
+  .modal-body textarea { min-height: 80px; resize: vertical; font-family: var(--font-family-base); }
+
+  /* Spacing (gap-3) posé en classe utilitaire sur le HTML. */
+  .series-row { display: flex; }
+  .series-row > div { flex: 1; }
+
+  /* ── Collections sans dossier ── .standalone-section : spacing (mb-2)
+     posé en classe utilitaire directement sur le HTML, plus de règle CSS. */
+
+  /* Spacing (py-3 px-4 — 10px arrondi à l'index 3/12px) posé en classe
+     utilitaire sur le HTML. */
   .standalone-header {
-    padding: 10px 16px;
     font-size: 11px;
     letter-spacing: 0.15em;
     text-transform: uppercase;
@@ -358,42 +661,72 @@
 
 <!-- LOGIN -->
 <div id="login">
-  <div class="login-box">
-    <h1>Stéphane Wagner · Admin</h1>
-    <input type="password" id="passwordInput" placeholder="Mot de passe" autocomplete="current-password">
-    <button onclick="tryLogin()">Accéder</button>
-    <div class="login-error" id="loginError"></div>
+  <div class="login-box p-12">
+    <h1 class="mb-8">Stéphane Wagner · Admin</h1>
+    <input type="password" id="passwordInput" class="py-3 px-4 mb-3" placeholder="Mot de passe" autocomplete="current-password">
+    <button class="p-4" onclick="tryLogin()">Accéder</button>
+    <div class="login-error mt-3" id="loginError"></div>
   </div>
 </div>
 
 <!-- DASHBOARD -->
 <div id="dashboard">
-  <div class="topbar">
-    <div class="topbar-left">
+  <div class="topbar py-4 px-8 gap-4">
+    <div class="topbar-left gap-6">
       <h1>Visibilité des collections</h1>
       <div class="stats" id="stats">—</div>
     </div>
-    <div class="topbar-right">
+    <div class="topbar-right gap-2">
       <span class="unsaved" id="unsavedBadge" style="display:none">● Non sauvegardé</span>
-      <button class="btn btn-save" id="saveBtn" disabled onclick="saveConfig()">Sauvegarder</button>
-      <button class="btn btn-logout" onclick="logout()">Déconnexion</button>
+      <a class="btn btn-logout px-4" href="/index.html" target="_blank" rel="noopener">Voir le site</a>
+      <button class="btn btn-save px-4" id="saveBtn" disabled onclick="saveConfig()">Sauvegarder</button>
+      <button class="btn btn-logout px-4" onclick="logout()">Déconnexion</button>
     </div>
   </div>
 
-  <div class="featured-bar">
+  <div class="featured-bar py-3 px-8 gap-4">
     <label for="featuredSelect">Collection mise en avant</label>
-    <select id="featuredSelect" onchange="setFeatured(this.value)">
+    <select id="featuredSelect" class="pl-4 pr-10" onchange="setFeatured(this.value)">
       <option value="">— Choisir —</option>
     </select>
-    <span class="featured-hint" id="featuredHint"></span>
+    <span class="featured-hint ml-auto" id="featuredHint"></span>
   </div>
 
-  <div class="search-bar">
-    <input type="text" id="searchInput" placeholder="Rechercher une collection…" oninput="filterList()">
+  <div class="featured-bar py-3 px-8 gap-4">
+    <label for="sagaFeaturedSelect-1">Saga vedette 1</label>
+    <select id="sagaFeaturedSelect-1" class="pl-4 pr-10" onchange="setFeaturedSaga('1', this.value)">
+      <option value="">— Choisir —</option>
+    </select>
+    <label for="sagaFeaturedSelect-2">Saga vedette 2</label>
+    <select id="sagaFeaturedSelect-2" class="pl-4 pr-10" onchange="setFeaturedSaga('2', this.value)">
+      <option value="">— Choisir —</option>
+    </select>
+    <button type="button" class="btn btn-save px-4" onclick="openCreateSagaModal()">+ Créer une saga</button>
   </div>
 
-  <div class="main" id="main">
-    <div class="loader">Chargement des collections…</div>
+  <div class="custom-sagas-bar gap-3 py-4 px-8" id="customSagasBar">
+    <label>Sagas éditoriales (sans dossier)</label>
+    <div id="customSagasList"></div>
+  </div>
+
+  <div class="search-bar py-3 px-8 gap-3">
+    <input type="text" id="searchInput" class="px-4" placeholder="Rechercher une collection…" oninput="filterList()">
+    <button type="button" class="btn btn-logout px-4" id="toggleAllFoldersBtn" onclick="toggleAllFolders()">Tout replier</button>
+  </div>
+
+  <div class="main py-6 px-8" id="main">
+    <div class="loader p-12">Chargement des collections…</div>
+  </div>
+</div>
+
+<!-- MODALE — détails d'une série ou d'une saga -->
+<div class="modal-overlay p-6" id="contentModalOverlay" onclick="if (event.target === this) closeContentModal()">
+  <div class="modal-box">
+    <div class="modal-header gap-4 py-5 px-6">
+      <h2 id="contentModalTitle"></h2>
+      <button class="modal-close" onclick="closeContentModal()" aria-label="Fermer">&times;</button>
+    </div>
+    <div class="modal-body pt-5 px-6 pb-6 gap-4" id="contentModalBody"></div>
   </div>
 </div>
 
@@ -412,7 +745,9 @@ const API_BASE  = IS_LOCAL
   ? null
   : `${WP_BASE}/wp-json/wplr/v1`;
 const TOKEN     = 'EDNusnA0Q8TW';
-const SAVE_URL  = './admin-save.php';
+const SAVE_URL     = './admin-save.php';
+const SERIES_URL   = './series-save.php';
+const SAGA_URL     = './saga-save.php';
 
 function adminFetch(path, options = {}) {
   const url = IS_LOCAL
@@ -424,9 +759,19 @@ function adminFetch(path, options = {}) {
   return fetch(url, options);
 }
 
-let config     = { featured_collection: '', collections: {}, folders: {} };
-let hierarchy  = null;
-let isDirty    = false;
+let config          = { featured_collection: '', collections: {}, folders: {}, series: {}, featured_series: {}, saga: {}, featured_sagas: {}, collection_saga: {} };
+let seriesContent   = {};
+let sagaContent     = {};
+let hierarchy       = null;
+let isDirty         = false;
+
+function esc(str) {
+  return String(str ?? '')
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;');
+}
 
 // --- AUTH ---
 function tryLogin() {
@@ -455,12 +800,17 @@ if (sessionStorage.getItem('admin_auth') === '1') {
 
 // --- INIT ---
 async function init() {
-  const [hier, cfg] = await Promise.all([
+  const [hier, cfg, sc, sgc] = await Promise.all([
     adminFetch('/wp-json/wplr/v1/hierarchy').then(r => r.json()),
     fetch(SAVE_URL).then(r => r.json()).catch(() => ({ collections: {}, folders: {} })),
+    fetch(SERIES_URL).then(r => r.json()).catch(() => ({})),
+    fetch(SAGA_URL).then(r => r.json()).catch(() => ({})),
   ]);
-  hierarchy = hier;
-  config    = { featured_collection: '', collections: {}, folders: {}, ...cfg };
+  hierarchy        = hier;
+  config           = { featured_collection: '', collections: {}, folders: {}, series: {}, featured_series: {}, saga: {}, featured_sagas: {}, collection_saga: {}, ...cfg };
+  delete config.spotlights; // retiré : la mise en avant "vedette" se fait désormais par saga (dossier), plus par collection arbitraire
+  seriesContent    = sc  || {};
+  sagaContent      = sgc || {};
   renderDashboard();
 }
 
@@ -488,9 +838,13 @@ function updateStats() {
   const hidC = countHidden('collections');
   const allF = countAll('folders');
   const hidF = countHidden('folders');
+  const seriesCount = Object.values(config.series || {}).filter(Boolean).length;
+  const sagaCount   = Object.values(config.saga || {}).filter(Boolean).length;
   document.getElementById('stats').innerHTML =
     `Collections : <span>${allC - hidC}</span>/${allC} visibles &nbsp;·&nbsp; ` +
-    `Dossiers : <span>${allF - hidF}</span>/${allF} visibles`;
+    `Dossiers : <span>${allF - hidF}</span>/${allF} visibles &nbsp;·&nbsp; ` +
+    `Séries : <span>${seriesCount}</span>/${allC} actives &nbsp;·&nbsp; ` +
+    `Sagas : <span>${sagaCount}</span> active${sagaCount > 1 ? 's' : ''}`;
 }
 
 function countAll(type) {
@@ -554,35 +908,55 @@ function renderDashboard() {
   folders.forEach(folder => {
     const cols    = colsByFolder[folder.id] || [];
     const visible = isVisible('folders', folder.id);
+    const isSaga  = !!(config.saga && config.saga[folder.id]);
+    const folderColor = isSaga ? (sagaContent[folder.id] || {}).couleur : '';
     html += `
-    <div class="folder-section open" id="folder-section-${folder.id}">
-      <div class="folder-header" onclick="toggleSection('${folder.id}')">
-        <div class="folder-header-left">
+    <div class="folder-section open mb-2" id="folder-section-${folder.id}">
+      <div class="folder-header py-3 px-4 gap-3" onclick="toggleSection('${folder.id}')">
+        <div class="folder-header-left gap-3">
           <span class="folder-chevron">▶</span>
           <span class="folder-name">${folder.name || folder.id}</span>
+          ${sagaColorDotHTML(folderColor)}
           <span class="folder-count">${cols.length} collection${cols.length > 1 ? 's' : ''}</span>
         </div>
-        <div class="toggle-mount" data-toggle-type="folder" data-toggle-id="${folder.id}" data-toggle-checked="${visible}" onclick="event.stopPropagation()"></div>
+        <div class="row-toggles gap-5">
+          <button type="button" class="content-edit-btn ${isSaga ? 'is-visible' : ''} ${hasSagaContent(folder.id) ? 'has-content' : ''}"
+                  id="saga-edit-${folder.id}"
+                  data-saga-id="${folder.id}" data-saga-name="${esc(folder.name || folder.id)}"
+                  title="Détails de la saga"
+                  onclick="event.stopPropagation(); openContentModal('saga', this.dataset.sagaId, this.dataset.sagaName)">+</button>
+          <div class="row-toggle-item gap-2" onclick="event.stopPropagation()">
+            <span class="row-toggle-label">Saga</span>
+            <span class="row-toggle-state ${isSaga ? 'is-active' : ''}" id="saga-state-${folder.id}">${isSaga ? 'Actif' : 'Inactif'}</span>
+            <div class="toggle-mount" data-toggle-type="saga" data-toggle-id="${folder.id}" data-toggle-checked="${isSaga}"></div>
+          </div>
+          <div class="row-toggle-item gap-2" onclick="event.stopPropagation()">
+            <span class="row-toggle-state ${visible ? 'is-active' : ''}" id="folder-state-${folder.id}">${visible ? 'Actif' : 'Inactif'}</span>
+            <div class="toggle-mount" data-toggle-type="folder" data-toggle-id="${folder.id}" data-toggle-checked="${visible}"></div>
+          </div>
+        </div>
       </div>
       <div class="collections-list">
-        ${cols.map(c => renderCollectionRow(c)).join('') || '<div class="empty">Aucune collection</div>'}
+        ${cols.map(c => renderCollectionRow(c, folder.id)).join('') || '<div class="empty p-8">Aucune collection</div>'}
       </div>
     </div>`;
   });
 
   // Collections sans dossier
   if (standaloneC.length) {
-    html += `<div class="standalone-section">
-      <div class="standalone-header">Sans dossier</div>
+    html += `<div class="standalone-section mb-2">
+      <div class="standalone-header py-3 px-4">Sans dossier</div>
       <div class="collections-list" style="display:block;">
-        ${standaloneC.map(c => renderCollectionRow(c)).join('')}
+        ${standaloneC.map(c => renderCollectionRow(c, null)).join('')}
       </div>
     </div>`;
   }
 
-  main.innerHTML = html || '<div class="empty">Aucune donnée.</div>';
+  main.innerHTML = html || '<div class="empty p-8">Aucune donnée.</div>';
   mountToggles(main);
   populateFeaturedSelect();
+  populateSagaFeaturedSelects();
+  renderCustomSagasSection();
   updateStats();
 }
 
@@ -596,16 +970,31 @@ async function mountToggles(container) {
     });
   }
 
+  // Visibilité collection/dossier : checkbox (Figma Design System 2, node
+  // 1585-15621) plutôt que le toggle-switch. La saga d'un dossier garde le
+  // toggle-switch (demande explicite) ; la saga d'une saga sans dossier
+  // ("saga-standalone", pas de dossier à toggler) reste en checkbox.
+  const CHECKBOX_HANDLERS = {
+    collection: (id, val) => toggleCollection(id, val),
+    folder:     (id, val) => toggleFolder(id, val),
+    'saga-standalone': (id, val) => toggleSaga(id, val),
+  };
+
   container.querySelectorAll('.toggle-mount').forEach(mount => {
     const type    = mount.dataset.toggleType;
     const id      = mount.dataset.toggleId;
     const checked = mount.dataset.toggleChecked === 'true';
 
+    if (CHECKBOX_HANDLERS[type]) {
+      mount.replaceWith(createCheckbox(checked, val => CHECKBOX_HANDLERS[type](id, val)));
+      return;
+    }
+
     const t = window.createToggle({
       checked,
       onChange: val => {
-        if (type === 'folder') toggleFolder(id, val);
-        else                   toggleCollection(id, val);
+        if (type === 'series')     toggleSeries(id, val);
+        else if (type === 'saga')  toggleSaga(id, val);
       },
     });
 
@@ -613,32 +1002,419 @@ async function mountToggles(container) {
   });
 }
 
-function renderCollectionRow(c) {
-  const visible = isVisible('collections', c.id);
+function createCheckbox(checked, onChange) {
+  const label = document.createElement('label');
+  label.className = 'admin-checkbox';
+  label.innerHTML = `
+    <input type="checkbox" ${checked ? 'checked' : ''}>
+    <span class="admin-checkbox__box">
+      <svg class="admin-checkbox__check" width="12" height="12" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M2.5 6.25L4.75 8.5L9.5 3.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </span>`;
+  label.querySelector('input').addEventListener('change', e => onChange(e.target.checked));
+  return label;
+}
+
+// Couleur effective d'une collection : priorité au rattachement manuel
+// (config.collection_saga, un choix explicite), sinon celle du dossier
+// physique s'il est lui-même une saga colorée. Additif ailleurs (comptage,
+// accueil), mais pour l'affichage on ne montre qu'une seule pastille.
+function getEffectiveSagaColor(collectionId, parentFolderId) {
+  const manualSagaId = config.collection_saga && config.collection_saga[collectionId];
+  const sagaId = manualSagaId || ((parentFolderId && config.saga && config.saga[parentFolderId]) ? parentFolderId : null);
+  if (!sagaId) return '';
+  return (sagaContent[sagaId] || {}).couleur || '';
+}
+
+function sagaColorDotHTML(color) {
+  if (!color) return '';
+  return `<span class="admin-saga-dot ml-2" style="background: var(--color-core-primary-${color});" title="Couleur de saga : ${color}"></span>`;
+}
+
+function renderCollectionRow(c, parentFolderId) {
+  const visible  = isVisible('collections', c.id);
+  const isSeries = !!(config.series && config.series[c.id]);
+  const name     = c.name || c.title || 'Sans nom';
+  const sagaColor = getEffectiveSagaColor(c.id, parentFolderId);
+  // Option B (2026-09-21) : n'importe quelle collection peut être rattachée
+  // à une saga à la main, pas seulement celles sans dossier — le dropdown
+  // est donc affiché sur toutes les lignes, en plus de l'appartenance
+  // naturelle au dossier (les deux sont additives, voir home-sections.js).
+  const sagaSelect = `
+        <select class="collection-saga-select pl-3 pr-8" data-collection-id="${c.id}" onclick="event.stopPropagation()" onchange="setCollectionSaga('${c.id}', this.value)" title="Rattacher à une saga">
+          ${sagaOptionsHTML(config.collection_saga && config.collection_saga[c.id])}
+        </select>`;
   return `
-  <div class="collection-row ${visible ? '' : 'hidden-row'}" id="crow-${c.id}">
-    <span>
-      <span class="collection-name">${c.name || c.title || 'Sans nom'}</span>
-      <span class="collection-id">ID ${c.id}</span>
-    </span>
-    <div class="toggle-mount" data-toggle-type="collection" data-toggle-id="${c.id}" data-toggle-checked="${visible}"></div>
+  <div class="collection-row-wrapper">
+    <div class="collection-row py-3 pr-4 pl-9 ${visible ? '' : 'hidden-row'}" id="crow-${c.id}" data-parent-folder-id="${parentFolderId || ''}">
+      <span>
+        <span class="collection-name">${esc(name)}</span>
+        <span class="admin-saga-dot-slot">${sagaColorDotHTML(sagaColor)}</span>
+        <span class="collection-id ml-2">ID ${c.id}</span>
+      </span>
+      <div class="row-toggles gap-5">${sagaSelect}
+        <button type="button" class="content-edit-btn is-visible ${hasSeriesContent(c.id) ? 'has-content' : ''}"
+                id="series-edit-${c.id}"
+                data-series-id="${c.id}" data-series-name="${esc(name)}"
+                title="Détails de la série"
+                ${isSeries ? '' : 'disabled'}
+                onclick="openContentModal('series', this.dataset.seriesId, this.dataset.seriesName)">+</button>
+        <div class="row-toggle-item gap-2">
+          <span class="row-toggle-label">Série</span>
+          <span class="row-toggle-state ${isSeries ? 'is-active' : ''}" id="series-state-${c.id}">${isSeries ? 'Actif' : 'Inactif'}</span>
+          <div class="toggle-mount" data-toggle-type="series" data-toggle-id="${c.id}" data-toggle-checked="${isSeries}"></div>
+        </div>
+        <div class="row-toggle-item gap-2">
+          <span class="row-toggle-state ${visible ? 'is-active' : ''}" id="collection-state-${c.id}">${visible ? 'Actif' : 'Inactif'}</span>
+          <div class="toggle-mount" data-toggle-type="collection" data-toggle-id="${c.id}" data-toggle-checked="${visible}"></div>
+        </div>
+      </div>
+    </div>
   </div>`;
 }
 
+// Toutes les sagas actives : dossiers explicitement activés (config.saga[id])
+// + sagas éditoriales "vierges" créées sans dossier (Option B, 2026-09-21).
+// Une saga vierge n'a pas de nom de dossier : on utilise sagaContent[id].nom.
+function getAllSagaEntries() {
+  const folderById = new Map(flatItems('folders').map(f => [String(f.id), f]));
+  return Object.keys(config.saga || {})
+    .filter(id => config.saga[id])
+    .map(id => {
+      const folder = folderById.get(String(id));
+      const name = folder ? (folder.name || id) : ((sagaContent[id] && sagaContent[id].nom) || id);
+      return { id, name };
+    })
+    .sort((a, b) => (a.name || '').localeCompare(b.name || '', 'fr'));
+}
+
+function sagaOptionsHTML(selectedId) {
+  return '<option value="">— Aucune —</option>' +
+    getAllSagaEntries().map(s => {
+      const sel = String(s.id) === String(selectedId) ? ' selected' : '';
+      return `<option value="${s.id}"${sel}>${esc(s.name)}</option>`;
+    }).join('');
+}
+
+function setCollectionSaga(id, sagaId) {
+  if (!config.collection_saga) config.collection_saga = {};
+  if (sagaId === '') {
+    delete config.collection_saga[id];
+  } else {
+    config.collection_saga[id] = sagaId;
+  }
+  markDirty();
+
+  const row = document.getElementById(`crow-${id}`);
+  const slot = row && row.querySelector('.admin-saga-dot-slot');
+  if (slot) {
+    const parentFolderId = row.dataset.parentFolderId || null;
+    slot.innerHTML = sagaColorDotHTML(getEffectiveSagaColor(id, parentFolderId));
+  }
+}
+
+// Le toggle "Saga" d'un dossier change la liste des sagas disponibles :
+// on rafraîchit les dropdowns déjà affichés pour rester cohérent.
+function refreshCollectionSagaSelects() {
+  document.querySelectorAll('.collection-saga-select').forEach(select => {
+    const collectionId = select.dataset.collectionId;
+    const current = config.collection_saga && config.collection_saga[collectionId];
+    select.innerHTML = sagaOptionsHTML(current);
+  });
+}
+
+function hasSeriesContent(id) {
+  const f = seriesContent[id] || {};
+  return !!(f.format || f.periode || f.description || featuredOrder(id) !== '');
+}
+
+function featuredOrder(id) {
+  const v = config.featured_series && config.featured_series[id];
+  return v == null ? '' : v;
+}
+
+function updateSeriesField(id, key, value) {
+  if (!seriesContent[id]) seriesContent[id] = {};
+  seriesContent[id][key] = value;
+  markDirty();
+}
+
+function updateFeaturedOrder(id, value) {
+  if (!config.featured_series) config.featured_series = {};
+  if (value === '') {
+    delete config.featured_series[id];
+  } else {
+    config.featured_series[id] = Number(value);
+  }
+  markDirty();
+}
+
+function toggleSeries(id, value) {
+  if (!config.series) config.series = {};
+  config.series[id] = value;
+  if (!value && config.featured_series) delete config.featured_series[id]; // une collection non-série ne peut pas être mise en avant
+  markDirty();
+  const btn = document.getElementById(`series-edit-${id}`);
+  if (btn) btn.disabled = !value;
+  const stateEl = document.getElementById(`series-state-${id}`);
+  if (stateEl) {
+    stateEl.textContent = value ? 'Actif' : 'Inactif';
+    stateEl.classList.toggle('is-active', value);
+  }
+  if (!value && currentModalKind === 'series' && currentModalId === id) closeContentModal();
+}
+
+// --- SAGA (dossier) ---
+function toggleSaga(id, value) {
+  if (!config.saga) config.saga = {};
+  config.saga[id] = value;
+  if (!value && config.featured_sagas) delete config.featured_sagas[id]; // un dossier non-saga ne peut pas être mis en avant
+  markDirty();
+  const btn = document.getElementById(`saga-edit-${id}`);
+  if (btn) btn.classList.toggle('is-visible', value);
+  const stateEl = document.getElementById(`saga-state-${id}`);
+  if (stateEl) {
+    stateEl.textContent = value ? 'Actif' : 'Inactif';
+    stateEl.classList.toggle('is-active', value);
+  }
+  if (!value && currentModalKind === 'saga' && currentModalId === id) closeContentModal();
+  refreshCollectionSagaSelects();
+  populateSagaFeaturedSelects();
+}
+
+function sagaFeaturedOrder(id) {
+  const v = config.featured_sagas && config.featured_sagas[id];
+  return v == null ? '' : v;
+}
+
+function updateSagaField(id, key, value) {
+  if (!sagaContent[id]) sagaContent[id] = {};
+  sagaContent[id][key] = value;
+  markDirty();
+}
+
+function hasSagaContent(id) {
+  const f = sagaContent[id] || {};
+  return !!(f.format || f.periode || f.lieu || f.couleur || f.description || f.note || sagaFeaturedOrder(id) !== '');
+}
+
+// --- COULEUR DE SAGA (2026-09-21) ---
+// Familles "primary" du design system (docs/tokens.css --color-core-primary-*),
+// noir/gris (primary_a) volontairement exclu — voir project_no_color_rule.
+// Utilisée sur l'accueil (pastille "Saga en vedette", home-sections.js) et
+// ici en admin (pastille sur chaque ligne dossier/saga/collection concernée).
+const SAGA_COLORS = ['blue', 'red', 'green', 'yellow', 'orange', 'purple', 'pink'];
+
+function sagaColorSwatchesHTML(id) {
+  const current = (sagaContent[id] || {}).couleur || '';
+  const swatches = SAGA_COLORS.map(c => `
+    <button type="button" class="saga-color-swatch p-0 ${current === c ? 'is-selected' : ''}"
+            style="background: var(--color-core-primary-${c});"
+            data-saga-id="${id}" data-color="${c}"
+            title="${c}"
+            onclick="setSagaColor('${id}', '${c}')"></button>`).join('');
+  return `
+    <div class="saga-color-swatches gap-2 mt-1">
+      ${swatches}
+      <button type="button" class="saga-color-swatch p-0 saga-color-swatch--none ${current === '' ? 'is-selected' : ''}"
+              data-saga-id="${id}" data-color=""
+              title="Aucune"
+              onclick="setSagaColor('${id}', '')">&times;</button>
+    </div>`;
+}
+
+function setSagaColor(id, color) {
+  if (!sagaContent[id]) sagaContent[id] = {};
+  sagaContent[id].couleur = color;
+  markDirty();
+  document.querySelectorAll(`.saga-color-swatch[data-saga-id="${id}"]`).forEach(btn => {
+    btn.classList.toggle('is-selected', btn.dataset.color === color);
+  });
+}
+
+// --- SAGAS ÉDITORIALES SANS DOSSIER (Option B, 2026-09-21) ---
+// Une saga "vierge" est une entrée de config.saga dont l'id ne correspond à
+// aucun dossier réel de la photothèque — elle n'a donc pas de ligne dans la
+// liste des dossiers/collections et vit dans sa propre section en haut de page.
+function getCustomSagaIds() {
+  const folderIds = new Set(flatItems('folders').map(f => String(f.id)));
+  return Object.keys(config.saga || {})
+    .filter(id => config.saga[id] && !folderIds.has(String(id)));
+}
+
+function renderCustomSagasSection() {
+  const bar  = document.getElementById('customSagasBar');
+  const list = document.getElementById('customSagasList');
+  if (!bar || !list) return;
+  const ids = getCustomSagaIds();
+  bar.classList.toggle('has-items', ids.length > 0);
+  if (ids.length === 0) { list.innerHTML = ''; return; }
+  list.innerHTML = ids.map(id => {
+    const name = (sagaContent[id] && sagaContent[id].nom) || id;
+    return `
+      <div class="custom-saga-row py-2 px-3" id="crow-saga-${id}">
+        <span class="collection-name">${esc(name)}</span>
+        ${sagaColorDotHTML((sagaContent[id] || {}).couleur)}
+        <div class="row-toggles gap-5">
+          <button type="button" class="content-edit-btn is-visible ${hasSagaContent(id) ? 'has-content' : ''}"
+                  id="saga-edit-${id}"
+                  data-saga-id="${id}" data-saga-name="${esc(name)}"
+                  title="Détails de la saga"
+                  onclick="openContentModal('saga', this.dataset.sagaId, this.dataset.sagaName)">+</button>
+          <div class="row-toggle-item">
+            <span class="row-toggle-label">Saga</span>
+            <span class="row-toggle-state is-active" id="saga-state-${id}">Actif</span>
+            <div class="toggle-mount" data-toggle-type="saga-standalone" data-toggle-id="${id}" data-toggle-checked="true"></div>
+          </div>
+          <button type="button" class="btn btn-logout" onclick="removeCustomSaga('${id}')">Supprimer</button>
+        </div>
+      </div>`;
+  }).join('');
+  mountToggles(list);
+}
+
+function removeCustomSaga(id) {
+  if (config.saga) delete config.saga[id];
+  if (config.featured_sagas) delete config.featured_sagas[id];
+  if (currentModalKind === 'saga' && currentModalId === id) closeContentModal();
+  markDirty();
+  renderCustomSagasSection();
+  populateSagaFeaturedSelects();
+  refreshCollectionSagaSelects();
+}
+
+// --- MODALE — détails d'une série ou d'une saga ---
+let currentModalKind = null; // 'series' | 'saga'
+let currentModalId   = null;
+
+function seriesFormHTML(id) {
+  const fields = seriesContent[id] || {};
+  return `
+    <div class="series-row gap-3">
+      <div>
+        <label class="mb-2" for="series-format-${id}">Format</label>
+        <input class="py-3 px-4" type="text" id="series-format-${id}" value="${esc(fields.format)}" placeholder="Portrait, paysage, carré…" oninput="updateSeriesField('${id}', 'format', this.value)">
+      </div>
+      <div>
+        <label class="mb-2" for="series-periode-${id}">Période</label>
+        <input class="py-3 px-4" type="text" id="series-periode-${id}" value="${esc(fields.periode)}" placeholder="2019–2021" oninput="updateSeriesField('${id}', 'periode', this.value)">
+      </div>
+    </div>
+    <div>
+      <label class="mb-2" for="series-desc-${id}">Description</label>
+      <textarea class="py-3 px-4" id="series-desc-${id}" placeholder="Description de la série…" oninput="updateSeriesField('${id}', 'description', this.value)">${esc(fields.description)}</textarea>
+    </div>
+    <div>
+      <label class="mb-2" for="series-order-${id}">Mise en avant sur l'accueil</label>
+      <input class="py-3 px-4" type="number" min="1" step="1" id="series-order-${id}" value="${esc(featuredOrder(id))}" placeholder="Ordre (1, 2, 3…) — vide = pas mis en avant" oninput="updateFeaturedOrder('${id}', this.value)">
+    </div>
+  `;
+}
+
+function sagaFormHTML(id) {
+  const fields = sagaContent[id] || {};
+  const isCustom = !flatItems('folders').some(f => String(f.id) === String(id));
+  const nameField = isCustom ? `
+    <div>
+      <label class="mb-2" for="saga-nom-${id}">Nom</label>
+      <input class="py-3 px-4" type="text" id="saga-nom-${id}" value="${esc(fields.nom)}" placeholder="Nom de la saga" oninput="updateSagaField('${id}', 'nom', this.value); document.getElementById('contentModalTitle').textContent = this.value || 'Saga';">
+    </div>` : '';
+  return `
+    ${nameField}
+    <div class="series-row gap-3">
+      <div>
+        <label class="mb-2" for="saga-format-${id}">Format</label>
+        <input class="py-3 px-4" type="text" id="saga-format-${id}" value="${esc(fields.format)}" placeholder="Portrait, paysage, carré…" oninput="updateSagaField('${id}', 'format', this.value)">
+      </div>
+      <div>
+        <label class="mb-2" for="saga-periode-${id}">Période</label>
+        <input class="py-3 px-4" type="text" id="saga-periode-${id}" value="${esc(fields.periode)}" placeholder="2019–2021" oninput="updateSagaField('${id}', 'periode', this.value)">
+      </div>
+      <div>
+        <label class="mb-2" for="saga-lieu-${id}">Lieu</label>
+        <input class="py-3 px-4" type="text" id="saga-lieu-${id}" value="${esc(fields.lieu)}" placeholder="Montréal…" oninput="updateSagaField('${id}', 'lieu', this.value)">
+      </div>
+    </div>
+    <div>
+      <label class="mb-2">Couleur (accent pour les séries de cette saga)</label>
+      ${sagaColorSwatchesHTML(id)}
+    </div>
+    <div>
+      <label class="mb-2" for="saga-desc-${id}">Description (texte principal, affiché en grand sur l'accueil)</label>
+      <textarea class="py-3 px-4" id="saga-desc-${id}" placeholder="Le texte principal de la saga — 1 à 3 phrases, ton narratif…" oninput="updateSagaField('${id}', 'description', this.value)">${esc(fields.description)}</textarea>
+    </div>
+    <div>
+      <label class="mb-2" for="saga-note-${id}">Note (second texte, plus discret — optionnel)</label>
+      <textarea class="py-3 px-4" id="saga-note-${id}" placeholder="Un complément plus discret (ex. précision technique) — laissez vide pour ne rien afficher" oninput="updateSagaField('${id}', 'note', this.value)">${esc(fields.note)}</textarea>
+    </div>
+    <p style="font-size:12px; color:var(--color-text-tertiary);">
+      ${sagaFeaturedOrder(id) !== '' ? `Actuellement en vedette (slot ${sagaFeaturedOrder(id)}).` : `Pas en vedette actuellement.`}
+      Se règle via "Saga vedette 1/2" en haut de page.
+    </p>
+  `;
+}
+
+function openContentModal(kind, id, name) {
+  currentModalKind = kind;
+  currentModalId   = id;
+  document.getElementById('contentModalTitle').textContent = name;
+  document.getElementById('contentModalBody').innerHTML = kind === 'series' ? seriesFormHTML(id) : sagaFormHTML(id);
+  document.getElementById('contentModalOverlay').classList.add('open');
+}
+
+function closeContentModal() {
+  document.getElementById('contentModalOverlay').classList.remove('open');
+  if (currentModalKind === 'series') {
+    const btn = document.getElementById(`series-edit-${currentModalId}`);
+    if (btn) btn.classList.toggle('has-content', hasSeriesContent(currentModalId));
+  } else if (currentModalKind === 'saga') {
+    // Un ré-rendu complet couvre tout ce qui peut avoir changé dans la
+    // modale saga : nom (saga vierge), couleur (pastilles sur dossier +
+    // collections rattachées), contenu (bouton "+"), dropdowns de
+    // rattachement et sélecteurs "Saga vedette 1/2".
+    renderDashboard();
+  }
+  currentModalKind = null;
+  currentModalId   = null;
+}
+
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') closeContentModal();
+});
+
 function toggleSection(folderId) {
   document.getElementById(`folder-section-${folderId}`).classList.toggle('open');
+}
+
+// Réduire/déplier tous les dossiers d'un coup — bascule selon l'état actuel
+// (si au moins un est ouvert, tout replier ; sinon tout déplier).
+function toggleAllFolders() {
+  const sections = document.querySelectorAll('.folder-section');
+  const anyOpen  = Array.from(sections).some(s => s.classList.contains('open'));
+  sections.forEach(s => s.classList.toggle('open', !anyOpen));
+  const btn = document.getElementById('toggleAllFoldersBtn');
+  if (btn) btn.textContent = anyOpen ? 'Tout déplier' : 'Tout replier';
 }
 
 function toggleFolder(id, value) {
   toggle('folders', id, value);
   const section = document.getElementById(`folder-section-${id}`);
   if (section) section.style.opacity = value ? '1' : '.5';
+  const stateEl = document.getElementById(`folder-state-${id}`);
+  if (stateEl) {
+    stateEl.textContent = value ? 'Actif' : 'Inactif';
+    stateEl.classList.toggle('is-active', value);
+  }
 }
 
 function toggleCollection(id, value) {
   toggle('collections', id, value);
   const row = document.getElementById(`crow-${id}`);
   if (row) row.classList.toggle('hidden-row', !value);
+  const stateEl = document.getElementById(`collection-state-${id}`);
+  if (stateEl) {
+    stateEl.textContent = value ? 'Actif' : 'Inactif';
+    stateEl.classList.toggle('is-active', value);
+  }
 }
 
 // --- FEATURED ---
@@ -671,6 +1447,98 @@ function updateFeaturedHint() {
     : '';
 }
 
+// --- SAGAS VEDETTES (accueil) ---
+function populateSagaFeaturedSelects() {
+  const sagas = getAllSagaEntries();
+  ['1', '2'].forEach(slot => {
+    const select = document.getElementById(`sagaFeaturedSelect-${slot}`);
+    if (!select) return;
+    const currentId = Object.keys(config.featured_sagas || {})
+      .find(id => String(config.featured_sagas[id]) === slot) || '';
+    select.innerHTML = '<option value="">— Choisir —</option>' +
+      sagas.map(s => {
+        const sel = String(s.id) === String(currentId) ? ' selected' : '';
+        return `<option value="${s.id}"${sel}>${esc(s.name)}</option>`;
+      }).join('');
+  });
+}
+
+function setFeaturedSaga(slot, folderId) {
+  if (!config.featured_sagas) config.featured_sagas = {};
+  // Un seul titulaire par slot : on retire l'ancien avant d'assigner le nouveau.
+  Object.keys(config.featured_sagas).forEach(id => {
+    if (String(config.featured_sagas[id]) === slot) delete config.featured_sagas[id];
+  });
+  if (folderId) config.featured_sagas[folderId] = Number(slot);
+  markDirty();
+}
+
+// --- CRÉER / ACTIVER UNE SAGA depuis la barre du haut (Option B, 2026-09-21) ---
+// Une saga peut désormais soit provenir d'un dossier existant (comme avant),
+// soit être créée "vierge" — un concept éditorial pur, sans dépendre de la
+// structure brute de la photothèque. Ses collections se rattachent ensuite
+// à la main depuis le dropdown de chaque ligne de collection.
+function openCreateSagaModal() {
+  const candidates = flatItems('folders')
+    .filter(f => !(config.saga && config.saga[f.id]))
+    .sort((a, b) => (a.name || '').localeCompare(b.name || '', 'fr'));
+
+  document.getElementById('contentModalTitle').textContent = 'Créer une saga';
+  document.getElementById('contentModalBody').innerHTML = `
+      <div>
+        <label for="newSagaName">Nouvelle saga éditoriale (sans dossier)</label>
+        <input type="text" id="newSagaName" placeholder="Ex. Rétrospective 2024">
+      </div>
+      <button type="button" class="btn btn-save" onclick="confirmCreateBlankSaga()">Créer une saga vierge</button>
+      <hr style="border:none; border-top:1px solid var(--color-border-secondary); margin:var(--space-20) 0;">
+      ${candidates.length === 0 ? `<p style="font-size:13px; color:var(--color-text-tertiary);">Tous les dossiers sont déjà des sagas.</p>` : `
+      <div>
+        <label for="createSagaSelect">Ou activer un dossier existant comme saga</label>
+        <select id="createSagaSelect">
+          <option value="">— Choisir —</option>
+          ${candidates.map(f => `<option value="${f.id}">${esc(f.name || f.id)}</option>`).join('')}
+        </select>
+      </div>
+      <button type="button" class="btn btn-save" onclick="confirmCreateSaga()">Activer comme saga</button>
+      `}
+    `;
+  currentModalKind = null;
+  currentModalId   = null;
+  document.getElementById('contentModalOverlay').classList.add('open');
+}
+
+function confirmCreateBlankSaga() {
+  const input = document.getElementById('newSagaName');
+  const name  = (input && input.value || '').trim();
+  if (!name) return;
+  const id = `custom-${Date.now()}`;
+
+  if (!config.saga) config.saga = {};
+  config.saga[id] = true;
+  if (!sagaContent[id]) sagaContent[id] = {};
+  sagaContent[id].nom = name;
+  markDirty();
+
+  renderCustomSagasSection();
+  populateSagaFeaturedSelects();
+  refreshCollectionSagaSelects();
+  openContentModal('saga', id, name);
+}
+
+function confirmCreateSaga() {
+  const select = document.getElementById('createSagaSelect');
+  const folderId = select && select.value;
+  if (!folderId) return;
+  const folder = flatItems('folders').find(f => String(f.id) === String(folderId));
+
+  if (!config.saga) config.saga = {};
+  config.saga[folderId] = true;
+  markDirty();
+
+  renderDashboard(); // rafraîchit le toggle/bouton "+" de ce dossier dans la liste
+  openContentModal('saga', folderId, folder?.name || folderId);
+}
+
 // --- SEARCH ---
 function filterList() {
   const q = document.getElementById('searchInput').value.toLowerCase().trim();
@@ -686,17 +1554,82 @@ function filterList() {
 }
 
 // --- SAVE ---
+function buildSeriesPayload() {
+  const payload  = {};
+  const nameById = {};
+  flatItems('collections').forEach(c => { nameById[c.id] = c.name || c.title || ''; });
+
+  const ids = new Set([
+    ...Object.keys(config.series || {}).filter(id => config.series[id]),
+    ...Object.keys(seriesContent),
+  ]);
+  ids.forEach(id => {
+    const f           = seriesContent[id] || {};
+    const isFlagged    = !!(config.series && config.series[id]);
+    const hasContent  = f.format || f.periode || f.description;
+    if (!isFlagged && !hasContent) return; // série désactivée et rien à garder
+    payload[id] = {
+      nom: nameById[id] || f.nom || '',
+      format: f.format || '',
+      periode: f.periode || '',
+      description: f.description || '',
+    };
+  });
+  return payload;
+}
+
+function buildSagaPayload() {
+  const payload  = {};
+  const nameById = {};
+  flatItems('folders').forEach(f => { nameById[f.id] = f.name || f.id; });
+
+  const ids = new Set([
+    ...Object.keys(config.saga || {}).filter(id => config.saga[id]),
+    ...Object.keys(config.featured_sagas || {}),
+    ...Object.keys(sagaContent),
+  ]);
+  ids.forEach(id => {
+    const f           = sagaContent[id] || {};
+    const isFlagged   = !!(config.saga && config.saga[id]);
+    const isFeatured  = config.featured_sagas && config.featured_sagas[id] != null;
+    const hasContent  = f.format || f.periode || f.lieu || f.couleur || f.description || f.note;
+    if (!isFlagged && !isFeatured && !hasContent) return; // dossier non-saga et rien à garder
+    payload[id] = {
+      nom: nameById[id] || f.nom || '',
+      format: f.format || '',
+      periode: f.periode || '',
+      lieu: f.lieu || '',
+      couleur: f.couleur || '',
+      description: f.description || '',
+      note: f.note || '',
+    };
+  });
+  return payload;
+}
+
 async function saveConfig() {
   const btn = document.getElementById('saveBtn');
   btn.textContent = 'Sauvegarde…';
   btn.disabled = true;
   try {
-    const resp = await fetch(SAVE_URL, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(config),
-    });
-    if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
+    const [r1, r2, r3] = await Promise.all([
+      fetch(SAVE_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(config),
+      }),
+      fetch(SERIES_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(buildSeriesPayload()),
+      }),
+      fetch(SAGA_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(buildSagaPayload()),
+      }),
+    ]);
+    if (!r1.ok || !r2.ok || !r3.ok) throw new Error(`HTTP ${r1.status}/${r2.status}/${r3.status}`);
     isDirty = false;
     document.getElementById('unsavedBadge').style.display = 'none';
     btn.textContent = 'Sauvegardé ✓';

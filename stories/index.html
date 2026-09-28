@@ -14,45 +14,62 @@
     <meta name="twitter:title" content="Exposition Photo">
     <meta name="twitter:description" content="Mes histoires visuelles">
     <meta name="twitter:image" content="https://images.unsplash.com/photo-1452587925148-ce544e77e70d?w=1200">
-    <meta name="theme-color" content="#1a1a2e">
+    <meta name="theme-color" content="#FAFAF8">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,500;1,400;1,500&amp;family=DM+Sans:wght@400;500&amp;display=swap">
+    <link rel="stylesheet" href="../assets/styles/styles.css">
+    <link rel="stylesheet" href="../assets/styles/components/triptyque.css">
+    <link rel="stylesheet" href="../assets/styles/pages/accueil.css">
     <link rel="stylesheet" href="stories.css">
 </head>
-<body>
-    <div class="container">
-        <header>
-            <h1>Exposition Photo</h1>
-            <p class="subtitle">Découvrez mes histoires visuelles à travers des collections photographiques immersives</p>
-        </header>
-        <div class="gallery" id="gallery"></div>
-    </div>
-    <!-- Stories Viewer -->
-    <div class="stories-viewer" id="storiesViewer">
-        <div class="story-header">
-            <div class="story-actions">
-                <button class="story-close" id="closeBtn" title="Fermer">×</button>
-            </div>
-            <div class="story-progress" id="storyProgress"></div>
-            <div class="story-actions">
-                <button class="story-btn" id="shareBtn" title="Partager">🔗</button>
+<body class="ac-page">
+    <div id="site-header-mount"></div>
+
+    <section class="ac-series py-13 px-6 md:py-16 md:px-13">
+        <div class="ac-series__head gap-6">
+            <div>
+                <p class="ac-eyebrow m-0">Stories</p>
+                <h1 class="ac-series__title m-0 mt-2">Exposition Photo</h1>
             </div>
         </div>
-        <div class="story-content">
+        <p class="stories-subtitle mt-4">Découvrez mes histoires visuelles à travers des collections photographiques immersives</p>
+        <div class="gallery gap-4 md:gap-6 mt-10" id="gallery"></div>
+    </section>
+    <!-- Stories Viewer -->
+    <div class="stories-viewer" id="storiesViewer">
+        <div class="story-header p-5">
+            <div class="story-actions gap-4">
+                <button class="story-close p-0" id="closeBtn" title="Fermer">×</button>
+            </div>
+            <div class="story-progress gap-1 m-5" id="storyProgress"></div>
+            <div class="story-actions gap-4">
+                <button class="story-btn py-2 px-4" id="shareBtn" title="Partager">🔗</button>
+            </div>
+        </div>
+        <div class="story-content p-5">
             <div class="story-slides" id="storySlides"></div>
             <button class="nav-btn prev-btn" id="prevSlideBtn">‹</button>
             <button class="nav-btn next-btn" id="nextSlideBtn">›</button>
         </div>
         <!-- Share Options -->
-        <div class="share-options" id="shareOptions">
-            <div class="share-option native" data-platform="native"><i>🔗</i> <span>Partager...</span></div>
-            <div class="share-option facebook" data-platform="facebook"><i>f</i> <span>Facebook</span></div>
-            <div class="share-option twitter" data-platform="twitter"><i>🐦</i> <span>Twitter</span></div>
-            <div class="share-option instagram" data-platform="instagram"><i>📷</i> <span>Instagram</span></div>
-            <div class="share-option whatsapp" data-platform="whatsapp"><i>💬</i> <span>WhatsApp</span></div>
-            <div class="share-option linkedin" data-platform="linkedin"><i>in</i> <span>LinkedIn</span></div>
-            <div class="share-option copy" data-platform="copy"><i>📋</i> <span>Copier le lien</span></div>
+        <div class="share-options p-4 gap-3" id="shareOptions">
+            <div class="share-option gap-3 py-3 px-4 native" data-platform="native"><i>🔗</i> <span>Partager...</span></div>
+            <div class="share-option gap-3 py-3 px-4 facebook" data-platform="facebook"><i>f</i> <span>Facebook</span></div>
+            <div class="share-option gap-3 py-3 px-4 twitter" data-platform="twitter"><i>🐦</i> <span>Twitter</span></div>
+            <div class="share-option gap-3 py-3 px-4 instagram" data-platform="instagram"><i>📷</i> <span>Instagram</span></div>
+            <div class="share-option gap-3 py-3 px-4 whatsapp" data-platform="whatsapp"><i>💬</i> <span>WhatsApp</span></div>
+            <div class="share-option gap-3 py-3 px-4 linkedin" data-platform="linkedin"><i>in</i> <span>LinkedIn</span></div>
+            <div class="share-option gap-3 py-3 px-4 copy" data-platform="copy"><i>📋</i> <span>Copier le lien</span></div>
         </div>
     </div>
-    <div class="toast" id="toast"></div>
+    <div class="toast py-4 px-6" id="toast"></div>
+
+    <!-- ===== FOOTER NAVIGATION ===== -->
+    <div id="site-footer-mount"></div>
+
+    <script src="../js/triptyque.js"></script>
+    <script type="module" src="../js/app.js"></script>
     <script src="stories.js"></script>
 </body>
 </html>

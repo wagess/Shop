@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Sagas — Stéphane Wagner</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,500;1,400;1,500&amp;family=DM+Sans:wght@400;500&amp;display=swap">
+    <link rel="stylesheet" href="./assets/styles/styles.css">
+    <link rel="stylesheet" href="./assets/styles/components/triptyque.css">
+    <link rel="stylesheet" href="./assets/styles/pages/accueil.css">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>📸</text></svg>">
+</head>
+<body class="ac-page">
+
+    <div id="site-header-mount"></div>
+
+    <section class="ac-series py-13 px-6 md:py-16 md:px-13">
+        <div class="ac-series__head gap-6">
+            <div>
+                <p class="ac-eyebrow m-0">Sagas</p>
+                <h2 class="ac-series__title m-0 mt-2">Toutes les sagas</h2>
+            </div>
+        </div>
+    </section>
+
+    <!-- Un <spotlight-saga> par saga active — même composant que la section
+         "Saga en vedette" de l'accueil (js/components/spotlight-saga.js),
+         rempli dynamiquement par js/sagas-page.js. -->
+    <div id="sagasList"></div>
+
+    <!-- ===== MODALE — Impression (options à venir) — CTA "Imprimer une
+         série" de chaque <spotlight-saga>, même composant que l'accueil. ===== -->
+    <popup-panel id="printSeriesModal" class="ac-popup p-5" style="display:none;">
+        <p class="ac-eyebrow m-0">Impression</p>
+        <p class="ac-popup__title m-0 mt-5">Impression grand format</p>
+        <p class="ac-popup__text m-0 mt-3">Les formats, papiers et tarifs d'impression sont en cours de définition. Options à venir.</p>
+    </popup-panel>
+
+    <!-- ===== FOOTER NAVIGATION ===== -->
+    <div id="site-footer-mount"></div>
+
+    <script src="js/triptyque.js"></script>
+    <script type="module" src="js/components/spotlight-saga.js"></script>
+    <script type="module" src="js/components/popup-panel.js"></script>
+    <script type="module" src="js/app.js"></script>
+    <script type="module" src="js/sagas-page.js"></script>
+</body>
+</html>

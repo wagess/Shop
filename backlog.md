@@ -6,10 +6,12 @@ Tâches concrètes et actionnables — bugs, correctifs, développements à réa
 
 ## Bugs — Haute priorité
 
-**Token API exposé**
-- Fichier : `js/api.js:4`
-- `BEARER_TOKEN = 'EDNusnA0Q8TW'` visible côté client
-- Action : restreindre les permissions à la lecture seule côté WordPress
+**Aucune authentification serveur réelle sur les endpoints d'écriture (audit du 2026-09-28)**
+- `admin.html:739` — `PASSWORD = 'sw2024'` codé en clair dans le JS livré au navigateur ; contournable en lisant le code source, n'importe qui peut aussi appeler les endpoints directement sans passer par l'UI.
+- `admin-save.php`, `series-save.php`, `saga-save.php` — écrivent `collections-visibility.json`/séries/sagas sans aucune vérification côté serveur (le mot de passe n'est vérifié que côté client) ; en plus `Access-Control-Allow-Origin: *` permet à n'importe quel site externe de déclencher l'appel.
+- `js/api.js:9` + `admin.html:747` — `BEARER_TOKEN = 'EDNusnA0Q8TW'` codé en dur côté client ; dans `wplr-iptc-keywords.php`, aucune route ne le vérifie (`permission_callback => '__return_true'` partout) — le token ne protège rien.
+- Impact : n'importe qui (script, bot, agent automatisé) peut réécrire la config du site à distance, sans avoir besoin de contourner quoi que ce soit.
+- Action : ajouter une vérification de secret côté serveur (header comparé à une valeur dans `.env`) sur les 3 `*-save.php` ; restreindre `Access-Control-Allow-Origin` à `shop.stephanewagner.com` ; faire respecter (ou retirer) le Bearer token dans `wplr-iptc-keywords.php` ; faire tourner le mot de passe et le token une fois le vrai contrôle en place (les deux sont publics depuis qu'ils sont dans le code source).
 
 **Code de test en production**
 - Fichier : `js/app.js:121-123`
@@ -49,13 +51,15 @@ Tâches concrètes et actionnables — bugs, correctifs, développements à réa
 
 ---
 
-## Triptyque narratif — Phase 3
+## Modale boutique unifiée — wireframe posé, design à préciser
 
-- [ ] Endpoint PHP côté serveur (`scripts/generate-story.php`) → appel API Anthropic
-- [ ] Génération narrative dans la modale (claude-haiku ou sonnet)
-- [ ] Affichage de l'histoire générée + bouton partager
-- [ ] Partage Web Share API (copie + natif mobile)
-- [ ] Code promo -20% généré côté serveur, lié à l'histoire, envoyé par email
+**Ex-"Triptyque narratif — Phase 3" (obsolète)** : décrivait la génération d'histoire IA (endpoint Claude, partage, code promo). Cette mécanique a été explicitement retirée le 2026-09-22 (pivot PO : le triptyque devient un panier de commande, pas un contenu éditorial — voir mémoire `project_triptyque.md`). Ne pas réintroduire sans nouvelle demande explicite.
+
+**Direction actuelle (2026-09-24)** — voir `idees.md` pour le détail complet : Shop (nav) et Commander (Heroes) ouvrent maintenant la même modale (`window.openShopModal()`, `js/triptyque.js`), posée en mode wireframe. Reste à faire :
+- [ ] Design final de la modale (actuellement wireframe : shell `.tmodal` réutilisé, panneau droit en bloc pointillé)
+- [ ] Trancher : le panier reste-t-il capé à 3 photos ("Triptyque") ou devient-il un panier de taille libre ?
+- [ ] Décider si "Commander une impression" par-photo (photothèque) doit aussi être absorbé dans cette modale
+- [ ] Contenu réel du panneau illustratif
 
 ---
 

@@ -1,9 +1,11 @@
 import { el, escapeHtml } from './utils.js';
-import { fetchHierarchy } from './api.js';
-import { createHeader } from './components/header.js';
+import { fetchHierarchy, fetchVisibilityConfig } from './api.js';
+import { createNav } from './components/nav.js';
 import { createFooter } from './components/footer.js';
+import { createPhotosModal } from './components/photos-modal.js';
 import { createBottomActionBar } from './components/bottom-action-bar.js';
 import { createButton } from './components/button.js';
+import { createActivityRing } from './components/activity-ring.js';
 import { 
     extractGalleryIds, 
     displayGalleries, 
@@ -55,6 +57,7 @@ window.onload = () => {
     protectImages();
     mountHeader();
     mountFooter();
+    mountPhotosModal();
     loadHierarchy();
 };
 
@@ -71,48 +74,14 @@ function mountHeader() {
     const mount = el('site-header-mount');
     if (!mount) return;
 
-    // Bouton Spotify (action slot)
-    const spotifyBtn = document.createElement('button');
-    spotifyBtn.id = 'spotifyNavBtn';
-    spotifyBtn.title = 'Écouter ma playlist';
-    spotifyBtn.className = 'btn-secondary btn-sm site-header__spotify';
-    spotifyBtn.innerHTML = `
-        <svg id="spotifyNavIcon" width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
-            <rect x="6" y="6" width="12" height="12" rx="1"/>
-        </svg>`;
+    mount.replaceWith(createNav());
 
-    // Bouton triptyque (action slot)
-    const triptyqueBtn = document.createElement('button');
-    triptyqueBtn.id = 'triptyque-cart';
-    triptyqueBtn.className = 'triptyque-cart';
-    triptyqueBtn.setAttribute('aria-label', 'Triptyque');
-    triptyqueBtn.setAttribute('onclick', 'window.openTriptyqueModal()');
-    triptyqueBtn.innerHTML = `
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
-            <rect x="2" y="6" width="20" height="14" rx="2"/>
-            <path d="M16 6V4a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"/>
-            <line x1="12" y1="11" x2="12" y2="17"/>
-            <line x1="9" y1="14" x2="15" y2="14"/>
-        </svg>
-        <span id="triptyque-badge" class="triptyque-cart__badge">0</span>`;
-
-    const header = createHeader({
-        logo: {
-            src: './assets/svg/Stéphane Wagner.svg',
-            alt: 'Logo Stéphane Wagner',
-            href: '/',
-        },
-        links: [
-            { label: 'Photothèque', href: '/phototheque.html', badge: '', badgeId: 'stats' },
-            { label: 'Portfolio',   href: 'https://www.photographie.stephanewagner.com/', },
-            { label: 'Stories',     href: '/stories/' },
-            { label: 'Infolettre',  href: '/rejoindre/' },
-        ],
-        actions: [spotifyBtn, triptyqueBtn],
-        type: 'desktop',
-    });
-
-    mount.replaceWith(header);
+    // Le badge du panier triptyque est créé à "0" dans le markup du nav —
+    // le resynchroniser avec le panier persisté (localStorage) une fois
+    // l'élément réellement dans le DOM (triptyque.js expose ces fonctions
+    // sur window en tant que script classique, chargé avant ce module).
+    window.triptyqueUpdateBadge?.();
+    window.triptyqueUpdateBar?.();
 }
 
 function mountFooter() {
@@ -122,23 +91,33 @@ function mountFooter() {
     const footer = createFooter({
         brand: '© Stéphane Wagner',
         links: [
-            { label: 'Photothèque',  href: '/phototheque.html' },
-            { label: 'Portfolio',    href: 'https://www.photographie.stephanewagner.com/', external: true },
-            { label: 'Stories',      href: '/stories/' },
-            { label: 'Infolettre',   href: '/rejoindre/' },
-            { label: 'Admin',        href: '/admin.html' },
+            { label: 'Photothèque',    href: '/phototheque.html' },
+            { label: 'Portfolio',      href: 'https://www.photographie.stephanewagner.com/', external: true },
+            { label: 'Stories',        href: '/stories/' },
+            { label: 'Infolettre',     href: '/rejoindre/' },
+            { label: 'Confidentialité', href: '/politique-confidentialite.html' },
+            { label: 'Admin',          href: '/admin.html' },
         ],
     });
 
     mount.replaceWith(footer);
 }
 
+// Montée uniquement sur phototheque.html (seule page avec #photos-modal-mount
+// — voir js/components/photos-modal.js pour le pourquoi de l'extraction).
+function mountPhotosModal() {
+    const mount = el('photos-modal-mount');
+    if (!mount) return;
+
+    mount.replaceWith(createPhotosModal());
+}
+
 async function loadVisibilityConfig() {
     try {
-        const resp = await fetch('./collections-visibility.json');
-        if (resp.ok) return await resp.json();
-    } catch {}
-    return { collections: {}, folders: {} };
+        return await fetchVisibilityConfig();
+    } catch {
+        return { collections: {}, folders: {} };
+    }
 }
 
 function applyVisibility(collections, folders, config) {
@@ -159,8 +138,6 @@ async function loadHierarchy() {
             fetchHierarchy(),
             loadVisibilityConfig(),
         ]);
-        
-        console.log('🔍 Hierarchy brute:', JSON.stringify(hierarchyData, null, 2));
         
         const nodes = extractGalleryIds(hierarchyData);
         const allCollections = nodes.filter(n => n.id != null && n.type !== 'folder');
@@ -190,24 +167,30 @@ async function loadHierarchy() {
         const statsEl = el('stats');
         if (statsEl) statsEl.textContent = `${shuffledCollections.length} collection${shuffledCollections.length > 1 ? 's' : ''}`;
 
-        displayGalleries(shuffledCollections, 1);
-        loadThumbnailsForCollections(shuffledCollections.slice(0, 8));
-        renderFolders(folders);
-        initSearchAutocomplete();
+        // Catalogue (grille, dossiers, recherche, vignettes) — uniquement
+        // pertinent sur phototheque.html : sur l'accueil, #galleriesContainer
+        // n'existe pas et ce travail (dont 8 appels réseau pour les vignettes)
+        // ne servirait à rien.
+        if (hasGalleriesContainer) {
+            displayGalleries(shuffledCollections, 1);
+            loadThumbnailsForCollections(shuffledCollections.slice(0, 8), reportThumbPreloadProgress);
+            renderFolders(folders, visibilityConfig);
+            initSearchAutocomplete();
+            hideGalleriesLoader();
+            restoreFromHash(shuffledCollections, hierarchyData);
+        }
         initModalListeners();
 
-        hideGalleriesLoader();
-        restoreFromHash(shuffledCollections, hierarchyData);
+        const featuredName = visibilityConfig.featured_collection || 'Scènes de vie';
 
         if (el('randomImage')) {
-            await loadRandomImageFromCollectionByName("Scènes de vie", globalCollections);
-            setTimeout(() => { updateImageInfo("Scènes de vie"); }, 1000);
+            await loadRandomImageFromCollectionByName(featuredName, globalCollections);
+            updateImageInfo(featuredName);
         }
 
         // Album featured sur la page d'accueil
         const featuredGrid = el('featuredPhotosGrid');
         if (featuredGrid) {
-            const featuredName = visibilityConfig.featured_collection || 'Scènes de vie';
             const collection = shuffledCollections.find(c =>
                 c.name?.toLowerCase() === featuredName.toLowerCase()
             );
@@ -215,7 +198,7 @@ async function loadHierarchy() {
                 const titleEl = el('featuredAlbumTitle');
                 if (titleEl) titleEl.textContent = collection.name;
                 try {
-                    const photos = (await fetchGalleryPhotos(collection.id)).slice(0, 9);
+                    const photos = (await fetchGalleryPhotos(collection.id)).slice(0, 4);
                     setCurrentPhotos(photos);
                     const masonryGrid = createMasonryGrid({
                         photos,
@@ -228,7 +211,7 @@ async function loadHierarchy() {
                     });
                     featuredGrid.replaceChildren(masonryGrid);
                 } catch (err) {
-                    featuredGrid.innerHTML = `<div class="error-message">Erreur chargement album : ${escapeHtml(err.message)}</div>`;
+                    featuredGrid.innerHTML = `<div class="error-message p-5 m-5">Erreur chargement album : ${escapeHtml(err.message)}</div>`;
                 }
             }
         }
@@ -236,7 +219,7 @@ async function loadHierarchy() {
     } catch (err) {
         console.error('loadHierarchy error', err);
         const errTarget = el('galleriesContainer') || el('featuredPhotosGrid');
-        if (errTarget) errTarget.innerHTML = `<div class="error-message">Erreur: ${escapeHtml(err.message)}</div>`;
+        if (errTarget) errTarget.innerHTML = `<div class="error-message p-5 m-5">Erreur: ${escapeHtml(err.message)}</div>`;
     }
 }
 
@@ -272,6 +255,40 @@ function hideGalleriesLoader() {
     }
 }
 
+// Progression du préchargement des vignettes de couverture (Activity Ring) —
+// la grille s'affiche tout de suite, cet anneau montre juste où en est le
+// remplissage des mosaïques en arrière-plan (voir loadThumbnailsForCollections).
+let thumbPreloadRingEl = null;
+
+function reportThumbPreloadProgress(done, total) {
+    const container = el('thumbPreloadRing');
+    if (!container || total === 0) return;
+
+    if (done >= total) {
+        container.classList.add('is-hidden');
+        return;
+    }
+
+    container.classList.remove('is-hidden');
+
+    if (!thumbPreloadRingEl) {
+        thumbPreloadRingEl = createActivityRing({
+            size: 48,
+            rings: [{ percentage: 0 }],
+            className: 'activity-ring--sm',
+        });
+        container.replaceChildren(thumbPreloadRingEl);
+    }
+    const percentage = (done / total) * 100;
+    thumbPreloadRingEl.update([{ percentage }], `${done}/${total}`);
+
+    // Reflète la même progression dans chaque card encore en attente de sa
+    // vignette (voir gallery.js — placeholder .gallery-icon--loading).
+    document.querySelectorAll('.gallery-icon--loading .progress-bar').forEach(bar => {
+        bar.update?.(percentage);
+    });
+}
+
 // Fonction pour recharger les thumbnails après un changement de vue
 function reloadThumbnails() {
     const galleryCards = document.querySelectorAll('.gallery-card');
@@ -287,7 +304,7 @@ function reloadThumbnails() {
     
     console.log('🔄 Rechargement thumbnails pour:', visibleCollections.map(c => c.name));
     if (visibleCollections.length > 0) {
-        loadThumbnailsForCollections(visibleCollections);
+        loadThumbnailsForCollections(visibleCollections, reportThumbPreloadProgress);
     }
 }
 

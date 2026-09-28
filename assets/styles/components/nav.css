@@ -1,0 +1,97 @@
+/* ==========================================================================
+   Nav principale — Sigma Design System (ac-nav)
+   Composant JS : js/components/nav.js — createNav()
+   Un seul style, identique sur toutes les pages : fond clair, texte toujours
+   foncé. Pas de variante sombre/transparente superposée à une photo — évite
+   les problèmes de contraste selon le contenu de la photo (voir mémoire
+   projet_site_structure, décision du 2026-09-21).
+   ========================================================================== */
+
+/* Spacing (py-* px-6 lg:px-13 — breakpoint 900px conservé, propre à la nav)
+   posé en classe utilitaire sur le HTML — voir js/components/nav.js. Hauteur
+   pilotée par le padding + le contenu, plus de height fixe en dur (incohérent
+   avec le reste du site où tout le spacing passe par spacing-utilities.css
+   — corrigé le 2026-09-23). Sur les pages avec hero (.ac-hero-viewport,
+   accueil.css), .ac-hero se recale automatiquement en flex:1 sur la vraie
+   hauteur rendue ici — aucune valeur de hauteur à dupliquer/maintenir
+   ailleurs si cette classe py-* change (ancien --nav-height retiré le même
+   jour, se désynchronisait silencieusement). */
+.ac-nav {
+  position: relative;
+  z-index: 20;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: var(--color-bg-primary);
+  border-bottom: 1px solid var(--color-border-tertiary);
+}
+
+.ac-nav__brand {
+  display: flex;
+  align-items: center;
+}
+
+.ac-nav__logo {
+  display: block;
+  height: 36px;
+  width: auto;
+}
+
+/* Spacing (gap-8) posé en classe utilitaire sur le HTML. */
+.ac-nav__links {
+  display: flex;
+  align-items: center;
+}
+
+/* Spacing (gap-1) posé en classe utilitaire sur le HTML. */
+.ac-nav__link {
+  display: inline-flex;
+  align-items: center;
+  font-size: 13px;
+  white-space: nowrap;
+}
+.ac-nav__link[aria-current="page"] { font-weight: 500; }
+
+/* `.ac-page a { color: inherit }` (accueil.css) est plus spécifique qu'un
+   simple `.ac-nav__link` et écraserait sa couleur sur les pages `.ac-page`
+   (index/phototheque/series/serie/a-propos) — le préfixe `.ac-nav` regagne
+   la priorité pour garantir un texte toujours foncé, sur toutes les pages. */
+.ac-nav .ac-nav__link { color: var(--color-text-primary); }
+.ac-nav .ac-nav__link:hover { color: var(--color-text-secondary); }
+
+/* Icône décorative par lien (nuage/avion/œil/aide) — voir js/components/nav.js */
+.ac-nav__link svg {
+  flex-shrink: 0;
+}
+
+/* Spacing (gap-3, 10px arrondi à l'index 3) posé en classe utilitaire sur
+   le HTML. */
+.ac-nav__actions {
+  display: flex;
+  align-items: center;
+}
+
+.ac-nav__newsletter {
+  font-size: 13px;
+  text-decoration: underline;
+  text-underline-position: from-font;
+  text-decoration-skip-ink: none;
+  white-space: nowrap;
+}
+
+/* Même garde de spécificité que .ac-nav__link ci-dessus. */
+.ac-nav .ac-nav__shop,
+.ac-nav .ac-nav__newsletter {
+  color: var(--color-text-primary);
+}
+
+/* Position relative pour ancrer le badge .triptyque-cart__badge
+   (assets/styles/components/triptyque.css). */
+.ac-nav__shop {
+  position: relative;
+}
+.ac-nav .ac-nav__newsletter:hover { color: var(--color-text-secondary); }
+
+@media (max-width: 900px) {
+  .ac-nav__links { display: none; }
+}

@@ -1,0 +1,232 @@
+/* ==========================================================================
+   Page /serie.html — détail d'une série
+   Figma vDYe0oWfzs4InGstvpCxBk, node 38:73.
+
+   Le hero réutilise .ac-hero/.ac-hero__frame/.ac-hero__img/.ac-hero__scrim/
+   .ac-hero__body/.ac-hero__title (pages/accueil.css) tels quels — même
+   traitement que l'accueil, pas de redéfinition ici.
+
+   Rayon : --radius-firm partout (cohérent avec l'unification du 2026-09-20),
+   pas les rayons --corner/* variés du fichier Figma source.
+
+   Spacing (2026-09-23) : plus aucun padding/margin/gap dans ce fichier —
+   posé exclusivement via les classes utilitaires de spacing-utilities.css,
+   sur serie.html et js/serie-page.js. .serie-intention/.serie-gallery
+   gardent leur breakpoint 900px (lg:) d'origine ; .serie-shop/.serie-next
+   gardent 700px (md:) — pas d'alignement inventé entre les deux.
+   ========================================================================== */
+
+.serie-page { background: var(--color-bg-primary); }
+
+.ac-eyebrow--on-dark {
+  color: var(--ac-accent-warm);
+}
+
+.serie-hero__actions {
+  display: flex;
+}
+
+/* ── Intention ── */
+.serie-intention {
+  display: flex;
+  align-items: flex-start;
+}
+
+.serie-intention__text {
+  flex: 1.6;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.serie-intention__heading {
+  font-family: var(--ac-font-serif);
+  font-weight: 400;
+  font-size: clamp(28px, 3vw, 44px);
+  line-height: 1.15;
+  color: var(--color-text-primary);
+}
+
+.serie-intention__text p {
+  font-family: var(--font-family-base);
+  font-size: 16px;
+  line-height: 1.6;
+  color: var(--color-text-secondary);
+}
+
+.serie-intention__aside {
+  flex: 1;
+  min-width: 280px;
+  max-width: 380px;
+  display: flex;
+  flex-direction: column;
+}
+
+.serie-meta-table {
+  display: flex;
+  flex-direction: column;
+  border-top: 1px solid var(--color-border-tertiary);
+}
+
+.serie-meta-row {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  border-bottom: 1px solid var(--color-border-tertiary);
+  font-family: var(--font-family-base);
+  font-size: 13px;
+}
+
+.serie-meta-row:last-child { border-bottom: none; }
+
+.serie-meta-row dt { color: var(--color-text-secondary); }
+.serie-meta-row dd { color: var(--color-text-primary); font-weight: 500; text-align: right; }
+
+@media (max-width: 900px) {
+  .serie-intention { flex-direction: column; }
+  .serie-intention__aside { max-width: none; }
+}
+
+/* ── Gallery ── */
+.serie-gallery {
+  display: flex;
+  flex-direction: column;
+}
+
+.serie-gallery__caption {
+  text-align: center;
+}
+
+#serieGalleryRows {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+}
+
+.serie-gallery__item {
+  border-radius: var(--radius-firm);
+  overflow: hidden;
+  background: var(--color-bg-secondary);
+  cursor: pointer;
+  display: block;
+}
+
+.serie-gallery__item img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  transition: transform 0.4s ease;
+}
+
+.serie-gallery__item:hover img { transform: scale(1.03); }
+
+.serie-gallery__full .serie-gallery__item { height: 640px; }
+
+.serie-gallery__pair {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+}
+.serie-gallery__pair .serie-gallery__item { height: 560px; }
+
+.serie-gallery__spotlight {
+  display: flex;
+  align-items: center;
+}
+.serie-gallery__spotlight .serie-gallery__item { flex: 1.4; height: 480px; }
+
+.serie-gallery__spotlight-text {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.serie-gallery__spotlight-title {
+  font-family: var(--ac-font-serif);
+  font-size: 28px;
+  color: var(--color-text-primary);
+}
+
+.serie-gallery__asymmetric {
+  display: grid;
+  grid-template-columns: 1.5fr 1fr;
+}
+.serie-gallery__asymmetric .serie-gallery__item { height: 480px; }
+
+@media (max-width: 900px) {
+  .serie-gallery__pair,
+  .serie-gallery__asymmetric { grid-template-columns: 1fr; }
+  .serie-gallery__spotlight { flex-direction: column; }
+  .serie-gallery__full .serie-gallery__item,
+  .serie-gallery__pair .serie-gallery__item,
+  .serie-gallery__spotlight .serie-gallery__item,
+  .serie-gallery__asymmetric .serie-gallery__item { height: 360px; }
+}
+
+/* ── Boutique de la série ── */
+.serie-shop {
+  background: var(--color-text-primary);
+  color: var(--color-on-accent);
+  display: flex;
+  flex-direction: column;
+}
+
+.serie-shop__title {
+  font-family: var(--ac-font-serif);
+  font-weight: 400;
+  font-size: clamp(26px, 3vw, 36px);
+}
+
+.serie-shop__note {
+  font-family: var(--font-family-base);
+  font-size: 14px;
+  color: rgba(255,255,255,0.6);
+  font-style: italic;
+}
+
+.serie-shop__cta { align-self: flex-start; }
+
+/* ── Chapitre suivant ── */
+.serie-next {
+  border-top: 1px solid var(--color-border-tertiary);
+  display: flex;
+  flex-direction: column;
+}
+
+.serie-next__header {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  flex-wrap: wrap;
+}
+
+.serie-next__title {
+  font-family: var(--ac-font-serif);
+  font-weight: 400;
+  font-size: clamp(28px, 3vw, 44px);
+  color: var(--color-text-primary);
+}
+
+.serie-next__subtitle {
+  font-family: var(--font-family-base);
+  font-size: 15px;
+  color: var(--color-text-secondary);
+}
+
+.serie-next__cover {
+  height: 320px;
+  border-radius: var(--radius-firm);
+  overflow: hidden;
+  position: relative;
+  display: block;
+}
+
+.serie-next__cover img {
+  width: 100%; height: 100%; object-fit: cover; display: block;
+}
+
+.serie-next__cover::after {
+  content: "";
+  position: absolute; inset: 0;
+  background: rgba(0,0,0,0.25);
+}

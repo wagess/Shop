@@ -1,8 +1,8 @@
 
+/* margin/padding retirés le 2026-09-23 : redondants avec le reset universel
+   `* { margin:0; padding:0 }` (reset.css), déjà à 0. */
 body {
     position: relative;
-    margin: 0;
-    padding: 0;
 }
 
 body::before {
@@ -31,29 +31,73 @@ body::after {
     z-index: -1;
 }
 
-/* ==================== Base Layout ==================== */
+/* ==========================================================================
+   .ac-page — classe de base Sigma, posée sur <body> par la plupart des pages
+   publiques (accueil, photothèque, séries, série, à propos, stories). Déplacée
+   depuis assets/styles/pages/accueil.css (2026-09-22) : ce n'est pas une
+   classe propre à une page, elle sert de socle partagé.
+   /stories/ l'a rejoint le 2026-09-23 (bascule sur le thème clair Sigma,
+   demande explicite du PO — voir mémoire projet_site_structure).
+   Non posée sur /rejoindre/ : thème sombre propre (background/color/
+   font-family définis directement sur body dans son CSS) — ajouter .ac-page
+   écraserait ce thème avec les valeurs claires par défaut de Sigma.
+   ========================================================================== */
+.ac-page {
+    background: var(--color-bg-primary);
+    color: var(--color-text-primary);
+    font-family: var(--font-family-base);
+}
+
+/* Neutralise le fond flouté fixe ci-dessus (body::before/::after) — propre
+   aux pages .ac-page (fond clair), le reste du site n'est pas concerné. */
+body.ac-page::before,
+body.ac-page::after {
+    content: none;
+    display: none;
+}
+
+.ac-page a { color: inherit; text-decoration: none; }
+.ac-page a.btn-tertiary { text-decoration: underline; }
+
+/* .spinner/.stats (utilities.css) sont stylés en blanc pour l'ancien fond
+   sombre du site. Sur une page .ac-page (fond clair), on les repasse sur
+   les tokens Sigma — sans toucher aux règles globales dont admin.html
+   dépend encore. */
+.ac-page .spinner {
+    border-color: var(--color-border-tertiary);
+    border-top-color: var(--color-accent);
+}
+.ac-page .stats {
+    color: var(--color-text-secondary);
+}
+
+/* ==================== Base Layout ====================
+   .container : spacing (mx-auto mb-10 mt-0) posé en classe utilitaire sur
+   le HTML — voir phototheque.html/stories/index.html. */
 .container {
     max-width: var(--container-max-width);
-    margin: var(--gap-large) auto;
-    margin-top: 0px;
     vertical-align: middle;
 }
 
+/* margin-bottom retiré le 2026-09-23 : toujours écrasé par le style inline
+   margin:20px de son unique instance (phototheque.html) — mort, vérifié
+   avant suppression. L'instance porte désormais la classe m-5 à la place. */
 #foldersContainerTop {
-    margin-bottom: var(--gap-large);
     z-index: 0;
 }
 
-/* ==================== Header ==================== */
+/* ==================== Header ====================
+   .header et .header h1 n'ont aucun usage dans le HTML/JS actuel (vérifié) :
+   spacing laissé en CSS, à convertir si cette classe est un jour réutilisée. */
 .header {
     text-align: center;
     color: var(--white);
-    margin-bottom: var(--gap-large);
+    margin-bottom: var(--space-40);
 }
 
 .header h1 {
     font-size: 1.5em;
-    margin-bottom: 10px;
+    margin-bottom: var(--space-10);
 }
 
 /* ==================== Main Content Layout ==================== */
@@ -63,17 +107,22 @@ body::after {
     align-items: center;
 }
 
+/* .left-panel n'a aucun usage dans le HTML/JS actuel (vérifié) : padding
+   laissé en CSS, à convertir si cette classe est un jour réutilisée. */
 .left-panel {
     width: 50%;
-    padding: 20px;
+    padding: var(--space-20);
     display: flex;
     flex-direction: column;
     justify-content: center;
 }
 
+/* .right-panel n'est référencé que via un querySelector de secours
+   (js/app.js:240) sans qu'aucun élément ne porte cette classe (vérifié) :
+   padding laissé en CSS, à convertir si elle est un jour réutilisée. */
 .right-panel {
     width: 50%;
-    padding: 20px;
+    padding: var(--space-20);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -93,13 +142,17 @@ body::after {
     z-index: 2;
 }
 
+/* .right-panel .spinner : même remarque que .right-panel ci-dessus, jamais
+   atteint (vérifié). */
 .right-panel .spinner {
     width: 40px;
     height: 40px;
-    margin-bottom: 10px;
+    margin-bottom: var(--space-10);
 }
 
-/* ==================== Nav button Design ==================== */
+/* ==================== Nav button Design ====================
+   .nav-button n'a aucun usage dans le HTML/JS actuel (vérifié) : spacing
+   laissé en CSS, à convertir si cette classe est un jour réutilisée. */
 /* Desktop */
 
 .nav-button {
@@ -110,7 +163,7 @@ body::after {
     background: rgba(255, 255, 255, 0.1);
     border: none;
     border-radius: 50px;
-    padding: 12px 20px;
+    padding: var(--space-12) var(--space-20);
     text-decoration: none;
     display: inline-block;
     transition: all 0.3s ease;
@@ -129,28 +182,25 @@ body::after {
 
 /* ==================== Responsive Design ==================== */
 /* Tablet Design */
+/* .left-panel/.right-panel/.search-container/#searchInput : aucun usage
+   dans le HTML/JS actuel pour ces sélecteurs précis (vérifié — #searchInput
+   est bien utilisé mais sa mise en forme réelle vient de search.css/
+   .search-field, pas de ces règles legacy) : spacing laissé en CSS. */
 @media (max-width: 1024px) and (min-width: 769px) {
-    .left-panel, 
+    .left-panel,
     .right-panel {
-        padding: 15px;
+        padding: var(--space-15);
     }
-    
+
     .search-container {
-        margin: 18px 0;
+        margin: var(--space-18) 0;
     }
-    
+
     #searchInput {
-        padding: 13px 16px;
+        padding: var(--space-13) var(--space-16);
         font-size: 15px;
     }
-    
-    #randomImage {
-        max-width: 95%;
-        max-height: 65vh;
-        width: 100%;
-        height: auto;
-    }
-    
+
     .galleries-grid {
         grid-template-columns: repeat(2, 1fr);
     }
@@ -166,52 +216,39 @@ body::after {
     
     .left-panel {
         width: 100%;
-        padding: 15px;
+        padding: var(--space-15);
         order: 2;
     }
-    
+
     .right-panel {
         width: 100%;
-        padding: 15px;
+        padding: var(--space-15);
         order: 1;
         min-height: 250px;
     }
-    
+
     .search-container {
-        margin: 15px auto;
+        margin: var(--space-15) auto;
         max-width: 100%;
     }
-    
+
     #searchInput {
-        padding: 14px 16px;
+        padding: var(--space-14) var(--space-16);
         font-size: 16px;
     }
-    
-    #randomImage {
-        aspect-ratio: 3/2;
-        max-width: 100%;
-        max-height: 60vh;
-        width: 100%;
-        height: auto;
-    }
-    
+
     .header h1 {
         font-size: 1.5rem;
         text-align: center;
     }
-    
+
     .header p {
         text-align: center;
         font-size: 0.9rem;
     }
-    
-    #galleriesContainer {
-        padding: 10px;
-    }
-    
+
     .galleries-grid {
         grid-template-columns: 1fr;
-        gap: 15px;
     }
     .nav-text {
         display: none !important;
@@ -231,9 +268,10 @@ body::after {
         display: inline !important;
     }
     
-    /* Boutons plus compacts sur mobile */
+    /* Boutons plus compacts sur mobile — .nav-button toujours sans usage
+       (vérifié) : padding laissé en CSS. */
     .nav-button {
-        padding: 10px 14px;
+        padding: var(--space-10) var(--space-14);
         min-width: 44px;
         min-height: 44px;
         display: flex;

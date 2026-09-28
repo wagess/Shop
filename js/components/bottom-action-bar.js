@@ -28,6 +28,7 @@ export function createBottomActionBar({
   const bar = document.createElement('div');
   bar.className = [
     'bottom-action-bar',
+    'gap-2 px-6',
     onMaterial ? 'bottom-action-bar--glass' : '',
     className,
   ].filter(Boolean).join(' ');
@@ -56,7 +57,7 @@ export function createBottomActionBar({
     if (secondary) {
       const link = document.createElement('button');
       link.type = 'button';
-      link.className = 'bottom-action-bar__secondary';
+      link.className = 'bottom-action-bar__secondary p-0';
       link.textContent = secondary;
       if (onSecondary) link.addEventListener('click', onSecondary);
       left.appendChild(link);
@@ -71,7 +72,7 @@ export function createBottomActionBar({
 
   const btn = document.createElement('button');
   btn.type = 'button';
-  btn.className = 'bottom-action-bar__btn';
+  btn.className = 'bottom-action-bar__btn py-4 px-8';
   btn.textContent = actionLabel;
   if (onAction) btn.addEventListener('click', onAction);
   right.appendChild(btn);

@@ -1,7 +1,14 @@
 /* Typography - Utilisation des variables */
 
+/* margin conservé ici (pas converti en classe) : filet de sécurité
+   typographique par défaut pour tout h1-h6 sans classe de spacing propre
+   (ex. admin.html #contentModalTitle) — au même titre que le reset universel
+   `*` (reset.css), ce n'est pas le spacing d'un composant ou d'une section
+   spécifique qu'on peut cibler par une classe HTML précise. Les titres du
+   site public ont déjà leur propre marge via une classe .ac-* qui prend le
+   pas sur cette règle (spécificité classe > sélecteur de type). */
 h1, h2, h3, h4, h5, h6 {
-    margin: 0 0 var(--gap-medium) 0;
+    margin: 0 0 var(--space-20) 0;
     font-weight: var(--font-weight-semibold);
     line-height: var(--line-height-tight);
     letter-spacing: var(--letter-spacing-tight);

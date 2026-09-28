@@ -35,7 +35,7 @@ export async function openGallery(galleryId, galleryName) {
         displayPhotos(photos, el('photosGrid'));
     } catch (err) {
         console.error('openGallery error', err);
-        grid.innerHTML = `<div class="error-message">Erreur: ${escapeHtml(err.message)}</div>`;
+        grid.innerHTML = `<div class="error-message p-5 m-5">Erreur: ${escapeHtml(err.message)}</div>`;
     }
 }
 
@@ -71,11 +71,11 @@ export async function displayPhotos(photos, gridEl = null) {
         <img src="${escapeHtml(imgUrl)}" alt="${escapeHtml(title)}" class="photo-img"
              onclick="openLightbox('${escapeJs(imgUrl)}', '${escapeJs(title)}', ${index})"
              onerror="this.style.background='linear-gradient(45deg,#ddd,#ccc)'; this.alt='Image non disponible';">
-        <div class="photo-info">
-            <div class="photo-title">${escapeHtml(title)}</div>
-            <div class="photo-id">ID: ${photo.id}</div>
-            <div class="keywords-container" id="keywords-${photo.id}">${kwsHtml}</div>
-            <div class="photo-actions"
+        <div class="photo-info p-5">
+            <div class="photo-title mb-3">${escapeHtml(title)}</div>
+            <div class="photo-id mb-4">ID: ${photo.id}</div>
+            <div class="keywords-container gap-1 pb-2" id="keywords-${photo.id}">${kwsHtml}</div>
+            <div class="photo-actions gap-2"
                  data-order-target="${photo.id}"
                  data-order-title="${escapeHtml(title)}"
                  data-order-url="${escapeHtml(imgUrl)}"
@@ -101,7 +101,7 @@ export async function displayPhotos(photos, gridEl = null) {
             size: 'md',
             onClick: (e) => {
                 e.stopPropagation();
-                window.orderPrint(title, imgUrl, photoId);
+                window.openShopModal({ mode: 'unique', photo: { id: photoId, title, url: imgUrl } });
             },
         });
         actionsEl.appendChild(orderBtn);
@@ -177,11 +177,11 @@ function renderKeywordsLimited(keywords, photoId = null) {
         return keyword.length > 20 ? keyword.substring(0, 17) + '...' : keyword;
     });
     
-    let html = truncatedKeywords.map(k => `<span class="keyword-tag">${escapeHtml(k)}</span>`).join(' ');
+    let html = truncatedKeywords.map(k => `<span class="keyword-tag py-1 px-2">${escapeHtml(k)}</span>`).join(' ');
     
     if (hiddenCount > 0) {
         const allKeywordsData = JSON.stringify(keywords);
-        html += ` <button class="more-keywords-btn" data-keywords='${escapeHtml(allKeywordsData)}' onclick="event.stopPropagation(); toggleAllKeywords('${photoId || ''}', this);" title="Afficher ${hiddenCount} mot(s)-clé(s) supplémentaire(s)">+${hiddenCount}</button>`;
+        html += ` <button class="more-keywords-btn py-1 px-2" data-keywords='${escapeHtml(allKeywordsData)}' onclick="event.stopPropagation(); toggleAllKeywords('${photoId || ''}', this);" title="Afficher ${hiddenCount} mot(s)-clé(s) supplémentaire(s)">+${hiddenCount}</button>`;
     }
     
     return html;
@@ -197,8 +197,8 @@ window.toggleAllKeywords = function(photoId, button) {
         container.innerHTML = renderKeywordsLimited(allKeywords, photoId);
         container.classList.remove('expanded');
     } else {
-        const allKeywordsHtml = allKeywords.map(k => `<span class="keyword-tag">${escapeHtml(k)}</span>`).join(' ');
-        container.innerHTML = allKeywordsHtml + ` <button class="more-keywords-btn" data-keywords='${escapeHtml(JSON.stringify(allKeywords))}' onclick="event.stopPropagation(); toggleAllKeywords('${photoId}', this);" data-expanded="true">−</button>`;
+        const allKeywordsHtml = allKeywords.map(k => `<span class="keyword-tag py-1 px-2">${escapeHtml(k)}</span>`).join(' ');
+        container.innerHTML = allKeywordsHtml + ` <button class="more-keywords-btn py-1 px-2" data-keywords='${escapeHtml(JSON.stringify(allKeywords))}' onclick="event.stopPropagation(); toggleAllKeywords('${photoId}', this);" data-expanded="true">−</button>`;
         container.classList.add('expanded');
     }
 };
@@ -269,29 +269,29 @@ function showOrderForm(title, imageUrl, photoId) {
 
     const overlay = document.createElement('div');
     overlay.id = 'orderFormOverlay';
-    overlay.className = 'order-overlay';
+    overlay.className = 'order-overlay p-5';
     overlay.innerHTML = `
         <div class="order-modal" role="dialog" aria-modal="true" aria-label="Commander une impression">
 
-            <div class="order-modal__header">
-                <button class="order-modal__back" id="orderBackBtn" aria-label="Retour" style="visibility:hidden">
+            <div class="order-modal__header px-5 pt-5">
+                <button class="order-modal__back p-2" id="orderBackBtn" aria-label="Retour" style="visibility:hidden">
                     <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
                         <path d="M12.7071 4.29289C13.0976 4.68342 13.0976 5.31658 12.7071 5.70711L8.41421 10L12.7071 14.2929C13.0976 14.6834 13.0976 15.3166 12.7071 15.7071C12.3166 16.0976 11.6834 16.0976 11.2929 15.7071L6.29289 10.7071C5.90237 10.3166 5.90237 9.68342 6.29289 9.29289L11.2929 4.29289C11.6834 3.90237 12.3166 3.90237 12.7071 4.29289Z"/>
                     </svg>
                 </button>
-                <div class="order-steps">
+                <div class="order-steps gap-2">
                     <span class="order-step order-step--active" id="orderStep1Dot"></span>
                     <span class="order-step" id="orderStep2Dot"></span>
                     <span class="order-step" id="orderStep3Dot"></span>
                 </div>
-                <button class="order-modal__close" id="closeOrderForm" aria-label="Fermer">
+                <button class="order-modal__close p-2" id="closeOrderForm" aria-label="Fermer">
                     <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
                         <path d="M10 8.58579L14.2929 4.29289C14.6834 3.90237 15.3166 3.90237 15.7071 4.29289C16.0976 4.68342 16.0976 5.31658 15.7071 5.70711L11.4142 10L15.7071 14.2929C16.0976 14.6834 16.0976 15.3166 15.7071 15.7071C15.3166 16.0976 14.6834 16.0976 14.2929 15.7071L10 11.4142L5.70711 15.7071C5.31658 16.0976 4.68342 16.0976 4.29289 15.7071C3.90237 15.3166 3.90237 14.6834 4.29289 14.2929L8.58579 10L4.29289 5.70711C3.90237 5.31658 3.90237 4.68342 4.29289 4.29289C4.68342 3.90237 5.31658 3.90237 5.70711 4.29289L10 8.58579Z"/>
                     </svg>
                 </button>
             </div>
 
-            <div class="order-modal__preview">
+            <div class="order-modal__preview gap-4 p-5">
                 <img src="${escapeHtml(imageUrl)}" alt="${escapeHtml(title)}">
                 <span class="order-modal__preview-title">${escapeHtml(title)}</span>
             </div>
@@ -299,21 +299,21 @@ function showOrderForm(title, imageUrl, photoId) {
             <div class="order-modal__steps-wrapper">
 
                 <!-- Étape 1 : Format & papier -->
-                <div class="order-step-panel" id="orderPanel1">
-                    <p class="order-step-label">Étape 1 — Format & finition</p>
+                <div class="order-step-panel p-5 gap-4" id="orderPanel1">
+                    <p class="order-step-label m-0">Étape 1 — Format & finition</p>
 
                     <!-- Orientation -->
-                    <div class="order-format-grid order-format-grid--2col">
-                        <label class="order-format-card order-format-card--selected">
+                    <div class="order-format-grid order-format-grid--2col gap-2">
+                        <label class="order-format-card order-format-card--selected py-3 px-2">
                             <input type="radio" name="orientation" value="Paysage" checked>
-                            <span class="order-orient-icon">
+                            <span class="order-orient-icon mb-2">
                                 <svg width="40" height="28" viewBox="0 0 40 28" fill="none"><rect x="0.75" y="0.75" width="38.5" height="26.5" rx="2.25" stroke="currentColor" stroke-width="1.5"/></svg>
                             </span>
                             <span class="order-format-card__label">Paysage</span>
                         </label>
-                        <label class="order-format-card">
+                        <label class="order-format-card py-3 px-2">
                             <input type="radio" name="orientation" value="Portrait">
-                            <span class="order-orient-icon">
+                            <span class="order-orient-icon mb-2">
                                 <svg width="28" height="40" viewBox="0 0 28 40" fill="none"><rect x="0.75" y="0.75" width="26.5" height="38.5" rx="2.25" stroke="currentColor" stroke-width="1.5"/></svg>
                             </span>
                             <span class="order-format-card__label">Portrait</span>
@@ -321,22 +321,22 @@ function showOrderForm(title, imageUrl, photoId) {
                     </div>
 
                     <!-- Taille -->
-                    <div class="order-paper-row">
+                    <div class="order-paper-row gap-2">
                         ${[
                             { label: 'Petit',  sub: '20×30 cm' },
                             { label: 'Moyen',  sub: '40×60 cm' },
                             { label: 'Grand',  sub: '60×90 cm' },
                         ].map((s, i) => `
-                        <label class="order-paper-chip${i === 1 ? ' order-paper-chip--selected' : ''}">
+                        <label class="order-paper-chip${i === 1 ? ' order-paper-chip--selected' : ''} py-2 px-3">
                             <input type="radio" name="taille" value="${s.label}"${i === 1 ? ' checked' : ''}>
-                            ${s.label}<span class="order-chip-sub">${s.sub}</span>
+                            ${s.label}<span class="order-chip-sub mt-1">${s.sub}</span>
                         </label>`).join('')}
                     </div>
 
                     <!-- Finition -->
-                    <div class="order-paper-row">
+                    <div class="order-paper-row gap-2">
                         ${['Brillant','Mat','Fine Art'].map((p, i) => `
-                        <label class="order-paper-chip${i === 1 ? ' order-paper-chip--selected' : ''}">
+                        <label class="order-paper-chip${i === 1 ? ' order-paper-chip--selected' : ''} py-2 px-3">
                             <input type="radio" name="paper" value="${p}"${i === 1 ? ' checked' : ''}>
                             ${p}
                         </label>`).join('')}
@@ -344,46 +344,46 @@ function showOrderForm(title, imageUrl, photoId) {
                 </div>
 
                 <!-- Étape 2 : Coordonnées -->
-                <div class="order-step-panel order-step-panel--hidden" id="orderPanel2">
-                    <p class="order-step-label">Étape 2 — Vos coordonnées</p>
+                <div class="order-step-panel order-step-panel--hidden p-5 gap-4" id="orderPanel2">
+                    <p class="order-step-label m-0">Étape 2 — Vos coordonnées</p>
                     <form id="orderForm" novalidate>
-                        <div class="order-field">
+                        <div class="order-field gap-2">
                             <label for="orderName">Nom complet <span class="order-field__required">*</span></label>
-                            <input type="text" id="orderName" name="name" required placeholder="Votre nom">
+                            <input type="text" id="orderName" name="name" required placeholder="Votre nom" class="p-3">
                         </div>
-                        <div class="order-field">
+                        <div class="order-field gap-2">
                             <label for="orderEmail">Courriel <span class="order-field__required">*</span></label>
-                            <input type="email" id="orderEmail" name="email" required placeholder="votre@courriel.com">
+                            <input type="email" id="orderEmail" name="email" required placeholder="votre@courriel.com" class="p-3">
                         </div>
-                        <div class="order-field">
+                        <div class="order-field gap-2">
                             <label for="orderPhone">Téléphone</label>
-                            <input type="tel" id="orderPhone" name="phone" placeholder="Optionnel">
+                            <input type="tel" id="orderPhone" name="phone" placeholder="Optionnel" class="p-3">
                         </div>
-                        <div class="order-field">
+                        <div class="order-field gap-2">
                             <label for="orderMessage">Message</label>
-                            <textarea id="orderMessage" name="message" rows="3" placeholder="Précisions, questions..."></textarea>
+                            <textarea id="orderMessage" name="message" rows="3" placeholder="Précisions, questions..." class="p-3"></textarea>
                         </div>
-                        <div class="order-feedback" id="orderFeedback"></div>
+                        <div class="order-feedback p-0" id="orderFeedback"></div>
                     </form>
                 </div>
 
                 <!-- Étape 3 : Confirmation -->
-                <div class="order-step-panel order-step-panel--hidden" id="orderPanel3">
-                    <div style="text-align: center; padding: 20px 0 10px;">
-                        <div style="width: 56px; height: 56px; background: rgba(87,173,157,0.15); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 16px;">
-                            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#57ad9d" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <div class="order-step-panel order-step-panel--hidden p-5 gap-4" id="orderPanel3">
+                    <div class="py-5 pb-3" style="text-align: center;">
+                        <div class="mx-auto mb-4" style="width: 56px; height: 56px; background: rgba(107,78,61,0.12); border-radius: 50%; display: flex; align-items: center; justify-content: center;">
+                            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#6B4E3D" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                                 <polyline points="20 6 9 17 4 12"/>
                             </svg>
                         </div>
-                        <p style="color: #57ad9d; font-size: var(--font-size-large); font-weight: var(--font-weight-medium); margin: 0 0 8px;">Commande envoyée !</p>
-                        <p style="color: var(--text-secondary); font-size: var(--font-size-small); margin: 0 0 4px;" id="orderConfirmName"></p>
+                        <p class="mb-2" style="color: #6B4E3D; font-size: var(--font-size-large); font-weight: var(--font-weight-medium);">Commande envoyée !</p>
+                        <p class="mb-1" style="color: var(--text-secondary); font-size: var(--font-size-small);" id="orderConfirmName"></p>
                         <p style="color: var(--text-muted); font-size: var(--font-size-small); margin: 0;">Je vous contacterai sous peu pour finaliser votre tirage.</p>
                     </div>
                 </div>
 
             </div>
 
-            <div id="orderBarMount"></div>
+            <div id="orderBarMount" class="mt-auto"></div>
         </div>
     `;
     document.body.appendChild(overlay);

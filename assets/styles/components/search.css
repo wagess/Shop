@@ -3,13 +3,14 @@
    Figma : node 1585-17155 — /Home/Components/Navigation and search/Search field
    ========================================================================== */
 
+/* Spacing (my-5 mx-auto) posé en classe utilitaire sur le HTML — voir
+   phototheque.html. */
 .search-field {
   display: flex;
   align-items: center;
   height: 56px;
   width: 100%;
   max-width: 500px;
-  margin: 20px auto;
 
   background: var(--color-bg-secondary);
   border: 1px solid var(--color-border-tertiary);
@@ -24,23 +25,23 @@
 }
 
 /* Icône loupe gauche */
+/* Spacing (py-2 pl-4) posé en classe utilitaire sur le HTML. */
 .search-field__icon {
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 6px 0 6px 16px;
   flex-shrink: 0;
   color: var(--color-text-primary);
 }
 
-/* Zone centrale — input + hint */
+/* Zone centrale — input + hint — Spacing (pl-3) posé en classe utilitaire
+   sur le HTML. */
 .search-field__body {
   flex: 1;
   display: flex;
   flex-direction: column;
   justify-content: center;
   min-width: 0;
-  padding-left: 12px;
   position: relative;
 }
 
@@ -81,11 +82,18 @@
 }
 
 /* Bouton flèche droite */
+/* Spacing (py-2 pl-2 pr-2) posé en classe utilitaire sur le HTML — le
+   pr-2 est nécessaire (pas juste symétrique par principe) : .search-field
+   est une pilule pleinement arrondie (border-radius: circular sur une
+   hauteur de 56px, donc des bouts en demi-cercle) ; un bouton rond posé
+   sans marge droite déborde de la silhouette courbe du conteneur au niveau
+   de ses coins haut/bas-droit (bug remonté le 2026-09-25 : "espace étrange
+   à 0 sur la droite"). Même correctif à appliquer à tout futur bouton rond
+   collé au bord d'un conteneur en pilule. */
 .search-field__action {
   display: flex;
   align-items: center;
   justify-content: flex-end;
-  padding: 6px 8px 6px 0;
   flex-shrink: 0;
 }
 
@@ -124,23 +132,4 @@
 /* Items cliquables dans le dropdown de suggestion */
 #searchSuggestions .dropdown__item {
   cursor: pointer;
-}
-
-/* ==========================================================================
-   Random Image
-   ========================================================================== */
-#randomImage {
-  aspect-ratio: 3/2;
-  max-width: 100%;
-  max-height: 70%;
-  width: 100%;
-  height: auto;
-  object-fit: cover;
-  border-radius: var(--radius-firm);
-  transition: opacity 0.3s ease-in-out;
-  background-color: var(--color-bg-active);
-  position: relative;
-  color: transparent;
-  text-indent: -9999px;
-  min-width: 90%;
 }

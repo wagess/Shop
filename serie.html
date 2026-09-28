@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Série — Stéphane Wagner</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,500;1,400;1,500&amp;family=DM+Sans:wght@400;500&amp;display=swap">
+    <link rel="stylesheet" href="./assets/styles/styles.css">
+    <link rel="stylesheet" href="./assets/styles/components/triptyque.css">
+    <link rel="stylesheet" href="./assets/styles/pages/accueil.css">
+    <link rel="stylesheet" href="./assets/styles/pages/serie.css">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>📸</text></svg>">
+</head>
+<body class="ac-page serie-page">
+
+    <div class="ac-hero-viewport">
+        <div id="site-header-mount"></div>
+
+        <!-- ===== HERO ===== -->
+        <section class="ac-hero">
+            <div class="ac-hero__frame shimmer" id="serieHeroFrame">
+                <img id="serieHeroImg" class="ac-hero__img" alt="" loading="eager" fetchpriority="high" decoding="async">
+                <div class="ac-hero__scrim"></div>
+                <div class="ac-hero__body pt-0 px-6 pb-13 gap-8 md:px-13 md:pb-16">
+                    <div>
+                        <p class="ac-eyebrow ac-eyebrow--on-dark m-0" id="serieHeroEyebrow">Série</p>
+                        <h1 class="ac-hero__title m-0" id="serieHeroTitle"></h1>
+                    </div>
+                    <div class="serie-hero__actions gap-3">
+                        <a href="#" onclick="window.openShopModal(); return false;" class="btn-primary btn-commander btn-sm gap-2 py-0 pr-4 pl-6">
+                            Commander
+                            <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg"><circle cx="10" cy="10" r="7.5" stroke="currentColor" stroke-width="1.5"/></svg>
+                        </a>
+                        <a href="/series.html" class="btn-soft gap-2 py-0 pr-4 pl-6">
+                            Toutes les séries
+                            <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg"><circle cx="10" cy="10" r="7.5" stroke="currentColor" stroke-width="1.5"/></svg>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <main>
+        <div id="serieError" class="error-message p-5 m-8" style="display:none;"></div>
+
+        <!-- ===== NOTE D'INTENTION ===== -->
+        <!-- Breakpoint 900px (lg:) — conservé tel quel, distinct du 700px
+             (md:) des sections plus bas (serie-shop/serie-next). -->
+        <section class="serie-intention py-13 px-6 gap-10 lg:py-16 lg:px-13 lg:gap-14">
+            <div class="serie-intention__text gap-6">
+                <p class="ac-eyebrow m-0">Note d'intention</p>
+                <h2 class="serie-intention__heading m-0" id="serieIntentionHeading"></h2>
+                <div id="serieIntentionBody"></div>
+            </div>
+            <div class="serie-intention__aside gap-4">
+                <p class="ac-eyebrow m-0">Fiche technique</p>
+                <div class="serie-meta-table pt-1" id="serieMetaTable"></div>
+            </div>
+        </section>
+
+        <!-- ===== GALERIE ===== -->
+        <section class="serie-gallery py-13 px-6 gap-6 lg:py-16 lg:px-13" id="serieGallery">
+            <p class="ac-eyebrow serie-gallery__caption m-0 mb-6" id="serieGalleryCaption"></p>
+            <div id="serieGalleryRows" class="gap-6"></div>
+        </section>
+
+        <!-- ===== BOUTIQUE DE LA SÉRIE ===== -->
+        <section class="serie-shop py-13 px-6 gap-4 md:py-16 md:px-13">
+            <p class="ac-eyebrow ac-eyebrow--on-dark m-0">Boutique de la série</p>
+            <h2 class="serie-shop__title m-0" id="serieShopTitle"></h2>
+            <p class="serie-shop__note m-0 mt-2">[Formats et tarifs à définir]</p>
+            <a href="/#shop" class="btn-soft serie-shop__cta gap-2 py-0 pr-4 pl-6 mt-4">
+                Voir la boutique
+                <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg"><circle cx="10" cy="10" r="7.5" stroke="currentColor" stroke-width="1.5"/></svg>
+            </a>
+        </section>
+
+        <!-- ===== CHAPITRE SUIVANT ===== -->
+        <section class="serie-next py-13 px-6 gap-6 md:py-16 md:px-13" id="serieNext">
+            <p class="ac-eyebrow m-0" style="color:var(--ac-accent-warm);">Chapitre suivant</p>
+            <div class="serie-next__header gap-6">
+                <div>
+                    <h2 class="serie-next__title m-0 mt-2" id="serieNextTitle"></h2>
+                </div>
+                <a href="#" class="btn-soft gap-2 py-0 pr-4 pl-6" id="serieNextLink">
+                    Découvrir la série
+                    <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg"><circle cx="10" cy="10" r="7.5" stroke="currentColor" stroke-width="1.5"/></svg>
+                </a>
+            </div>
+            <a href="#" class="serie-next__cover" id="serieNextCover">
+                <img alt="" loading="lazy">
+            </a>
+        </section>
+    </main>
+
+    <div id="site-footer-mount"></div>
+
+    <script src="js/triptyque.js"></script>
+    <script type="module" src="js/app.js"></script>
+    <script type="module" src="js/serie-page.js"></script>
+</body>
+</html>

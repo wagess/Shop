@@ -2,21 +2,22 @@
    Footer — Sigma Design System
    ========================================================================== */
 
+/* Spacing (py-8 px-6) posé en classe utilitaire sur le HTML — voir
+   js/components/footer.js. */
 .site-footer {
   background: var(--color-surface-subtle);
   border-top: 1px solid var(--color-border);
-  padding: 32px 24px;
   width: 100%;
   box-sizing: border-box;
 }
 
+/* Spacing (gap-4 md:gap-6 — breakpoint aligné à 700px comme le reste du
+   site, au lieu du 768px d'origine) posé en classe utilitaire sur le HTML. */
 .site-footer__inner {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 24px;
   max-width: 1200px;
-  margin: 0 auto;
   flex-wrap: wrap;
 }
 
@@ -30,11 +31,10 @@
   white-space: nowrap;
 }
 
-/* ── Nav ── */
+/* ── Nav ── Spacing (gap-4 md:gap-6) posé en classe utilitaire sur le HTML. */
 .site-footer__nav {
   display: flex;
   align-items: center;
-  gap: 24px;
   flex-wrap: wrap;
 }
 
@@ -66,10 +66,5 @@
   .site-footer__inner {
     flex-direction: column;
     align-items: flex-start;
-    gap: 16px;
-  }
-
-  .site-footer__nav {
-    gap: 16px;
   }
 }

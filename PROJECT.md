@@ -2,6 +2,8 @@
 
 ## 1. Vision
 
+Créer un système qui remet la photographie au centre et transforme mes projets photographiques en expériences éditoriales et éventuellement commerciales.
+
 Faire évoluer mon **portfolio photographique et ma boutique en ligne** pour en faire une expérience numérique cohérente, éditoriale et commerciale.
 
 Le projet sert également de **laboratoire personnel UX + IA** afin d'expérimenter concrètement de nouvelles méthodes de conception et de collaboration avec Claude.
@@ -10,17 +12,23 @@ Le projet sert également de **laboratoire personnel UX + IA** afin d'expérimen
 
 ## 2. Objectifs
 
+*(voir aussi CLAUDE.md §1 — source de vérité des objectifs)*
+
 ### Produit photo
 
-* Accompagner une exposition photo et un contenu éditorial comme un livre
-* Faire vivre un écosystème UNIQUE numérique en parallèle
-* améliorer le portfolio ;
-* améliorer l'expérience de découverte des séries ;
-* mieux raconter mon travail photographique ;
-* améliorer la boutique et le parcours d'achat ;
-* renforcer mon identité et mon positionnement ;
-* développer progressivement les ventes ;
-* développer une relation directe avec mon audience.
+* Se démarquer et challenger toutes les plateformes de vente photo en ligne ;
+* s'inspirer de l'expérience d'achat des services d'impression (pas du print-on-demand générique) ;
+* faire de mon shop l'unique point de référence pour ma photothèque ;
+* raconter une histoire à travers mes séries et mon portfolio, en développant un narratif à travers le matériel visuel ;
+* générer et fructifier un auditoire ;
+* vendre des packs de photos ou des impressions d'art, éventuellement d'autres produits (livres) ;
+* accompagner une exposition photo et un contenu éditorial comme un livre ;
+* renforcer mon identité et mon positionnement.
+
+### Objectif éditorial
+
+* Ébauche éditoriale déjà élaborée sur photographie.stephanewagner.com
+* Séries de type sagas (ex. tango.saga)
 
 ### Objectif personnel
 
@@ -63,6 +71,22 @@ Liste des sites, application et services qui doivent servir de modèle et d'exem
 ---
 
 ## 4. Périmètre
+
+PHOTOGRAPHIE
+│
+├── PROJETS
+│   ├── Cuba
+│   ├── ...
+│   ├── ...
+│   └── ...
+│
+├── CARNETS
+│   ├── récit / voyage
+│   └── récit / voyage
+│
+├── EXPOSITIONS
+│
+└── SHOP
 
 Le projet concerne principalement :
 
@@ -142,12 +166,14 @@ Je reste responsable des décisions finales.
 
 ## 9. État actuel
 
-**Phase : Exploration / cadrage**
+**Phase : Build — migration Sigma**
 
-Prochaine étape :
+Priorité actuelle (2026-09-04) :
 
-> Comprendre l'existant, identifier les principaux problèmes et définir la première amélioration à réaliser.
-> Générer des ventes pour un auditoire spécifique qui est encore à définir.
+> 1. Terminer la migration du design system Sigma (composants, tokens, light mode) — voir `docs/skills.md`.
+> 2. Obtenir un outil stable qui facilite la vente : parcours d'achat fiable, sans bug bloquant.
+
+Les nouvelles fonctionnalités (modale boutique unifiée — panier + impression, tableau de bord Shutterstock, etc.) passent après ces deux priorités.
 
 ---
 

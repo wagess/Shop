@@ -7,6 +7,14 @@
 
   /* --------------------------------------------------------------------------
      Colors — Core (identiques light/dark sauf secondary_green)
+
+     RÈGLE : le système visuel du site (accueil, photothèque, séries, modales,
+     boutons, formulaires) n'utilise AUCUNE de ces teintes. L'identité visuelle
+     se limite au noir/gris (--color-text-*, --color-bg-*, --color-border-*)
+     et au beige (--color-accent). Ces couleurs "Core" existent dans le
+     système Sigma pour des usages hors identité de marque (ex. états
+     internes d'outils d'admin) — ne pas les réutiliser pour des CTA, badges
+     ou messages sur les interfaces publiques.
      -------------------------------------------------------------------------- */
   --color-core-primary-a:         #1f1f1f;
   --color-core-primary-b:         #ffffff;
@@ -103,6 +111,48 @@
      -------------------------------------------------------------------------- */
   --radius-firm:      12px;
   --radius-circular:  200px;
+
+  /* --------------------------------------------------------------------------
+     Spacing — cleanup du 2026-09-23 (tokenisation de toutes les valeurs
+     padding/margin/gap du projet ; aucune valeur en dur restante).
+     Pas d'équivalent dans le fichier Figma Sigma (aucune variable de
+     spacing n'y est définie — vérifié par recherche) : échelle propre au
+     projet, pas importée.
+
+     Échelle de base (multiples de 4px) : 4, 8, 12, 16, 20, 24, 28, 32, 36,
+     40, 44, 48, 64, 80, 96, 112.
+
+     Tokens marqués "hors échelle" = valeurs historiques (pré-Sigma)
+     préservées telles quelles pour ne pas changer le rendu visuel pendant
+     ce cleanup. Candidates à fusionner vers l'échelle de base lors de la
+     prochaine passe d'UNIFORMISATION (décision à prendre, pas encore
+     tranchée — voir [[project_code_architecture]] en mémoire projet).
+     -------------------------------------------------------------------------- */
+  --space-2:    2px;   /* hors échelle */
+  --space-4:    4px;
+  --space-5:    5px;   /* hors échelle — utilisé seulement en négatif (retouche optique) */
+  --space-6:    6px;   /* hors échelle */
+  --space-8:    8px;
+  --space-10:   10px;  /* hors échelle */
+  --space-12:   12px;
+  --space-13:   13px;  /* hors échelle */
+  --space-14:   14px;  /* hors échelle */
+  --space-15:   15px;  /* hors échelle */
+  --space-16:   16px;
+  --space-18:   18px;  /* hors échelle */
+  --space-20:   20px;
+  --space-24:   24px;
+  --space-25:   25px;  /* hors échelle */
+  --space-28:   28px;
+  --space-32:   32px;
+  --space-36:   36px;
+  --space-40:   40px;
+  --space-44:   44px;
+  --space-48:   48px;
+  --space-64:   64px;
+  --space-80:   80px;
+  --space-96:   96px;
+  --space-112:  112px;
 }
 
 /* ==========================================================================
@@ -134,4 +184,131 @@
 
   /* Core — secondary_green différent en dark */
   --color-core-secondary-green:   #0dd6a4;
+}
+
+/* ==========================================================================
+   Legacy — tokens pré-Sigma (fusionnés depuis assets/styles/variables.css
+   le 2026-09-22, sur demande du PO : un seul fichier de tokens CSS).
+
+   Ces tokens n'ont PAS de valeur Sigma équivalente (tailles utilitaires) ou
+   ont une valeur DIFFÉRENTE de leur équivalent Sigma nommé pareil en
+   substance (ex. --text-secondary/#b0b0b0 ≠ --color-text-secondary
+   Sigma/#5F5E5A) — encore utilisés par des composants pas migrés vers Sigma
+   (gallery.css, modal.css, layout.css, utilities.css, reset.css : la grille
+   photo et le lightbox). Ne PAS remplacer leurs valeurs par les tokens Sigma
+   ci-dessus sans revue visuelle dédiée de ces composants — voir
+   [[project_code_architecture]] en mémoire projet.
+
+   Les espacements (--gap, --gap-medium, --gap-large, --padding-small,
+   --padding-large) ont été retirés d'ici le 2026-09-23 : remplacés partout
+   par les tokens --space-* ci-dessus (section Spacing).
+
+   Seuls les tokens réellement utilisés quelque part dans le code ont été
+   conservés (vérifié par grep le 2026-09-22) — les tokens inutilisés de
+   l'ancien variables.css (ex. --primary-color, --bg-modal, --shadow-button,
+   --border-radius-pill) ont été supprimés.
+   ========================================================================== */
+:root {
+  /* Bordures */
+  --border-radius-medium: 4px;
+
+  /* Couleurs */
+  --error-color:        #404040;
+  --text-secondary:     #b0b0b0;
+  --text-muted:         #808080;
+  --white:              #ffffff;
+
+  /* Fonds */
+  --bg-gradient: linear-gradient(135deg, #282323 0%, #404245 100%);
+
+  /* Ombres */
+  --shadow-large: 0 5px 20px rgba(0, 0, 0, 0.3);
+  --shadow-hover: 0 10px 10px rgba(0, 0, 0, 0.4);
+
+  /* Transitions */
+  --transition-fast:   all 0.2s ease;
+  --transition-normal: all 0.3s ease;
+
+  /* Tailles */
+  --container-max-width: 1400px;
+  --img-height:           250px;
+  --gallery-min-width:    320px;
+  --photo-min-width:      300px;
+
+  /* Typography — Desktop */
+  --font-size-h1:     2rem;      /* 32px */
+  --font-size-h2:     2rem;      /* 32px */
+  --font-size-h3:     1.75rem;   /* 28px */
+  --font-size-h4:     1.5rem;    /* 24px */
+  --font-size-h5:     1.25rem;   /* 20px */
+  --font-size-h6:     1rem;      /* 16px */
+  --font-size-large:  1.125rem;  /* 18px */
+  --font-size-small:  0.875rem;  /* 14px */
+  --font-size-xs:     0.75rem;   /* 12px */
+  --font-size-body:   1rem;      /* 16px */
+
+  /* Line Heights */
+  --line-height-tight:   1.2;
+  --line-height-normal:  1.4;
+  --line-height-relaxed: 1.6;
+
+  /* Font Weights */
+  --font-weight-light:    300;
+  --font-weight-normal:   400;
+  --font-weight-medium:   500;
+  --font-weight-semibold: 600;
+  --font-weight-bold:     700;
+  --font-weight-black:    900;
+
+  /* Letter Spacing */
+  --letter-spacing-tight:  -0.025em;
+  --letter-spacing-normal: 0;
+  --letter-spacing-wide:   0.025em;
+}
+
+/* Legacy — Typography responsive (tablette) */
+@media (max-width: 1024px) and (min-width: 769px) {
+  :root {
+    --font-size-h1:     2rem;
+    --font-size-h2:     1.875rem;
+    --font-size-h3:     1.625rem;
+    --font-size-h4:     1.375rem;
+    --font-size-h5:     1.125rem;
+    --font-size-h6:     1rem;
+    --font-size-large:  1.0625rem;
+    --font-size-body:   0.9375rem;
+    --font-size-small:  0.8125rem;
+  }
+}
+
+/* Legacy — Typography responsive (mobile) */
+@media (max-width: 768px) {
+  :root {
+    --font-size-h1:     1.875rem;
+    --font-size-h2:     1.625rem;
+    --font-size-h3:     1.375rem;
+    --font-size-h4:     1.25rem;
+    --font-size-h5:     1.125rem;
+    --font-size-h6:     1rem;
+    --font-size-large:  1rem;
+    --font-size-body:   0.875rem;
+    --font-size-small:  0.8125rem;
+    --font-size-xs:     0.6875rem;
+  }
+}
+
+/* Legacy — Typography responsive (petit mobile) */
+@media (max-width: 480px) {
+  :root {
+    --font-size-h1:     1.2rem;
+    --font-size-h2:     1.125rem;
+    --font-size-h3:     1rem;
+    --font-size-h4:     0.9375rem;
+    --font-size-h5:     0.875rem;
+    --font-size-h6:     0.8125rem;
+    --font-size-large:  0.8125rem;
+    --font-size-body:   0.6875rem;
+    --font-size-small:  0.625rem;
+    --font-size-xs:     0.5625rem;
+  }
 }

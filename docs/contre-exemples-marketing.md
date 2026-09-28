@@ -44,9 +44,21 @@ Print-on-demand et impression à la demande.
 
 > Modèle de commodité qui banalise l'œuvre et dégrade la relation entre le photographe et l'acheteur.
 
+**Nuance :** l'objectif de s'inspirer des services d'impression (CLAUDE.md §1) vise leur **expérience d'achat** — présentation du produit, configurateur, confiance dans la qualité — pas le modèle de commodité POD générique listé ici.
+
 ---
 
-## 4. OWNED
+## 4. SAAS PORTFOLIO GÉNÉRIQUE
+
+Constructeurs de sites portfolio/galerie pour photographes.
+
+* Zenfolio
+
+> Templates génériques, look interchangeable d'un photographe à l'autre — manque d'identité propre.
+
+---
+
+## 5. OWNED
 
 Canal direct, contrôlé par le photographe.
 

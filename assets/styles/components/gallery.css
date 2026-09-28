@@ -1,24 +1,104 @@
+/* ==================== Folders / Favorite themes ==================== */
+/* Spacing (mb-4) posé en classe utilitaire sur le HTML — voir js/gallery.js. */
+.folders-heading {
+    color: var(--color-text-secondary);
+    text-align: center;
+    font-weight: var(--font-weight-normal);
+}
+
+/* Spacing (gap-3 px-5 pb-5) posé en classe utilitaire sur le HTML. */
+.folders-row {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+/* Spacing (py-2 px-3) posé en classe utilitaire sur le HTML. */
+.folder-link,
+.favorite-item {
+    border-radius: var(--radius-firm);
+    border: 1px solid var(--color-border-tertiary);
+    background: var(--color-bg-secondary);
+    color: var(--color-text-primary);
+    cursor: pointer;
+    transition: var(--transition-normal);
+}
+
+/* .favorite-item : override spacing (py-3 px-4, remplace py-2 px-3) posé
+   en classe utilitaire sur le HTML, pas de règle CSS supplémentaire. */
+
+.folder-link:hover,
+.favorite-item:hover {
+    background: var(--color-hover-primary);
+    border-color: var(--color-border-secondary);
+    transform: translateY(-2px);
+}
+
+/* ==================== Pagination ==================== */
+/* Spacing (my-5) posé en classe utilitaire sur le HTML. */
+.pagination-container {
+    text-align: center;
+}
+
+/* Spacing (mb-3) posé en classe utilitaire sur le HTML. */
+.pagination-info {
+    color: var(--color-text-secondary);
+    font-size: 14px;
+}
+
+/* Spacing (gap-3) posé en classe utilitaire sur le HTML. */
+.pagination-buttons {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+/* Spacing (py-2 px-3) posé en classe utilitaire sur le HTML. */
+.pagination-btn {
+    background: var(--color-bg-secondary);
+    border: 1px solid var(--color-border-tertiary);
+    color: var(--color-text-primary);
+    border-radius: var(--border-radius-medium);
+    cursor: pointer;
+    transition: var(--transition-normal);
+}
+
+.pagination-btn:hover {
+    background: var(--color-hover-primary);
+}
+
+.pagination-btn.active {
+    background: var(--color-accent);
+    border-color: var(--color-accent);
+    color: var(--color-on-accent);
+    font-weight: var(--font-weight-bold);
+}
+
 /* ==================== Gallery Grid ==================== */
+/* Spacing (gap-4 md:gap-5 mb-5 pt-3 md:pt-5 pr-3 md:pr-0 pb-3 md:pb-0
+   pl-3 md:pl-0 — breakpoint aligné à 700px, ex-768px dans layout.css ;
+   #galleriesContainer avait aussi un padding mobile-only de 10px sur les 4
+   côtés, qui l'emportait sur le padding-top de .galleries-grid via la
+   spécificité de l'id — recomposé en longhands pour reproduire le même
+   résultat sans dépendre de l'ordre du fichier CSS) posé en classe
+   utilitaire sur le HTML. */
 .galleries-grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(var(--gallery-min-width), 1fr));
-    gap: var(--gap-medium);
-    margin-bottom: var(--gap-medium);
-    padding-top: var(--gap-medium);
 }
 
 .gallery-card {
-    background: var(--white);
-    border-radius: var(--border-radius);
+    background: var(--color-bg-primary);
+    border: 1px solid var(--color-border-tertiary);
+    border-radius: var(--radius-firm);
     overflow: hidden;
-    box-shadow: var(--shadow-medium);
     transition: var(--transition-normal);
     cursor: pointer;
 }
 
 .gallery-card:hover {
     transform: translateY(-5px);
-    box-shadow: var(--shadow-small);
+    border-color: var(--color-border-secondary);
 }
 
 .gallery-cover {
@@ -38,41 +118,60 @@
     object-fit: cover;
 }
 
-.gallery-info {
-    padding: var(--padding-large);
+/* Spacing (py-2 px-4) posé en classe utilitaire sur le HTML. */
+.gallery-badge {
+    position: absolute;
+    top: 12px;
+    left: 12px;
+    z-index: 2;
+    display: inline-flex;
+    align-items: center;
+    border-radius: var(--radius-circular);
+    border: 1px solid rgba(255, 255, 255, 0.4);
+    background: rgba(94, 94, 94, 0.35);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    color: rgba(255, 255, 255, 0.96);
+    font-family: var(--font-family-base);
+    font-size: var(--font-body-caption-size);
+    font-weight: var(--font-weight-medium);
+    line-height: var(--font-body-caption-line-height);
+    letter-spacing: var(--font-body-caption-letter-spacing);
+    white-space: nowrap;
 }
 
+/* .gallery-info : plus de règle CSS, spacing (p-6) posé en classe utilitaire
+   directement sur le HTML — voir js/gallery.js. */
+
+/* Spacing (mb-1) posé en classe utilitaire sur le HTML. */
 .gallery-name {
-    font-size: 1.5em;
-    font-weight: bold;
-    color: var(--text-primary);
-    margin-bottom: 10px;
+    font-family: var(--font-family-base);
+    font-size: var(--font-headline-body-size);
+    font-weight: var(--font-headline-body-weight);
+    line-height: var(--font-headline-body-line-height);
+    letter-spacing: var(--font-headline-body-letter-spacing);
+    color: var(--color-text-primary);
 }
 
-.gallery-meta {
-    color: var(--text-secondary);
-    font-size: 0.9em;
-    margin-bottom: var(--gap-medium);
+.gallery-meta,
+.gallery-date {
+    font-family: var(--font-family-base);
+    font-size: var(--font-body-caption-size);
+    font-weight: var(--font-body-caption-weight);
+    line-height: var(--font-body-caption-line-height);
+    letter-spacing: var(--font-body-caption-letter-spacing);
+    color: var(--color-text-tertiary);
 }
 
-.gallery-count {
-    display: inline-block;
-    background: var(--primary-color);
-    color: var(--white);
-    padding: 6px 15px;
-    border-radius: var(--gap-medium);
-    font-size: 0.85em;
-    font-weight: bold;
-}
-
+/* Spacing (gap-0) posé en classe utilitaire sur le HTML. */
 .gallery-mosaic {
     display: grid;
     grid-template-columns: 1fr 1fr;
     grid-template-rows: 1fr 1fr;
-    gap: 0px;
     width: 100%;
     height: 100%;
-    background: rgba(0, 0, 0, 0.2);
+    background: var(--color-bg-secondary);
     opacity: 1;
     transition: opacity 0.5s ease-in;
 }
@@ -82,7 +181,7 @@
     background-size: cover;
     background-position: center;
     transition: background-image 0.3s ease;
-    background-color: rgba(255, 255, 255, 0.05);
+    background-color: var(--color-bg-secondary);
     min-height: 0;
 }
 
@@ -92,7 +191,7 @@
     justify-content: center;
     font-size: 48px;
     height: 100%;
-    background: rgba(255, 255, 255, 0.05);
+    background: var(--color-bg-secondary);
     opacity: 1;
     transition: opacity 0.3s ease-out;
 }
@@ -101,14 +200,9 @@
     opacity: 0.5;
 }
 
-.picture-details__title {
-    font-family: "rock salt";
-    font-weight: 400;
-    text-transform: capitalize;
-    text-align: center;
-    color: whitesmoke;
-    font-size: var(--font-weight-medium);
-    letter-spacing: 0.75px;
+/* Spacing (px-8) posé en classe utilitaire sur le HTML. */
+.gallery-icon--loading {
+    width: 100%;
 }
 
 .gallery-loading {
@@ -119,28 +213,47 @@
     width: 100%;
     height: 100%;
     min-height: 200px;
-    background: var(--primary-color);
-    color: var(--white);
+    background: var(--color-bg-secondary);
+    color: var(--color-text-primary);
     position: absolute;
     top: 0;
     left: 0;
 }
 
+/* .loading-spinner n'a aucun usage dans le HTML/JS actuel (vérifié) :
+   margin-bottom laissé en CSS, à convertir si ce loader est un jour utilisé. */
 .loading-spinner {
     width: 40px;
     height: 40px;
-    border: 4px solid rgba(255, 255, 255, 0.3);
-    border-top: 4px solid var(--white);
+    border: 4px solid var(--color-border-tertiary);
+    border-top: 4px solid var(--color-accent);
     border-radius: 50%;
     animation: spin 1s linear infinite;
-    margin-bottom: 12px;
+    margin-bottom: var(--space-12);
 }
 
 .loading-text {
     font-size: 14px;
     opacity: 0.9;
-    color: var(--white);
+    color: var(--color-text-secondary);
     font-weight: 500;
+}
+
+/* Préchargement des vignettes de couverture (Activity Ring, voir
+   js/thumbnails.js) — indicateur discret, pas un loader bloquant : la
+   grille de galeries s'affiche immédiatement, cet anneau montre juste la
+   progression pendant que les mosaïques de couverture se remplissent. */
+/* Spacing (mt-3) posé en classe utilitaire sur le HTML. */
+.thumb-preload-ring {
+    display: flex;
+    justify-content: center;
+    opacity: 1;
+    transition: opacity 0.4s ease;
+}
+
+.thumb-preload-ring.is-hidden {
+    opacity: 0;
+    pointer-events: none;
 }
 
 .mosaic-loader {
@@ -150,8 +263,8 @@
     transform: translate(-50%, -50%);
     width: 20px;
     height: 20px;
-    border: 2px solid #666;
-    border-top: 2px solid #fff;
+    border: 2px solid var(--color-border-tertiary);
+    border-top: 2px solid var(--color-accent);
     border-radius: 50%;
     animation: spin 1s linear infinite;
 }

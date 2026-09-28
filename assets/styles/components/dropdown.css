@@ -4,10 +4,11 @@
    Shadow token : minShadow (0 1px 4px rgba(0,0,0,0.04), 0 4px 12px rgba(0,0,0,0.06))
    ========================================================================== */
 
+/* Spacing (p-4) posé en classe utilitaire sur le HTML — voir
+   js/components/dropdown.js. */
 .dropdown {
   display: flex;
   flex-direction: column;
-  padding: 16px;
   border-radius: 16px;
   background: var(--color-bg-primary);
   box-shadow:
@@ -27,12 +28,11 @@
 }
 
 /* ── Item ── */
+/* Spacing (gap-1 py-1 px-4) posé en classe utilitaire sur le HTML. */
 .dropdown__item {
   display: flex;
   align-items: center;
-  gap: 4px;
   height: 56px;
-  padding: 4px 16px;
   border-radius: var(--radius-firm);
   transition: background 0.1s ease;
 }
@@ -51,6 +51,7 @@
 }
 
 /* ── Avatar ── */
+/* Spacing (pr-4) posé en classe utilitaire sur le HTML. */
 .dropdown__avatar {
   display: flex;
   align-items: center;
@@ -58,7 +59,6 @@
   flex-shrink: 0;
   width: 48px;
   height: 56px;
-  padding-right: 16px;
 }
 
 .dropdown__avatar-img {

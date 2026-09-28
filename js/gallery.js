@@ -1,13 +1,6 @@
 import { el, escapeHtml, escapeJs } from './utils.js';
-
-// Configuration des thématiques favorites
-const FAVORITE_FOLDERS = [
-    { id: '67', name: 'Scènes de vie', icon: '⭐', type: 'collection' },
-    { id: '73', name: 'Paysages', icon: '🏔️', type: 'collection' },
-    { id: 'portraits', name: 'Portraits', icon: '👤', type: 'folder' },
-    { id: 'tango', name: 'Tango', icon: '💃', type: 'folder' },
-    { id: 'voyages', name: 'Voyages', icon: '✈️', type: 'folder' },
-];
+import { createProgressBar } from './components/progress-bar.js';
+import { getAllSagaIds } from './components/series-cards.js';
 
 export let allGalleries = [];
 export let hierarchyData = null;
@@ -77,22 +70,26 @@ export function displayGalleries(galleries, page = 1) {
 
     container.innerHTML = paginatedGalleries.map(g => {
         let icon = '🖼️';
-        if (g.type === 'collection') icon = '📸';
-        else if (g.type === 'folder') icon = '📂';
+        if (g.type === 'folder') icon = '📂';
         else if (g.type === 'gallery') icon = '🎨';
         else if (g.type === 'album') icon = '📔';
-        
+
         // Créer la mosaïque de 4 photos si disponibles
         let coverContent = '';
         if (g.thumbnails && g.thumbnails.length > 0) {
             const thumbs = g.thumbnails.slice(0, 4);
             coverContent = `
-                <div class="gallery-mosaic">
+                <div class="gallery-mosaic gap-0">
                     ${thumbs.map(thumb => `
                         <div class="mosaic-item" style="background-image: url('${escapeHtml(thumb)}')"></div>
                     `).join('')}
                 </div>
             `;
+        } else if (g.type === 'collection') {
+            // En attente de la vignette (voir thumbnails.js) — barre de
+            // progression reflétant l'avancement réel du chargement en
+            // arrière-plan (done/total, voir reportThumbPreloadProgress).
+            coverContent = `<div class="gallery-icon gallery-icon--loading shimmer px-8" data-loading-progress></div>`;
         } else {
             coverContent = `<div class="gallery-icon">${icon}</div>`;
         }
@@ -103,19 +100,28 @@ export function displayGalleries(galleries, page = 1) {
             const date = new Date(g.created_date);
             dateDisplay = `<div class="gallery-date">📅 ${date.toLocaleDateString('fr-FR')}</div>`;
         }
-        
+
+        const typeLabels = { collection: 'Collection', folder: 'Dossier', gallery: 'Galerie', album: 'Album' };
+        const typeLabel = typeLabels[g.type] || escapeHtml(g.type);
+
         return `
             <div class="gallery-card" onclick="window.openGallery(${g.id}, '${escapeJs(g.name)}')">
-                <div class="gallery-cover">${coverContent}</div>
-                <div class="gallery-info">
-                    <div class="gallery-name">${escapeHtml(g.name)}</div>
-                    <div class="gallery-meta">ID: ${g.id} • Type: ${escapeHtml(g.type)}</div>
+                <div class="gallery-cover">
+                    ${coverContent}
+                    <div class="gallery-badge py-2 px-4">${g.count} photo${g.count > 1 ? 's' : ''}</div>
+                </div>
+                <div class="gallery-info p-6">
+                    <div class="gallery-name mb-1">${escapeHtml(g.name)}</div>
+                    <div class="gallery-meta">${typeLabel}</div>
                     ${dateDisplay}
-                    <div class="gallery-count">${g.count} photo${g.count > 1 ? 's' : ''}</div>
                 </div>
             </div>
         `;
     }).join('');
+
+    container.querySelectorAll('[data-loading-progress]').forEach(node => {
+        node.appendChild(createProgressBar({ percentage: 0, showPercentage: false }));
+    });
 
     // Ajouter la pagination
     renderPagination(totalPages, page, galleries.length);
@@ -142,21 +148,21 @@ function renderPagination(totalPages, currentPage, totalItems) {
     if (!container) return;
 
     const paginationHTML = `
-        <div class="pagination-container" style="margin: 20px 0; text-align: center;">
-            <div class="pagination-info" style="color: white; margin-bottom: 10px; font-size: 14px;">
+        <div class="pagination-container my-5">
+            <div class="pagination-info mb-3">
                 Page ${currentPage} sur ${totalPages} (${totalItems} collections au total)
             </div>
-            <div class="pagination-buttons" style="display: flex; justify-content: center; gap: 10px; flex-wrap: wrap;">
+            <div class="pagination-buttons gap-3">
                 ${currentPage > 1 ? `
-                    <button onclick="changePage(1)" class="pagination-btn" style="padding: 8px 12px; background: rgba(255,255,255,0.1); border: none; color: white; border-radius: 4px; cursor: pointer;">«</button>
-                    <button onclick="changePage(${currentPage - 1})" class="pagination-btn" style="padding: 8px 12px; background: rgba(255,255,255,0.1); border: none; color: white; border-radius: 4px; cursor: pointer;">‹</button>
+                    <button onclick="changePage(1)" class="pagination-btn py-2 px-3">«</button>
+                    <button onclick="changePage(${currentPage - 1})" class="pagination-btn py-2 px-3">‹</button>
                 ` : ''}
-                
+
                 ${generatePageNumbers(currentPage, totalPages)}
-                
+
                 ${currentPage < totalPages ? `
-                    <button onclick="changePage(${currentPage + 1})" class="pagination-btn" style="padding: 8px 12px; background: rgba(255,255,255,0.1); border: none; color: white; border-radius: 4px; cursor: pointer;">›</button>
-                    <button onclick="changePage(${totalPages})" class="pagination-btn" style="padding: 8px 12px; background: rgba(255,255,255,0.1); border: none; color: white; border-radius: 4px; cursor: pointer;">»</button>
+                    <button onclick="changePage(${currentPage + 1})" class="pagination-btn py-2 px-3">›</button>
+                    <button onclick="changePage(${totalPages})" class="pagination-btn py-2 px-3">»</button>
                 ` : ''}
             </div>
         </div>
@@ -168,13 +174,11 @@ function renderPagination(totalPages, currentPage, totalItems) {
 function generatePageNumbers(currentPage, totalPages) {
     let pages = '';
     const range = 2; // Nombre de pages à afficher de chaque côté de la page actuelle
-    
+
     for (let i = Math.max(1, currentPage - range); i <= Math.min(totalPages, currentPage + range); i++) {
         const isActive = i === currentPage;
         pages += `
-            <button onclick="changePage(${i})" class="pagination-btn ${isActive ? 'active' : ''}" 
-                style="padding: 8px 12px; background: ${isActive ? 'rgba(255,255,255,0.3)' : 'rgba(255,255,255,0.1)'}; 
-                border: none; color: white; border-radius: 4px; cursor: pointer; font-weight: ${isActive ? 'bold' : 'normal'};">
+            <button onclick="changePage(${i})" class="pagination-btn py-2 px-3 ${isActive ? 'active' : ''}">
                 ${i}
             </button>
         `;
@@ -200,7 +204,7 @@ window.changePage = function(page) {
     }
 };
 
-export function renderFolders(folders) {
+export function renderFolders(folders, cfg = {}) {
     const containerTop = el('foldersContainerTop');
     const containerBottom = el('foldersContainerBottom');
     if (!folders || folders.length === 0) {
@@ -209,93 +213,64 @@ export function renderFolders(folders) {
         return;
     }
 
-    // Séparer favoris dossiers et collections
-    const favoriteFolders = folders.filter(f => 
-        FAVORITE_FOLDERS.some(fav => 
-            fav.type === 'folder' && (
-                fav.id.toString().toLowerCase() === f.id.toString().toLowerCase() || 
-                fav.id.toLowerCase() === f.name?.toLowerCase()
-            )
-        )
+    // Favoris = Sagas et thématiques favorites (Séries mises en vedette),
+    // telles que définies depuis l'admin (config.saga / config.featured_series,
+    // collections-visibility.json), remplace le 2026-09-25 l'ancienne liste
+    // FAVORITE_FOLDERS codée en dur. config.featured_series (pas config.series) :
+    // le sous-ensemble "vedette" (même source que le triptyque de l'accueil,
+    // js/home-sections.js), pas la liste complète des séries — trop nombreuses
+    // pour cette barre. Une Série est toujours une collection (jamais un dossier
+    // — voir mémoire project_content_model) ; une Saga est toujours un dossier
+    // réel de la hiérarchie — les sagas "vierges" (sans dossier, Option B) sont
+    // exclues ici : ce bouton ouvre un dossier via showFolder(), qui n'a rien à
+    // ouvrir pour une saga vierge.
+    const featuredSeriesIds = Object.keys(cfg.featured_series || {});
+    const favoriteSeries = allGalleries.filter(g =>
+        featuredSeriesIds.some(id => String(id) === String(g.id))
     );
-    
-    const favoriteCollections = allGalleries.filter(g => 
-        FAVORITE_FOLDERS.some(fav => 
-            fav.type === 'collection' && (
-                fav.id.toString() === g.id.toString() || 
-                fav.id.toLowerCase() === g.name?.toLowerCase()
-            )
-        )
-    );
+
+    const sagaIds = getAllSagaIds(cfg);
+    const favoriteSagas = sagaIds
+        .map(id => findNodeById(hierarchyData, id))
+        .filter(node => node && node.type === 'folder');
 
     // HTML pour tous les dossiers
     const allFoldersHtml = `
-        <div id="foldersList" style="display:flex; justify-content:center; flex-wrap:wrap; gap:16px; padding:20px;">
+        <div id="foldersList" class="folders-row gap-3 px-5 pb-5">
             ${folders.map(f => `
-                <button class="folder-link" data-id="${f.id}" data-name="${escapeHtml(f.name||'')}" data-type="folder"
-                    style="padding:8px 12px; border-radius:8px; border:none; background:rgba(255,255,255,0.06); color:white; cursor:pointer; transition: all 0.3s ease;"
-                    onmouseover="this.style.background='rgba(255,255,255,0.15)'; this.style.transform='translateY(-2px)'; this.style.boxShadow='0 4px 12px rgba(0,0,0,0.3)';"
-                    onmouseout="this.style.background='rgba(255,255,255,0.06)'; this.style.transform='translateY(0)'; this.style.boxShadow='none';">
+                <button class="folder-link py-2 px-3" data-id="${f.id}" data-name="${escapeHtml(f.name||'')}" data-type="folder">
                     📂 ${escapeHtml(f.name)}
                 </button>
             `).join('')}
         </div>
     `;
 
-    // HTML pour les favoris (dossiers + collections) avec icônes personnalisées
-    const favoritesHtml = (favoriteFolders.length > 0 || favoriteCollections.length > 0) ? `
-        <div id="favoritesList" style="display:flex; justify-content:center; flex-wrap:wrap; gap:10px;">
-            ${favoriteFolders.map(f => {
-                const favConfig = FAVORITE_FOLDERS.find(fav => 
-                    fav.type === 'folder' && (
-                        fav.id.toString().toLowerCase() === f.id.toString().toLowerCase() || 
-                        fav.id.toLowerCase() === f.name?.toLowerCase()
-                    )
-                );
-                const icon = favConfig?.icon || '📂';
-                const displayName = favConfig?.name || f.name;
-                
-                return `
-                    <button class="favorite-item" data-id="${f.id}" data-name="${escapeHtml(f.name||'')}" data-type="folder"
-                        style="padding:12px 16px; border-radius:8px; border:none; background:rgba(255,255,255,0.06); color:white; cursor:pointer; transition: all 0.3s ease;"
-                        onmouseover="this.style.background='rgba(255,255,255,0.15)'; this.style.transform='translateY(-2px)'; this.style.boxShadow='0 4px 12px rgba(0,0,0,0.3)';"
-                        onmouseout="this.style.background='rgba(255,255,255,0.06)'; this.style.transform='translateY(0)'; this.style.boxShadow='none';">
-                        ${icon} ${escapeHtml(displayName)}
-                    </button>
-                `;
-            }).join('')}
-            ${favoriteCollections.map(c => {
-                const favConfig = FAVORITE_FOLDERS.find(fav => 
-                    fav.type === 'collection' && (
-                        fav.id.toString() === c.id.toString() || 
-                        fav.id.toLowerCase() === c.name?.toLowerCase()
-                    )
-                );
-                const icon = favConfig?.icon || '🎨';
-                const displayName = favConfig?.name || c.name;
-                
-                return `
-                    <button class="favorite-item" data-id="${c.id}" data-name="${escapeHtml(c.name||'')}" data-type="collection"
-                        style="padding:12px 16px; border-radius:8px; border:none; background:rgba(255,255,255,0.06); color:white; cursor:pointer; transition: all 0.3s ease;"
-                        onmouseover="this.style.background='rgba(255,255,255,0.15)'; this.style.transform='translateY(-2px)'; this.style.boxShadow='0 4px 12px rgba(0,0,0,0.3)';"
-                        onmouseout="this.style.background='rgba(255,255,255,0.06)'; this.style.transform='translateY(0)'; this.style.boxShadow='none';">
-                        ${icon} ${escapeHtml(displayName)}
-                    </button>
-                `;
-            }).join('')}
+    // HTML pour les favoris (Séries + Sagas)
+    const favoritesHtml = (favoriteSeries.length > 0 || favoriteSagas.length > 0) ? `
+        <div id="favoritesList" class="folders-row gap-3 px-5 pb-5">
+            ${favoriteSeries.map(c => `
+                <button class="favorite-item py-3 px-4" data-id="${c.id}" data-name="${escapeHtml(c.name||'')}" data-type="collection">
+                    🗂️ ${escapeHtml(c.name)}
+                </button>
+            `).join('')}
+            ${favoriteSagas.map(f => `
+                <button class="favorite-item py-3 px-4" data-id="${f.id}" data-name="${escapeHtml(f.name||'')}" data-type="folder">
+                    ✈️ ${escapeHtml(f.name)}
+                </button>
+            `).join('')}
         </div>
     ` : '';
-    
+
     // Afficher les favoris en haut
     if (containerTop) {
-        containerTop.innerHTML = (favoriteFolders.length > 0 || favoriteCollections.length > 0) 
-            ? `<div style="color:white; margin-bottom:16px; font-weight:normal;">Quelques thèmes favoris</div>${favoritesHtml}`
+        containerTop.innerHTML = (favoriteSeries.length > 0 || favoriteSagas.length > 0)
+            ? favoritesHtml
             : '';
     }
-    
+
     // Afficher toutes les catégories en bas
     if (containerBottom) {
-        containerBottom.innerHTML = `<div style="color:white; margin-bottom:16px; font-weight:normal;">Toutes les catégories :</div>${allFoldersHtml}`;
+        containerBottom.innerHTML = `<div class="folders-heading mb-4">Toutes les catégories :</div>${allFoldersHtml}`;
     }
 
     // Fonction pour gérer le clic selon le type
@@ -310,7 +285,7 @@ export function renderFolders(folders) {
         
         // Ajouter le spinner
         btn.innerHTML = `
-            <div style="display: flex; align-items: center; gap: 8px;">
+            <div style="display: flex; align-items: center; gap: var(--space-8);">
                 <div style="width: 16px; height: 16px; border: 2px solid rgba(255,255,255,0.3); border-top: 2px solid white; border-radius: 50%; animation: spin 1s linear infinite;"></div>
                 ${originalContent}
             </div>
@@ -417,7 +392,7 @@ export async function showFolder(folderId, folderName) {
     if (existing) existing.remove();
     const container = el('galleriesContainer');
     if (container) {
-        container.insertAdjacentHTML('afterend', `<div id="backToAll" style="margin:20px; padding:20px; text-align:center;"><a href="#" onclick="window.displayCollectionsView();return false;" style="color:white; text-decoration:underline; font-size:16px;">← Retour à l'accueil</a></div>`);
+        container.insertAdjacentHTML('afterend', `<div id="backToAll" style="margin:var(--space-20); padding:var(--space-20); text-align:center;"><a href="#" onclick="window.displayCollectionsView();return false;" style="color:white; text-decoration:underline; font-size:16px;">← Retour à l'accueil</a></div>`);
     }
     
     // Scroll down vers les galeries après un petit délai
@@ -510,6 +485,6 @@ export function selectGallery(selectedCollection) {
     if (existing) existing.remove();
     const container = el('galleriesContainer');
     if (container) {
-        container.insertAdjacentHTML('afterend', `<div id="backToAll" style="margin:20px; padding:20px; text-align:center;"><a href="#" onclick="window.displayCollectionsView();return false;" style="color:white; text-decoration:underline; font-size:16px;">← Retour à l'accueil</a></div>`);
+        container.insertAdjacentHTML('afterend', `<div id="backToAll" style="margin:var(--space-20); padding:var(--space-20); text-align:center;"><a href="#" onclick="window.displayCollectionsView();return false;" style="color:white; text-decoration:underline; font-size:16px;">← Retour à l'accueil</a></div>`);
     }
 }

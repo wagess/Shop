@@ -1,27 +1,7 @@
 # Skill : design-critique
 
-## Objectif
-Identifier les problèmes Design et UX de l'application.
+Skill actif — implémenté dans `~/.claude/skills/design-critique/SKILL.md` (niveau utilisateur, comme `triptyque`).
 
-## Méthode
-1. Comprendre l'objectif de la page
-2. Identifier l'utilisateur
-3. Analyser la hiérarchie
-4. Analyser la navigation
-5. Examiner le contenu
-6. Identifier les frictions
-7. Évaluer la gravité
-8. Formuler des hypothèses
+Lancement : `/design-critique`
 
-## Règles
-- Ne pas proposer de solution avant le diagnostic.
-- Distinguer faits et hypothèses.
-- Prioriser les problèmes à fort impact.
-
-## Sortie
-Pour chaque problème :
-- problème
-- évidence
-- impact
-- sévérité
-- hypothèse
+Objectif : vérifier la cohérence du design et de l'UX avec le design system Sigma (Desktop/Mobile, priorité light mode et responsive), sans proposer de solution avant le diagnostic.

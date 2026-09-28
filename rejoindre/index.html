@@ -5,7 +5,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Rejoindre — Stéphane Wagner</title>
     <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>📸</text></svg>">
+    <link rel="stylesheet" href="../assets/styles/styles.css">
+    <link rel="stylesheet" href="../assets/styles/components/triptyque.css">
     <style>
+        /* Reset universel : même exception que reset.css (racine du site). */
         *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
         body {
@@ -27,11 +30,13 @@
             transform: scale(1.05);
         }
 
-        /* Header */
+        /* Header — sélecteur d'élément <header>, absent du HTML de cette page
+           (le mount #site-header-mount est remplacé par un <nav>, pas un
+           <header> — vérifié) : règle morte, spacing laissé en CSS. */
         header {
             position: relative;
             z-index: 10;
-            padding: 28px 40px;
+            padding: var(--space-28) var(--space-40);
             display: flex;
             justify-content: space-between;
             align-items: center;
@@ -48,6 +53,7 @@
         header a:hover { color: #fff; }
 
         /* Contenu principal */
+        /* Spacing (py-10 px-5) posé en classe utilitaire sur le HTML. */
         main {
             position: relative;
             z-index: 10;
@@ -55,90 +61,96 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            padding: 40px 20px;
         }
 
+        /* Le footer partagé (.site-footer) est ajouté en JS après .main — sans
+           position/z-index explicite il est peint sous .bg (position:fixed,
+           z-index:0) et devient invisible. Même traitement que header/main. */
+        .site-footer {
+            position: relative;
+            z-index: 10;
+        }
+
+        /* Spacing (py-9 px-6 md:py-13 md:px-12, breakpoint aligné à 700px,
+           ex-580px) posé en classe utilitaire sur le HTML. */
         .card {
             background: rgba(0,0,0,0.55);
             backdrop-filter: blur(20px);
             border: 1px solid rgba(255,255,255,0.08);
             border-radius: 4px;
-            padding: 56px 52px;
             max-width: 520px;
             width: 100%;
             text-align: center;
         }
 
+        /* Spacing (mb-6) posé en classe utilitaire sur le HTML. */
         .eyebrow {
             font-family: sans-serif;
             font-size: 11px;
             letter-spacing: 3px;
             text-transform: uppercase;
-            color: #57ad9d;
-            margin-bottom: 24px;
+            color: #C9B8A8;
         }
 
+        /* Spacing (mb-5) posé en classe utilitaire sur le HTML. */
         h1 {
             font-size: clamp(1.6rem, 4vw, 2.2rem);
             font-weight: 400;
             line-height: 1.3;
-            margin-bottom: 20px;
             color: #fff;
         }
 
+        /* Spacing (mb-10) posé en classe utilitaire sur le HTML. */
         .subtitle {
             font-family: sans-serif;
             font-size: 14px;
             line-height: 1.7;
             color: rgba(255,255,255,0.65);
-            margin-bottom: 40px;
         }
 
-        /* Avantages */
+        /* Avantages — spacing (gap-3 mb-10) posé en classe utilitaire sur
+           le HTML. */
         .perks {
             display: flex;
             flex-direction: column;
-            gap: 12px;
-            margin-bottom: 40px;
             text-align: left;
         }
 
+        /* Spacing (gap-3) posé en classe utilitaire sur le HTML. */
         .perk {
             display: flex;
             align-items: flex-start;
-            gap: 12px;
             font-family: sans-serif;
             font-size: 13px;
             color: rgba(255,255,255,0.75);
             line-height: 1.5;
         }
 
+        /* Spacing (mt-1) posé en classe utilitaire sur le HTML. */
         .perk-icon {
             flex-shrink: 0;
             width: 20px;
             height: 20px;
-            background: rgba(87,173,157,0.2);
+            background: rgba(107,78,61,0.35);
             border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
-            color: #57ad9d;
+            color: #C9B8A8;
             font-size: 10px;
-            margin-top: 2px;
         }
 
-        /* Formulaire */
+        /* Formulaire — spacing (gap-3 mb-4) posé en classe utilitaire sur
+           le HTML. */
         .form-group {
             display: flex;
             flex-direction: column;
-            gap: 12px;
-            margin-bottom: 16px;
         }
 
+        /* Spacing (py-4 px-5) posé en classe utilitaire sur le HTML. */
         input[type="text"],
         input[type="email"] {
             width: 100%;
-            padding: 14px 18px;
             background: rgba(255,255,255,0.07);
             border: 1px solid rgba(255,255,255,0.12);
             border-radius: 3px;
@@ -152,14 +164,15 @@
         input::placeholder { color: rgba(255,255,255,0.35); }
 
         input:focus {
-            border-color: #57ad9d;
+            border-color: #C9B8A8;
             background: rgba(255,255,255,0.1);
         }
 
+        /* Spacing (p-4 — 15px arrondi à l'index 4/16px) posé en classe
+           utilitaire sur le HTML. */
         .btn-submit {
             width: 100%;
-            padding: 15px;
-            background: #57ad9d;
+            background: #6B4E3D;
             color: #fff;
             border: none;
             border-radius: 3px;
@@ -172,9 +185,9 @@
         }
 
         .btn-submit:hover {
-            background: #4a9a8c;
+            background: #51392C;
             transform: translateY(-1px);
-            box-shadow: 0 6px 20px rgba(87,173,157,0.35);
+            box-shadow: 0 6px 20px rgba(107,78,61,0.35);
         }
 
         .btn-submit:disabled {
@@ -183,40 +196,39 @@
             transform: none;
         }
 
+        /* Spacing (mt-3) posé en classe utilitaire sur le HTML. */
         .form-note {
             font-family: sans-serif;
             font-size: 11px;
             color: rgba(255,255,255,0.35);
-            margin-top: 12px;
             line-height: 1.5;
         }
 
-        /* Messages de retour */
+        /* Messages de retour — spacing (py-4 px-5 mt-4) posé en classe
+           utilitaire sur le HTML. */
         .msg {
             display: none;
-            padding: 14px 18px;
             border-radius: 3px;
             font-family: sans-serif;
             font-size: 13px;
-            margin-top: 16px;
         }
         .msg-success {
-            background: rgba(87,173,157,0.15);
-            border: 1px solid rgba(87,173,157,0.3);
-            color: #7ecfc3;
+            background: rgba(107,78,61,0.15);
+            border: 1px solid rgba(107,78,61,0.3);
+            color: #C9B8A8;
         }
         .msg-error {
-            background: rgba(220,80,80,0.12);
-            border: 1px solid rgba(220,80,80,0.25);
-            color: #e87878;
+            background: rgba(255,255,255,0.08);
+            border: 1px solid rgba(255,255,255,0.2);
+            color: rgba(255,255,255,0.85);
         }
 
-        /* Diviseur */
+        /* Diviseur — spacing (my-8 mx-auto) posé en classe utilitaire sur
+           le HTML. */
         .divider {
             width: 40px;
             height: 1px;
             background: rgba(255,255,255,0.15);
-            margin: 32px auto;
         }
 
         /* Compteur abonnés */
@@ -230,9 +242,9 @@
             color: rgba(255,255,255,0.7);
         }
 
+        /* header : règle morte, voir plus haut. */
         @media (max-width: 580px) {
-            .card { padding: 36px 24px; }
-            header { padding: 20px 24px; }
+            header { padding: var(--space-20) var(--space-24); }
         }
     </style>
 </head>
@@ -240,62 +252,64 @@
 
     <div class="bg"></div>
 
-    <header>
-        <img src="../assets/svg/Stéphane Wagner.svg" alt="Stéphane Wagner" style="height:28px; filter:invert(1) opacity(0.8);">
-        <a href="../index.html">← Retour au shop</a>
-    </header>
+    <div id="site-header-mount"></div>
 
-    <main>
-        <div class="card">
+    <main class="py-10 px-5">
+        <div class="card py-9 px-6 md:py-13 md:px-12">
 
-            <p class="eyebrow">Infolettre</p>
+            <p class="eyebrow mb-6">Infolettre</p>
 
-            <h1>Recevez mes photos<br>avant tout le monde</h1>
+            <h1 class="mb-5">Recevez mes photos<br>avant tout le monde</h1>
 
-            <p class="subtitle">
+            <p class="subtitle mb-10">
                 Nouvelles séries, coulisses, tirages disponibles —<br>
                 directement dans votre boîte de réception.
             </p>
 
-            <div class="perks">
-                <div class="perk">
-                    <div class="perk-icon">✓</div>
+            <div class="perks gap-3 mb-10">
+                <div class="perk gap-3">
+                    <div class="perk-icon mt-1">✓</div>
                     <span>Accès en avant-première aux nouvelles collections</span>
                 </div>
-                <div class="perk">
-                    <div class="perk-icon">✓</div>
+                <div class="perk gap-3">
+                    <div class="perk-icon mt-1">✓</div>
                     <span>Coulisses et histoires derrière chaque série</span>
                 </div>
-                <div class="perk">
-                    <div class="perk-icon">✓</div>
+                <div class="perk gap-3">
+                    <div class="perk-icon mt-1">✓</div>
                     <span>Offres exclusives sur les tirages d'art</span>
                 </div>
             </div>
 
             <form id="signupForm">
-                <div class="form-group">
-                    <input type="text" id="fname" placeholder="Votre prénom (optionnel)" autocomplete="given-name">
-                    <input type="email" id="email" placeholder="Votre adresse courriel" required autocomplete="email">
+                <div class="form-group gap-3 mb-4">
+                    <input type="text" id="fname" class="py-4 px-5" placeholder="Votre prénom (optionnel)" autocomplete="given-name">
+                    <input type="email" id="email" class="py-4 px-5" placeholder="Votre adresse courriel" required autocomplete="email">
                 </div>
                 <!-- Honeypot anti-spam Mailchimp -->
                 <div style="position:absolute;left:-5000px;" aria-hidden="true">
                     <input type="text" id="mc-honeypot" name="b_9e13300aa07c637eb257e4db1_185ed965aa" tabindex="-1" value="">
                 </div>
-                <button type="submit" class="btn-submit" id="submitBtn">Rejoindre la liste</button>
-                <div class="form-note">
+                <button type="submit" class="btn-submit p-4" id="submitBtn">Rejoindre la liste</button>
+                <div class="form-note mt-3">
                     Aucun spam. Désabonnement en un clic. Fréquence : une photo à la fois.
                 </div>
-                <div class="msg msg-success" id="msgSuccess"></div>
-                <div class="msg msg-error" id="msgError"></div>
+                <div class="msg msg-success py-4 px-5 mt-4" id="msgSuccess"></div>
+                <div class="msg msg-error py-4 px-5 mt-4" id="msgError"></div>
             </form>
 
-            <div class="divider"></div>
+            <div class="divider my-8 mx-auto"></div>
 
             <p class="social-proof">Rejoignez <strong>469 abonnés</strong> qui reçoivent déjà l'infolettre.</p>
 
         </div>
     </main>
 
+    <!-- ===== FOOTER NAVIGATION ===== -->
+    <div id="site-footer-mount"></div>
+
+    <script src="../js/triptyque.js"></script>
+    <script type="module" src="../js/app.js"></script>
     <script>
         const form = document.getElementById('signupForm');
         const submitBtn = document.getElementById('submitBtn');
