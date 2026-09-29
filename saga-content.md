@@ -92,3 +92,18 @@ mes meilleurs voyages
 
 ---
 
+## [custom-1790649408404]
+
+[nom] voyages voyeur
+[format] Canon 5D
+[periode] 
+[lieu] Monde
+[couleur] blue
+[description]
+Immersions exploratoires et scènes de voyages.
+
+[note]
+Je flirte entre le documentaire et le témoignage anonyme.
+
+---
+
