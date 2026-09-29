@@ -3,7 +3,6 @@ wplr-iptc-keywords.php
 .env
 node_modules/
 docs/skills.md
-collections-visibility.json
 shutterstock-callback/
 shutterstock/
 infolettre/.hierarchy-cache.json

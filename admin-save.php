@@ -4,6 +4,8 @@ header('Access-Control-Allow-Origin: *');
 header('Access-Control-Allow-Methods: POST, GET');
 header('Access-Control-Allow-Headers: Content-Type');
 
+require __DIR__ . '/admin-guard.php';
+
 $file = __DIR__ . '/collections-visibility.json';
 
 if ($_SERVER['REQUEST_METHOD'] === 'GET') {
@@ -12,6 +14,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
 }
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    require_local_write();
     $body = file_get_contents('php://input');
     $data = json_decode($body, true);
     if ($data === null) {
