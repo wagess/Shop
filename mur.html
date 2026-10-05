@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="robots" content="noindex, nofollow">
+    <title>Mur virtuel (prototype) — Stéphane Wagner</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,500;1,400;1,500&amp;family=DM+Sans:wght@400;500&amp;display=swap">
+    <link rel="stylesheet" href="./assets/styles/styles.css">
+    <link rel="stylesheet" href="./assets/styles/pages/accueil.css">
+    <link rel="stylesheet" href="./assets/styles/pages/mur.css">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>📸</text></svg>">
+</head>
+<body class="ac-page mur-page">
+
+    <div id="site-header-mount"></div>
+
+    <header class="mur-intro py-13 px-6 md:py-16">
+        <p class="ac-eyebrow m-0">Prototype — non listé</p>
+        <h1 class="m-0">Le mur</h1>
+        <p class="mur-intro__text m-0">Une exploration : la photothèque accrochée comme un mur de cadres, plutôt que rangée en grille. Idée en test, pas encore une page du site.</p>
+    </header>
+
+    <main class="mur-wall px-6 pb-16 md:px-10" id="murWall">
+        <div class="loading" id="murLoading">
+            <div class="spinner"></div>
+            Accrochage des cadres…
+        </div>
+    </main>
+
+    <div class="mur-viewer" id="murViewer" hidden>
+        <button type="button" class="mur-viewer__close" id="murViewerClose" aria-label="Fermer">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M6 6L18 18M18 6L6 18" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+        </button>
+        <figure class="mur-viewer__figure">
+            <img id="murViewerImg" alt="">
+            <figcaption id="murViewerCaption"></figcaption>
+        </figure>
+    </div>
+
+    <div id="site-footer-mount"></div>
+
+    <script type="module" src="js/mur-page.js"></script>
+    <script type="module" src="js/app.js"></script>
+</body>
+</html>

@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="robots" content="noindex, nofollow">
+    <title>Prévisualisation — Shop sheet (prototype)</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,500;1,400;1,500&amp;family=DM+Sans:wght@400;500&amp;display=swap">
+    <link rel="stylesheet" href="./assets/styles/styles.css">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🧪</text></svg>">
+</head>
+<body class="ac-page">
+
+    <div id="site-header-mount"></div>
+
+    <main class="container mx-auto py-16 px-6" style="max-width: 640px;">
+        <p class="ac-eyebrow m-0">Prototype — non listé, non branché</p>
+        <h1 class="mt-2">Shop sheet</h1>
+        <p class="mt-4" style="color: var(--color-text-secondary);">
+            Prévisualisation du shell de modale shop construit depuis Figma
+            (<code>vDYe0oWfzs4InGstvpCxBk</code>, node 69:632). Le contenu du
+            module shop n'est pas branché — cette page sert uniquement à voir
+            et tester le shell (handle, retour, titre, fermer).
+        </p>
+
+        <div class="mt-8" style="display: flex; flex-direction: column; gap: 12px; align-items: flex-start;">
+            <button type="button" class="btn-primary" id="openDefault">Ouvrir — par défaut</button>
+            <button type="button" class="btn-secondary" id="openNoBack">Ouvrir — sans retour, sans handle</button>
+            <button type="button" class="btn-secondary" id="openNoTitle">Ouvrir — sans titre</button>
+        </div>
+    </main>
+
+    <div id="site-footer-mount"></div>
+
+    <script type="module">
+        import { openShopSheet } from './js/components/shop-sheet.js';
+
+        document.getElementById('openDefault').addEventListener('click', () => {
+            openShopSheet({ title: 'Modal Title' });
+        });
+        document.getElementById('openNoBack').addEventListener('click', () => {
+            openShopSheet({ title: 'Sans retour ni handle', leftAction: false, showHandle: false });
+        });
+        document.getElementById('openNoTitle').addEventListener('click', () => {
+            openShopSheet({ showTitle: false });
+        });
+    </script>
+    <script type="module" src="js/app.js"></script>
+</body>
+</html>
