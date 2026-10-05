@@ -20,13 +20,15 @@ async function getFeaturedSeriesIds() {
     return entries.map(([id]) => id);
 }
 
-async function renderSeriesCards(collections) {
+async function renderSeriesCards(hierarchy, collections) {
     const grid = el('seriesCardsGrid');
     if (!grid) return;
 
-    const [featuredIds, seriesContent] = await Promise.all([
+    const [featuredIds, seriesContent, cfg, sagaContent] = await Promise.all([
         getFeaturedSeriesIds(),
         getSeriesContent(),
+        getSiteConfig(),
+        getSagaContent(),
     ]);
 
     // Triptyque : les 3 premières séries mises en avant depuis l'admin,
@@ -41,7 +43,7 @@ async function renderSeriesCards(collections) {
         return;
     }
 
-    const cards = await buildSeriesCards(picks, seriesContent);
+    const cards = await buildSeriesCards(picks, seriesContent, { hierarchy, cfg, sagaContent });
     grid.innerHTML = cards.map(c => seriesCardHTML(c, { flex: c.index === 1 ? 1.5 : 1, large: c.index === 1 })).join('');
 }
 
@@ -71,7 +73,20 @@ async function renderShopMedia() {
         if (!img) return;
         try {
             const photos = await fetchGalleryPhotos(collectionId);
-            if (photos[0]) img.src = photoUrl(photos[0]);
+            const photo = photos[0];
+            if (!photo) return;
+            img.src = photoUrl(photo);
+
+            // Rebranche le CTA "shop-modal-btn" (placeholder vers la
+            // photothèque par défaut, voir shop-card.js) sur le vrai
+            // formulaire de commande pour cette photo précise, une fois
+            // qu'elle est chargée.
+            const ctaBtn = mediaEl.closest('shop-card')?.querySelector('.ac-shop-card__cta');
+            if (ctaBtn) {
+                const title = photo.title || photo.name || '';
+                const url = photoUrl(photo);
+                ctaBtn.onclick = () => window.orderPrint(title, url, photo.id);
+            }
         } catch (err) {
             console.error('Erreur chargement photo boutique', collectionId, err);
         }
@@ -88,7 +103,7 @@ async function init() {
         const hierarchy = await fetchHierarchy();
         const collections = flattenCollections(hierarchy);
         await Promise.all([
-            renderSeriesCards(collections),
+            renderSeriesCards(hierarchy, collections),
             renderSpotlights(hierarchy, collections),
             renderShopMedia(),
         ]);

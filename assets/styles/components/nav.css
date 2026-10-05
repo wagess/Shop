@@ -80,16 +80,10 @@
 }
 
 /* Même garde de spécificité que .ac-nav__link ci-dessus. */
-.ac-nav .ac-nav__shop,
 .ac-nav .ac-nav__newsletter {
   color: var(--color-text-primary);
 }
 
-/* Position relative pour ancrer le badge .triptyque-cart__badge
-   (assets/styles/components/triptyque.css). */
-.ac-nav__shop {
-  position: relative;
-}
 .ac-nav .ac-nav__newsletter:hover { color: var(--color-text-secondary); }
 
 @media (max-width: 900px) {

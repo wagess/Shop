@@ -19,12 +19,17 @@
  *                         pas de media-id
  *   cta                — libellé du bouton
  *   cta-icon            (booléen) — ajoute l'icône cercle au bouton
- *   print-btn           (booléen) — ajoute data-role="print-btn" (ouvre la
- *                         modale Impression, voir home-sections.js)
+ *   shop-modal-btn       (booléen) — ouvre le formulaire de commande
+ *                         (window.orderPrint) pour la photo affichée dans le
+ *                         média de la carte (media-id) ; repose sur
+ *                         home-sections.js:renderShopMedia, qui réassigne ce
+ *                         CTA une fois la photo chargée — valeur par défaut
+ *                         (avant chargement, ou si pas de media-id) : renvoie
+ *                         vers la photothèque (MVP simplifié 2026-10-05)
  *   disabled            (booléen) — bouton désactivé, style secondaire
  *
  * Usage :
- *   <shop-card heading="Tirages d'art" media-id="73" badge="…" cta="Commander un tirage" cta-icon print-btn>
+ *   <shop-card heading="Tirages d'art" media-id="73" badge="…" cta="Commander un tirage" cta-icon shop-modal-btn>
  *     <dl class="ac-shop-card__prices">…</dl>
  *   </shop-card>
  */
@@ -41,7 +46,7 @@ class ShopCard extends HTMLElement {
         const placeholderText = this.getAttribute('placeholder-text') || '';
         const cta = this.getAttribute('cta') || '';
         const hasCtaIcon = this.hasAttribute('cta-icon');
-        const isPrintBtn = this.hasAttribute('print-btn');
+        const isShopModalBtn = this.hasAttribute('shop-modal-btn');
         const isDisabled = this.hasAttribute('disabled');
 
         // Contenu variable (liste de prix ou description+note) déjà déclaré
@@ -81,7 +86,7 @@ class ShopCard extends HTMLElement {
         ctaBtn.type = 'button';
         ctaBtn.className = `${isDisabled ? 'btn-secondary gap-2 py-4 px-8' : 'btn-soft gap-2 py-0 pr-4 pl-6'} ac-shop-card__cta mt-auto`;
         if (isDisabled) ctaBtn.disabled = true;
-        if (isPrintBtn) ctaBtn.dataset.role = 'print-btn';
+        if (isShopModalBtn) ctaBtn.onclick = () => { window.location.href = '/phototheque.html'; };
         const ctaLabel = document.createElement('span');
         ctaLabel.textContent = cta;
         ctaBtn.appendChild(ctaLabel);

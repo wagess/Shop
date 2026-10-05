@@ -2,12 +2,7 @@ import { el, escapeHtml, escapeJs } from './utils.js';
 import { fetchGalleryPhotos, fetchPhotoKeywords, sendOrderEmail } from './api.js';
 import { createButton } from './components/button.js';
 import { createBottomActionBar } from './components/bottom-action-bar.js';
-
-const HEART_OUTLINE = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>`;
-const HEART_FILLED  = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>`;
-
-window.HEART_OUTLINE = HEART_OUTLINE;
-window.HEART_FILLED  = HEART_FILLED;
+import { openShopSheet, closeShopSheet } from './components/shop-sheet.js';
 
 export async function openGallery(galleryId, galleryName) {
     const modal = el('photosModal');
@@ -64,8 +59,6 @@ export async function displayPhotos(photos, gridEl = null) {
         const kws = collectKeywords(photo);
         const kwsHtml = kws.length ? renderKeywordsLimited(kws) : `<span style="color:#999; font-size:12px;">Chargement mots-clés...</span>`;
 
-        const alreadySelected = (typeof triptyqueGet === 'function') ? triptyqueGet().some(p => p.id === photo.id) : false;
-
         return `
     <div class="photo-card" id="photo-card-${photo.id}">
         <img src="${escapeHtml(imgUrl)}" alt="${escapeHtml(title)}" class="photo-img"
@@ -78,8 +71,7 @@ export async function displayPhotos(photos, gridEl = null) {
             <div class="photo-actions gap-2"
                  data-order-target="${photo.id}"
                  data-order-title="${escapeHtml(title)}"
-                 data-order-url="${escapeHtml(imgUrl)}"
-                 data-triptyque-selected="${alreadySelected}">
+                 data-order-url="${escapeHtml(imgUrl)}">
             </div>
         </div>
     </div>
@@ -92,39 +84,20 @@ export async function displayPhotos(photos, gridEl = null) {
         const photoId  = actionsEl.dataset.orderTarget;
         const title    = actionsEl.dataset.orderTitle;
         const imgUrl   = actionsEl.dataset.orderUrl;
-        const selected = actionsEl.dataset.triptyqueSelected === 'true';
 
-        // Bouton "Commander une impression"
+        // Bouton "Commander une impression" — ouvre directement le
+        // formulaire de commande par courriel (orderPrint), sans étape
+        // intermédiaire (MVP simplifié, 2026-10-05 : plus de panier).
         const orderBtn = createButton({
             label: 'Commander une impression',
             variant: 'primary',
             size: 'md',
             onClick: (e) => {
                 e.stopPropagation();
-                window.openShopModal({ mode: 'unique', photo: { id: photoId, title, url: imgUrl } });
+                window.orderPrint(title, imgUrl, photoId);
             },
         });
         actionsEl.appendChild(orderBtn);
-
-        // Bouton wishlist triptyque (cœur)
-        const heartBtn = createButton({
-            label:     selected ? 'Retirer du triptyque' : 'Ajouter au triptyque',
-            variant:   selected ? 'primary' : 'secondary',
-            size:      'sm',
-            labelType: 'icon-only',
-            icon:      selected ? HEART_FILLED : HEART_OUTLINE,
-            className: 'triptyque-wish-btn',
-        });
-        heartBtn.id = `triptyque-btn-${photoId}`;
-        heartBtn.dataset.photoId    = photoId;
-        heartBtn.dataset.photoTitle = title;
-        heartBtn.dataset.photoUrl   = imgUrl;
-        if (selected) heartBtn.classList.add('triptyque-add-btn--selected');
-        heartBtn.addEventListener('click', (e) => {
-            e.stopPropagation();
-            window.toggleTriptyquePhoto(heartBtn);
-        });
-        actionsEl.appendChild(heartBtn);
     });
 
     await Promise.allSettled(photos.map(async photo => {
@@ -264,31 +237,24 @@ export function orderPrint(title, imageUrl, photoId) {
     showOrderForm(title, imageUrl, photoId);
 }
 
+// Shell .shop-sheet depuis le 2026-10-04 (demande PO : "utiliser ce layout
+// comme modèle pour toutes les modales", voir idees.md) — remplace l'ancien
+// .order-overlay/.order-modal. Mécaniques internes (étapes, transitions,
+// sélection format/papier, soumission) inchangées ; seul le chrome (overlay,
+// boîte centrée → tiroir ancré en bas, bouton retour/fermer) change. Les
+// pastilles d'étape (.order-steps) restent dans le corps de la modale — le
+// shell n'a qu'un slot de titre texte, pas de place pour un indicateur
+// personnalisé.
 function showOrderForm(title, imageUrl, photoId) {
-    document.getElementById('orderFormOverlay')?.remove();
+    const { sheet, body } = openShopSheet({ title: 'Commander une impression', leftAction: true });
+    const closeForm = closeShopSheet;
 
-    const overlay = document.createElement('div');
-    overlay.id = 'orderFormOverlay';
-    overlay.className = 'order-overlay p-5';
-    overlay.innerHTML = `
-        <div class="order-modal" role="dialog" aria-modal="true" aria-label="Commander une impression">
-
-            <div class="order-modal__header px-5 pt-5">
-                <button class="order-modal__back p-2" id="orderBackBtn" aria-label="Retour" style="visibility:hidden">
-                    <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
-                        <path d="M12.7071 4.29289C13.0976 4.68342 13.0976 5.31658 12.7071 5.70711L8.41421 10L12.7071 14.2929C13.0976 14.6834 13.0976 15.3166 12.7071 15.7071C12.3166 16.0976 11.6834 16.0976 11.2929 15.7071L6.29289 10.7071C5.90237 10.3166 5.90237 9.68342 6.29289 9.29289L11.2929 4.29289C11.6834 3.90237 12.3166 3.90237 12.7071 4.29289Z"/>
-                    </svg>
-                </button>
-                <div class="order-steps gap-2">
-                    <span class="order-step order-step--active" id="orderStep1Dot"></span>
-                    <span class="order-step" id="orderStep2Dot"></span>
-                    <span class="order-step" id="orderStep3Dot"></span>
-                </div>
-                <button class="order-modal__close p-2" id="closeOrderForm" aria-label="Fermer">
-                    <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
-                        <path d="M10 8.58579L14.2929 4.29289C14.6834 3.90237 15.3166 3.90237 15.7071 4.29289C16.0976 4.68342 16.0976 5.31658 15.7071 5.70711L11.4142 10L15.7071 14.2929C16.0976 14.6834 16.0976 15.3166 15.7071 15.7071C15.3166 16.0976 14.6834 16.0976 14.2929 15.7071L10 11.4142L5.70711 15.7071C5.31658 16.0976 4.68342 16.0976 4.29289 15.7071C3.90237 15.3166 3.90237 14.6834 4.29289 14.2929L8.58579 10L4.29289 5.70711C3.90237 5.31658 3.90237 4.68342 4.29289 4.29289C4.68342 3.90237 5.31658 3.90237 5.70711 4.29289L10 8.58579Z"/>
-                    </svg>
-                </button>
+    body.innerHTML = `
+        <div class="shop-sheet__content shop-sheet__content--narrow">
+            <div class="order-steps gap-2 px-5 pt-5" id="orderSteps">
+                <span class="order-step order-step--active" id="orderStep1Dot"></span>
+                <span class="order-step" id="orderStep2Dot"></span>
+                <span class="order-step" id="orderStep3Dot"></span>
             </div>
 
             <div class="order-modal__preview gap-4 p-5">
@@ -383,19 +349,15 @@ function showOrderForm(title, imageUrl, photoId) {
 
             </div>
 
-            <div id="orderBarMount" class="mt-auto"></div>
+            <div id="orderBarMount"></div>
         </div>
     `;
-    document.body.appendChild(overlay);
-    requestAnimationFrame(() => overlay.classList.add('order-overlay--visible'));
 
-    function closeForm() {
-        overlay.classList.remove('order-overlay--visible');
-        overlay.addEventListener('transitionend', () => overlay.remove(), { once: true });
-    }
+    const backBtn = sheet.querySelector('[data-action="back"]');
+    if (backBtn) backBtn.style.visibility = 'hidden';
 
     function mountOrderBar(step) {
-        const mount = document.getElementById('orderBarMount');
+        const mount = body.querySelector('#orderBarMount');
         if (!mount) return;
         mount.innerHTML = '';
 
@@ -408,7 +370,7 @@ function showOrderForm(title, imageUrl, photoId) {
                 secondary: '← Retour',
                 onSecondary: () => goToStep(1),
                 actionLabel: 'Envoyer la commande',
-                onAction: () => document.getElementById('orderForm')?.requestSubmit(),
+                onAction: () => body.querySelector('#orderForm')?.requestSubmit(),
             },
             3: {
                 actionLabel: 'Fermer',
@@ -419,44 +381,38 @@ function showOrderForm(title, imageUrl, photoId) {
         mount.appendChild(createBottomActionBar(configs[step] || configs[1]));
     }
 
-    document.getElementById('closeOrderForm').addEventListener('click', closeForm);
-    overlay.addEventListener('click', e => { if (e.target === overlay) closeForm(); });
-
     // Sélection orientation (format-card)
-    overlay.querySelectorAll('.order-format-card input').forEach(input => {
+    body.querySelectorAll('.order-format-card input').forEach(input => {
         input.addEventListener('change', () => {
-            overlay.querySelectorAll(`.order-format-card input[name="${input.name}"]`)
-                   .forEach(r => r.closest('.order-format-card').classList.remove('order-format-card--selected'));
+            body.querySelectorAll(`.order-format-card input[name="${input.name}"]`)
+                .forEach(r => r.closest('.order-format-card').classList.remove('order-format-card--selected'));
             input.closest('.order-format-card').classList.add('order-format-card--selected');
         });
     });
 
     // Sélection chips (taille + finition — scopé par name)
-    overlay.querySelectorAll('.order-paper-chip input').forEach(input => {
+    body.querySelectorAll('.order-paper-chip input').forEach(input => {
         input.addEventListener('change', () => {
-            overlay.querySelectorAll(`.order-paper-chip input[name="${input.name}"]`)
-                   .forEach(r => r.closest('.order-paper-chip').classList.remove('order-paper-chip--selected'));
+            body.querySelectorAll(`.order-paper-chip input[name="${input.name}"]`)
+                .forEach(r => r.closest('.order-paper-chip').classList.remove('order-paper-chip--selected'));
             input.closest('.order-paper-chip').classList.add('order-paper-chip--selected');
         });
     });
 
-    // Retour étape 2 → 1 (bouton flèche dans le header)
-    document.getElementById('orderBackBtn').addEventListener('click', () => {
-        goToStep(1);
-    });
+    // Retour étape 2 → 1 (chevron du header, fourni par le shell)
+    backBtn?.addEventListener('click', () => goToStep(1));
 
     function goToStep(step) {
         const panels = [
-            document.getElementById('orderPanel1'),
-            document.getElementById('orderPanel2'),
-            document.getElementById('orderPanel3'),
+            body.querySelector('#orderPanel1'),
+            body.querySelector('#orderPanel2'),
+            body.querySelector('#orderPanel3'),
         ];
         const dots = [
-            document.getElementById('orderStep1Dot'),
-            document.getElementById('orderStep2Dot'),
-            document.getElementById('orderStep3Dot'),
+            body.querySelector('#orderStep1Dot'),
+            body.querySelector('#orderStep2Dot'),
+            body.querySelector('#orderStep3Dot'),
         ];
-        const backBtn = document.getElementById('orderBackBtn');
 
         const currentIndex = panels.findIndex(p => !p.classList.contains('order-step-panel--hidden'));
         const nextIndex = step - 1;
@@ -475,11 +431,11 @@ function showOrderForm(title, imageUrl, photoId) {
             requestAnimationFrame(() => {
                 requestAnimationFrame(() => next.classList.remove('order-step-panel--enter', 'order-step-panel--enter-reverse'));
             });
-            if (step === 2) document.getElementById('orderName')?.focus();
+            if (step === 2) body.querySelector('#orderName')?.focus();
         }, { once: true });
 
         dots.forEach((d, i) => d.classList.toggle('order-step--active', i === nextIndex));
-        backBtn.style.visibility = step === 2 ? 'visible' : 'hidden';
+        if (backBtn) backBtn.style.visibility = step === 2 ? 'visible' : 'hidden';
         mountOrderBar(step);
     }
 
@@ -487,14 +443,14 @@ function showOrderForm(title, imageUrl, photoId) {
     mountOrderBar(1);
 
     // Soumission
-    document.getElementById('orderForm').addEventListener('submit', async (e) => {
+    body.querySelector('#orderForm').addEventListener('submit', async (e) => {
         e.preventDefault();
-        const feedback = document.getElementById('orderFeedback');
-        const barBtn = document.querySelector('#orderBarMount .bottom-action-bar__btn');
+        const feedback = body.querySelector('#orderFeedback');
+        const barBtn = body.querySelector('#orderBarMount .bottom-action-bar__btn');
 
-        const orientation = overlay.querySelector('input[name="orientation"]:checked')?.value || '';
-        const taille      = overlay.querySelector('input[name="taille"]:checked')?.value || '';
-        const paper       = overlay.querySelector('input[name="paper"]:checked')?.value || '';
+        const orientation = body.querySelector('input[name="orientation"]:checked')?.value || '';
+        const taille      = body.querySelector('input[name="taille"]:checked')?.value || '';
+        const paper       = body.querySelector('input[name="paper"]:checked')?.value || '';
         const format      = `${orientation} — ${taille}`;
 
         if (barBtn) { barBtn.disabled = true; barBtn.textContent = 'Envoi en cours…'; }
@@ -514,7 +470,7 @@ function showOrderForm(title, imageUrl, photoId) {
                 photo_id: photoId,
                 photo_url: imageUrl,
             });
-            const confirmName = document.getElementById('orderConfirmName');
+            const confirmName = body.querySelector('#orderConfirmName');
             if (confirmName) confirmName.textContent = `Merci ${name}, votre demande a bien été reçue.`;
             goToStep(3);
         } catch (err) {

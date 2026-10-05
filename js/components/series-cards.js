@@ -76,7 +76,12 @@ export function getSagaDescendants(hierarchy, collections, cfg, sagaId) {
     return { folder, descendants: Array.from(descendantsById.values()) };
 }
 
-export async function buildSeriesCards(picks, seriesContent) {
+// saga: { hierarchy, cfg, sagaContent } — optionnel. Omis, les cartes
+// retombent sur la pastille noire (voir seriesColorIconHTML) plutôt que de
+// planter : les pages qui n'ont pas encore ces données sous la main gardent
+// un comportement correct.
+export async function buildSeriesCards(picks, seriesContent, saga = {}) {
+    const { hierarchy, cfg, sagaContent } = saga;
     return Promise.all(picks.map(async (c, i) => {
         let cover = '';
         try {
@@ -86,7 +91,10 @@ export async function buildSeriesCards(picks, seriesContent) {
             console.error('Erreur chargement série', c.name, err);
         }
         const fields = seriesContent[String(c.id)] || {};
-        return { id: c.id, name: c.name, count: c.count, index: i + 1, cover, periode: fields.periode || '' };
+        const couleur = (hierarchy && cfg && sagaContent)
+            ? getEffectiveSeriesColor(hierarchy, cfg, sagaContent, c.id)
+            : '';
+        return { id: c.id, name: c.name, count: c.count, index: i + 1, cover, periode: fields.periode || '', couleur };
     }));
 }
 
@@ -102,6 +110,44 @@ export function renderSkeletonCards(grid, count) {
 // Icône "cercle" — Figma vDYe0oWfzs4InGstvpCxBk, node I42:118;1045:5381
 // (asset 5d4cc10e-b076-4c95-8398-5b04b83f9786.svg), reproduite à l'identique.
 export const CIRCLE_ICON = '<svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg"><circle cx="10" cy="10" r="7.5" stroke="currentColor" stroke-width="1.5"/></svg>';
+
+// Même cercle, mais plein et coloré par la saga de la série (2026-10-03) —
+// seul le CTA "Voir la série" des cartes série est concerné, pas CIRCLE_ICON
+// ailleurs (Commander, Shop...). Couleur posée en CSS via [data-color]
+// (assets/styles/components/series-cards.css), pas en style inline — même
+// pattern que .ac-spotlight__dot[data-color] (pages/accueil.css). Pas de
+// couleur associée → fallback noir (règle de base de .series-card__cta-dot).
+function seriesColorIconHTML(couleur) {
+    const colorAttr = couleur ? ` data-color="${escapeHtml(couleur)}"` : '';
+    return `<svg class="series-card__cta-dot" width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg"${colorAttr}><circle cx="10" cy="10" r="7.5"/></svg>`;
+}
+
+// Dossier parent d'une collection dans la hiérarchie (null si à la racine,
+// undefined si la collection est introuvable) — même parcours récursif que
+// findFolderById, utilisé par getEffectiveSeriesColor ci-dessous.
+export function findParentFolderId(nodes, collectionId, parentId = null) {
+    for (const n of nodes || []) {
+        if (n.type === 'folder') {
+            const found = findParentFolderId(n.children, collectionId, n.id);
+            if (found !== undefined) return found;
+        } else if (String(n.id) === String(collectionId)) {
+            return parentId;
+        }
+    }
+    return undefined;
+}
+
+// Couleur effective d'une série via sa saga — même logique que
+// getEffectiveSagaColor() dans admin.html (source de vérité du modèle) :
+// priorité au rattachement manuel (cfg.collection_saga), sinon le dossier
+// physique parent s'il est lui-même une saga colorée (cfg.saga).
+export function getEffectiveSeriesColor(hierarchy, cfg, sagaContent, collectionId) {
+    const parentFolderId = findParentFolderId(hierarchy, collectionId) || null;
+    const manualSagaId = cfg.collection_saga && cfg.collection_saga[collectionId];
+    const sagaId = manualSagaId || ((parentFolderId && cfg.saga && cfg.saga[parentFolderId]) ? parentFolderId : null);
+    if (!sagaId) return '';
+    return (sagaContent[sagaId] || {}).couleur || '';
+}
 
 export function seriesCardHTML(c, { flex, large } = {}) {
     const style = flex ? ` style="flex:${flex};"` : '';
@@ -120,7 +166,7 @@ export function seriesCardHTML(c, { flex, large } = {}) {
                 <h3 class="series-card__title mt-2">${escapeHtml(c.name)}</h3>
                 <span class="btn-soft series-card__cta gap-2 py-0 pr-4 pl-6 mt-5">
                     Voir la série
-                    ${CIRCLE_ICON}
+                    ${seriesColorIconHTML(c.couleur)}
                 </span>
             </div>
         </a>

@@ -1,3 +1,13 @@
+/* ==================== Carte photothèque — actions ==================== */
+
+/* Spacing (gap-2) posé en classe utilitaire sur le HTML — voir js/modal.js. */
+.photo-actions {
+    display: flex;
+    align-items: center;
+}
+
+.photo-actions > button:first-child { flex: 1; }
+
 /* ==================== Modal ==================== */
 .photos-modal {
     display: none;
@@ -48,46 +58,13 @@
     transform: scale(1.05);
 }
 
-/* ==================== Order Form Overlay ==================== */
-/* Spacing (p-5) posé en classe utilitaire sur le HTML — voir js/modal.js. */
-.order-overlay {
-    position: fixed;
-    inset: 0;
-    background: rgba(0, 0, 0, 0.5);
-    z-index: 2000;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    opacity: 0;
-    transition: opacity 0.2s ease;
-}
-
-.order-overlay--visible {
-    opacity: 1;
-}
-
-.order-overlay--visible .order-modal {
-    transform: translateY(0);
-}
-
-.order-modal {
-    background: var(--color-surface);
-    border: 1px solid var(--color-border);
-    border-radius: var(--radius-firm);
-    width: 100%;
-    max-width: 480px;
-    max-height: 90vh;
-    overflow-y: auto;
-    transform: translateY(20px);
-    transition: transform 0.2s ease;
-}
-
-/* Spacing (px-5 pt-5) posé en classe utilitaire sur le HTML. */
-.order-modal__header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-}
+/* ==================== Formulaire de commande ====================
+   Chrome de modale (overlay, boîte, retour/fermer) fourni par le shell
+   .shop-sheet (components/shop-sheet.css) depuis le 2026-10-04 — voir
+   idees.md. .order-overlay, .order-modal (boîte), .order-modal__header et
+   .order-modal__back/.order-modal__close ont disparu avec l'ancien shell ;
+   les classes ci-dessous ne stylent plus que le CONTENU injecté dans
+   .shop-sheet__body par js/modal.js (showOrderForm). */
 
 /* Spacing (gap-2) posé en classe utilitaire sur le HTML. */
 .order-steps {
@@ -106,25 +83,6 @@
 .order-step--active {
     background: var(--color-accent);
     transform: scale(1.25);
-}
-
-/* Spacing (p-2) posé en classe utilitaire sur le HTML. */
-.order-modal__back,
-.order-modal__close {
-    background: var(--color-surface-subtle);
-    border: none;
-    border-radius: var(--radius-firm);
-    color: var(--color-text-primary);
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    transition: var(--transition-fast);
-}
-
-.order-modal__back:hover,
-.order-modal__close:hover {
-    background: var(--color-border);
 }
 
 /* Spacing (gap-4 p-5) posé en classe utilitaire sur le HTML. */

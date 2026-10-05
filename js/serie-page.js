@@ -142,17 +142,14 @@ function renderGallery(photos) {
     });
 
     // "Commander" sur la photo spotlight (remplace "Voir en grand" — demande
-    // PO du 2026-09-24) : ouvre la modale boutique en mode impression unique,
-    // contextualisée à cette photo précise (window.openShopModal, js/triptyque.js).
+    // PO du 2026-09-24) : ouvre directement le formulaire de commande par
+    // courriel (orderPrint, js/modal.js), contextualisé à cette photo précise.
     rows.querySelectorAll('[data-order-photo-index]').forEach(node => {
         node.addEventListener('click', (e) => {
             e.stopPropagation();
             const index = Number(node.dataset.orderPhotoIndex);
             const photo = photos[index];
-            window.openShopModal({
-                mode: 'unique',
-                photo: { id: photo.id, title: photo.title || photo.name || '', url: photoUrl(photo) },
-            });
+            window.orderPrint(photo.title || photo.name || '', photoUrl(photo), photo.id);
         });
     });
 }

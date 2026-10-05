@@ -76,6 +76,21 @@
 /* .series-card__cta : plus de règle CSS, spacing (mt-5) posé en classe
    utilitaire directement sur le HTML — voir js/components/series-cards.js. */
 
+/* Pastille de la saga sur le CTA "Voir la série" (2026-10-03) — reflète la
+   couleur assignée à la saga depuis l'admin (sagaColorDotHTML). Même palette
+   et même pattern [data-color] que .ac-spotlight__dot (pages/accueil.css),
+   seule exception au noir/gris/beige du système visuel avec cette dernière —
+   voir idees.md. Pas de couleur de saga associée → pastille noire (règle de
+   base, --color-core-primary-a). */
+.series-card__cta-dot circle { fill: var(--color-core-primary-a); }
+.series-card__cta-dot[data-color="blue"]   circle { fill: var(--color-core-primary-blue); }
+.series-card__cta-dot[data-color="red"]    circle { fill: var(--color-core-primary-red); }
+.series-card__cta-dot[data-color="green"]  circle { fill: var(--color-core-primary-green); }
+.series-card__cta-dot[data-color="yellow"] circle { fill: var(--color-core-primary-yellow); }
+.series-card__cta-dot[data-color="orange"] circle { fill: var(--color-core-primary-orange); }
+.series-card__cta-dot[data-color="purple"] circle { fill: var(--color-core-primary-purple); }
+.series-card__cta-dot[data-color="pink"]   circle { fill: var(--color-core-primary-pink); }
+
 /* Intégration dans la grille "toutes les séries" (/series.html) — voir
    .ac-series__grid--wrap dans pages/accueil.css. */
 .ac-series__grid--wrap .series-card {

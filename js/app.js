@@ -75,13 +75,6 @@ function mountHeader() {
     if (!mount) return;
 
     mount.replaceWith(createNav());
-
-    // Le badge du panier triptyque est créé à "0" dans le markup du nav —
-    // le resynchroniser avec le panier persisté (localStorage) une fois
-    // l'élément réellement dans le DOM (triptyque.js expose ces fonctions
-    // sur window en tant que script classique, chargé avant ce module).
-    window.triptyqueUpdateBadge?.();
-    window.triptyqueUpdateBar?.();
 }
 
 function mountFooter() {
@@ -95,6 +88,7 @@ function mountFooter() {
             { label: 'Portfolio',      href: 'https://www.photographie.stephanewagner.com/', external: true },
             { label: 'Stories',        href: '/stories/' },
             { label: 'Infolettre',     href: '/rejoindre/' },
+            { label: 'Mur (prototype)', href: '/mur.html' },
             { label: 'Confidentialité', href: '/politique-confidentialite.html' },
             { label: 'Admin',          href: '/admin.html' },
         ],

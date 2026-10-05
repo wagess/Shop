@@ -117,6 +117,21 @@ Design pas encore décidé pour l'un ou l'autre — à concevoir quand cette pis
 
 ---
 
+## Mur virtuel de photos encadrées — prototype construit le 2026-10-03
+
+**Idée :** une page présentant la photothèque comme un mur de cadres accrochés (façon salon, cadres de tailles et inclinaisons variées), plutôt que la grille habituelle de `phototheque.html`. Piste exploratoire, cohérente avec ART → STORY → DISCOVERY (CLAUDE.md §6) — pas encore évaluée comme fonctionnalité à part entière.
+
+**Prototype construit, non listé dans le site :** `/mur.html`. Accessible uniquement via un lien dans le footer (« Mur (prototype) »), absent de la nav principale et marqué `noindex`. Charge un échantillon aléatoire de vraies photos depuis l'API existante (`js/api.js`), affichées en cadres avec marie-louise, légère rotation et tailles variées ; clic = visionneuse plein écran.
+
+**Pas encore tranché :**
+- Est-ce que ce concept remplace, complète ou n'a aucun rapport avec `phototheque.html` ?
+- Sélection des photos : aléatoire (comme aujourd'hui) vs. curatée (une série, les coups de cœur) ?
+- Vaut-il la peine d'être développé plus loin, ou reste-t-il une expérimentation visuelle à usage unique ?
+
+**Fichiers :** `mur.html`, `js/mur-page.js`, `assets/styles/pages/mur.css`, lien ajouté dans `js/app.js` (`mountFooter`).
+
+---
+
 ## Modale boutique unifiée (Shop + Commander + impression) — wireframe démarré le 2026-09-24
 
 **Contexte :** avant cette décision, 3 parcours d'achat coexistaient sans lien entre eux : le bouton "Shop" de la nav ouvrait le panier triptyque (3 photos, `js/triptyque.js`), le bouton "Commander" des Heroes pointait vers la section `#shop` de l'accueil (catalogue, prix "à définir"), et le bouton "Commander une impression" sur chaque photo ouvrait un vrai formulaire de commande par photo (`js/modal.js` → `orderPrint`, connecté à l'API WordPress). Trois entrées, trois destinations différentes, aucune vue d'ensemble. Reprend et précise l'idée notée précédemment ici ("le Tryptique devient un panier d'achat... focus modèle UX Airbnb").
@@ -184,3 +199,59 @@ Dans les deux cas, la commande **envoie un courriel** (aucun vrai checkout/paiem
 **Toujours ouvert :** le produit exact de l'acquisition numérique (licence perso/commerciale, fichiers HD, tarif par photo ou par lot) — pas traité par cette décision, à clarifier avant de designer l'étape 3 en mode numérique.
 
 **Fichiers impactés (mise à jour) :** `js/triptyque.js` (refonte majeure), `assets/styles/components/triptyque.css`, `js/components/nav.js` (badge), `js/modal.js` (formulaire à généraliser pour panier multi-photos + mode numérique), `js/images.js`, `js/serie-page.js`, `index.html`, `serie.html`.
+
+---
+
+**Nouveau shell de modale depuis Figma — prototype construit le 2026-10-04 :** le PO a fourni un modèle d'affichage pour la modale shop directement depuis Figma (`vDYe0oWfzs4InGstvpCxBk`, node 69:632 — instance du composant Sigma "Modal", fichier `QgM6d52yaLh6vkJCnTRsMa` node 1585:16501, intégrité du composant vérifiée avant implémentation). Forme très différente de l'actuel `.tmodal` (boîte centrée) : un tiroir plein écran ancré en bas, coins arrondis en haut seulement, handle de glisser, entête retour/titre/fermer.
+
+Construit en **shell seul**, sans contenu et sans être branché nulle part (demande explicite du PO) : `js/components/shop-sheet.js` (`createShopSheet()`, `openShopSheet()`, `closeShopSheet()`) + `assets/styles/components/shop-sheet.css`. Aucun fichier existant modifié pour l'intégrer — pas de `<link>` dans `styles.css`, pas d'appel depuis `triptyque.js` ou `nav.js`. Testé en isolation (injection runtime dans le navigateur, retirée après vérification) : rendu conforme à la capture Figma, bouton fermer fonctionnel, options `leftAction`/`rightAction`/`showHandle`/`showTitle` robustes.
+
+**Adopté comme modèle pour toutes les modales — migration 2026-10-04 (même jour) :** suite à validation du prototype, demande du PO ("utiliser ce layout comme modèle pour toutes les modales"). Périmètre clarifié par question de cadrage : panier/shop (`.tmodal`) et formulaire de commande (`.order-modal`, l'outil de vente actif) migrés ; popups légers (`<popup-panel>` — Impression, Infolettre) et visionneuse photo plein écran (`.photos-modal`/lightbox) **exclus** — contenu trop léger ou pas un vrai "dialogue", le tiroir 84vh aurait été surdimensionné.
+
+Migration effectuée :
+- `js/triptyque.js` converti en module ES (import `shop-sheet.js`) — les 9 pages qui le chargent passent en `<script type="module">`. Les 4 écrans (hub, impression unique, panier triptyque, confirmation) rendent leur contenu dans `.shop-sheet__body` ; `.tmodal-overlay`/`.tmodal`/`.tmodal__close`/`.tmodal__label` supprimés de `triptyque.css` (morts). Amélioration permise par le nouveau header : la confirmation triptyque a maintenant un vrai bouton retour vers le panier (absent avant).
+- `js/modal.js` → `showOrderForm` (formulaire de commande 3 étapes) migré de la même façon : `.order-overlay`/`.order-modal`/`.order-modal__header`/`.order-modal__back`/`.order-modal__close` supprimés de `modal.css` (morts) ; étapes, transitions, sélection format/papier et soumission (`sendOrderEmail`) **inchangées**, seul le chrome change. Les pastilles d'étape restent dans le corps (le shell n'a qu'un slot de titre texte).
+- `shop-sheet.js` : nouvelle fonction `setShopSheetHeader()` pour changer titre/bouton retour d'une sheet déjà ouverte sans la refermer (transition panier ↔ confirmation).
+- `shop-sheet.css` globalisé dans `styles.css` (comme `modal.css`) plutôt que lié page par page — le formulaire de commande peut s'ouvrir depuis n'importe quelle page.
+- Testé en direct dans le navigateur (pas seulement en isolation) : accueil, photothèque, séries — hub, panier (ajout/retrait/réinitialisation), confirmation + retour, impression unique → vrai formulaire de commande (3 étapes, retour, focus auto) ; soumission réelle non testée (appellerait l'API de production/enverrait un vrai courriel).
+
+**Ajustement — la modale recouvre le hero en gardant l'allure d'un onglet (2026-10-04, même jour, affiné en 4 passes) :**
+1. Overlay aligné sous la nav, mais gardait un voile noir + carte flottante centrée (min(1327px,92vw), coins arrondis 20px, ombre).
+2. PO : zéro voile, même taille que le hero → `.shop-sheet-overlay` sans fond, `.shop-sheet` passé en `width:100%`/`height:100%`, coins arrondis et ombre retirés.
+3. PO : trop plat — garder l'allure "onglet" (coins arrondis + ombre) tout en couvrant la même zone que le hero → coins arrondis (20px) et ombre remis, taille/position de l'étape 2 conservées (plein écran, pas de voile).
+4. PO fournit la maquette Figma manquante — node **73:674** ("Layout Modale shop ouvert", le hero AVEC la modale par-dessus, pas seulement le shell vide de 69:260 regardé au premier tour). Elle montre que la modale reste une carte "onglet" avec marges (1331/1440 ≈ 92% large, 865/1024 ≈ 84.5% haut, coins arrondis **34px** — valeur différente du shell vide), et que l'effet "recouvre le hero" vient d'ailleurs : un voile léger sur tout le cadre nav comprise (`rgba(0,0,0,0.14)`, pas 0.25) **et** le hero qui s'estompe derrière (image à 80% d'opacité + fond blanc à 70%).
+
+État final (fidèle à 73:674) : `.shop-sheet-overlay` = voile `rgba(0,0,0,0.14)` plein écran (nav comprise, overlay simple `inset:0`, plus d'alignement JS sur la nav — abandonné, l'estompage fait le travail). `.shop-sheet` = carte `min(1331px,92.4vw)` × `min(865px,84.5vh)`, coins 34px (20px en mobile <700px), ombre inchangée. Nouvelle classe `body.shop-sheet-open` (posée/retirée par `openShopSheet()`/`closeShopSheet()`) qui estompe `.ac-hero`/`.ac-hero__frame` (`pages/accueil.css`) quand la page en a un — no-op sur les pages sans hero. Scroll du body verrouillé pendant que la modale est ouverte. Testé : hub, formulaire de commande — dimensions/rayon confirmés par `getComputedStyle`, classe `shop-sheet-open` et scroll correctement retirés à la fermeture.
+
+**Pas encore tranché :**
+- Largeur/hauteur mobile (100% de largeur) et rayon 20px posés par interprétation du desktop Figma (aucune maquette mobile fournie) — à valider.
+- Popups légers (`<popup-panel>`) et lightbox restent sur leur shell actuel — à reconsidérer séparément si besoin, pas dans ce tour.
+
+**Bandeau triptyque en bas de page — supprimé (2026-10-04, même jour) :** demande du PO. `triptyqueUpdateBar()` (`js/triptyque.js`), son appel dans `triptyqueSave()`/`DOMContentLoaded`, le pont `window.triptyqueUpdateBar`, l'appel depuis `js/app.js` (`mountHeader()`) et le CSS mort (`#triptyque-page-bar*`, `triptyque.css`) retirés entièrement — pas juste caché. L'accès au panier reste uniquement le badge du bouton Shop (nav), qui continue de se synchroniser normalement. Testé : ajout d'une photo (via `toggleTriptyquePhoto`, le vrai flux) — badge mis à jour, aucun bandeau n'apparaît.
+
+**CTA "Commander un tirage" (section boutique) raccordé à la modale shop (2026-10-04, même jour) :** incohérence relevée par le PO — ce bouton (3 `<shop-card>` sur `index.html`) ouvrait encore l'ancienne modale "Impression" (`<popup-panel id="printSeriesModal">`, via l'attribut `print-btn`), partagée avec "Imprimer une série" (spotlight) — pas la nouvelle modale shop comme les autres CTA "Commander" du site. Nouvel attribut `shop-modal-btn` sur `<shop-card>` (`js/components/shop-card.js`) qui ouvre `window.openShopModal()` au clic, remplace `print-btn` sur les 3 cartes boutique (`index.html`). "Imprimer une série" (spotlight) n'est pas touché, continue d'utiliser `data-role="print-btn"` → `printSeriesModal`. Testé : clic sur "Commander un tirage" → modale shop (hub) ; clic sur "Imprimer une série" → toujours le popup Impression.
+
+---
+
+## Panier triptyque retiré — simplification MVP (2026-10-05)
+
+**Decision :** simplifier le shop au maximum pour un MVP — un visiteur peut demander l'impression d'une photo par courriel, le reste est mis de côté pour l'instant.
+
+**Context :** le panier triptyque (3 photos, cœur, badge "Shop" de la nav) et le hub boutique ("Modale boutique unifiée" ci-dessus, 2026-09-24/2026-10-04) étaient une impasse — l'écran final du panier disait littéralement "formats et tarifs à venir, revenez bientôt", aucune commande n'y était réellement envoyée.
+
+**Problem :** demander à un visiteur de constituer un panier de 3 photos, puis lui dire que rien n'est encore vendable, ajoute de la friction et de la confusion sans bénéfice — alors qu'un vrai parcours de commande par photo existait déjà et fonctionnait (formulaire 3 étapes → courriel via l'API WordPress, `js/modal.js:orderPrint`/`sendOrderEmail`).
+
+**Options considered :**
+1. Réduire aussi le formulaire de commande existant (3 étapes format/papier/coordonnées) à un simple champ message.
+2. Garder le formulaire tel quel, retirer seulement le panier/hub et rebrancher tous les CTA "Commander" dessus directement.
+
+**Decision :** option 2 — question de cadrage au PO, confirmée.
+
+**Reason :** le formulaire 3 étapes fonctionne déjà et transmet une information utile (format, papier) au photographe ; la friction venait du panier/hub, pas du formulaire.
+
+**Consequences :**
+- Retirés entièrement : `js/triptyque.js` (panier, hub, mode "unique" intermédiaire), le bouton cœur/wishlist et `toggleTriptyquePhoto` (`js/modal.js`), le badge `#triptyque-badge` et le bouton Shop (`js/components/nav.js`), `assets/styles/components/triptyque.css`.
+- Chaque CTA "Commander" (photothèque, hero accueil, spotlight série, cartes boutique `#shop`) appelle désormais directement `window.orderPrint(title, url, photoId)` — plus d'étape intermédiaire "hub"/"impression unique". `window.openShopModal()` n'existe plus.
+- CTA génériques sans photo précise restants (aucun après ce changement — même les cartes `#shop`, qui affichent une vraie photo de collection via `home-sections.js:renderShopMedia`, sont maintenant contextualisées).
+- `.shop-sheet` (shell de modale, voir section précédente) ne sert plus que le formulaire de commande.
+- Testé en direct dans le navigateur avec données réelles (photothèque, hero accueil, cartes boutique) : flux complet jusqu'à soumission réelle validée (courriel reçu via l'endpoint WordPress de production).

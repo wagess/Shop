@@ -8,7 +8,6 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,500;1,400;1,500&amp;family=DM+Sans:wght@400;500&amp;display=swap">
     <link rel="stylesheet" href="./assets/styles/styles.css">
-    <link rel="stylesheet" href="./assets/styles/components/triptyque.css">
     <link rel="stylesheet" href="./assets/styles/pages/accueil.css">
     <!-- Favicon avec emoji -->
     <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>📸</text></svg>">
@@ -29,18 +28,14 @@
                         <h1 class="ac-hero__title m-0">Explorez mon<br><em>univers photographique</em></h1>
                         <!-- Câblé par js/images.js (updateOrderBtn) — masqué tant que la
                              photo aléatoire n'est pas chargée, affiché ensuite avec son
-                             onclick. Ouvre la modale boutique en mode impression unique
-                             pour cette photo précise (window.openShopModal, 2026-09-24). -->
+                             onclick. Ouvre directement le formulaire de commande par
+                             courriel pour cette photo précise (window.orderPrint). -->
                         <button type="button" id="randomImageOrderBtn" class="btn-soft gap-2 py-0 pr-4 pl-6 mt-6" style="display:none;">
                             Commander cette photo
                             <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg"><circle cx="10" cy="10" r="7.5" stroke="currentColor" stroke-width="1.5"/></svg>
                         </button>
                     </div>
                     <div class="ac-hero__links-row gap-2">
-                        <a href="#" onclick="window.openShopModal(); return false;" class="btn-primary btn-commander btn-sm gap-2 py-0 pr-4 pl-6">
-                            Commander
-                            <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg"><circle cx="10" cy="10" r="7.5" stroke="currentColor" stroke-width="1.5"/></svg>
-                        </a>
                         <a href="/phototheque.html" class="btn-soft gap-2 py-0 pr-4 pl-6">
                             Voir les collections
                             <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg"><circle cx="10" cy="10" r="7.5" stroke="currentColor" stroke-width="1.5"/></svg>
@@ -106,7 +101,7 @@
         <h2 class="ac-shop__title m-0 mt-3">Acquérir une œuvre</h2>
 
         <div class="ac-shop__grid gap-8 mt-12">
-            <shop-card heading="Tirages d'art" media-id="73" badge="[Mention à définir]" cta="Commander un tirage" cta-icon print-btn>
+            <shop-card heading="Tirages d'art" media-id="73" badge="[Mention à définir]" cta="Commander un tirage" cta-icon shop-modal-btn>
                 <dl class="ac-shop-card__prices gap-3 pt-4 m-0">
                     <div class="ac-shop-card__price-row gap-3">
                         <dt><span class="ac-placeholder">Petit format</span> <span class="ac-shop-card__edition ac-placeholder ml-1">[éd. à définir]</span></dt>
@@ -121,7 +116,7 @@
                         <dd class="ac-placeholder m-0">[prix]</dd>
                     </div>
                 </dl>
-            </shop-card><shop-card heading="Tirages d'art" media-id="73" badge="[Mention à définir]" cta="Commander un tirage" cta-icon print-btn>
+            </shop-card><shop-card heading="Tirages d'art" media-id="73" badge="[Mention à définir]" cta="Commander un tirage" cta-icon shop-modal-btn>
                 <dl class="ac-shop-card__prices gap-3 pt-4 m-0">
                     <div class="ac-shop-card__price-row gap-3">
                         <dt><span class="ac-placeholder">Petit format</span> <span class="ac-shop-card__edition ac-placeholder ml-1">[éd. à définir]</span></dt>
@@ -136,7 +131,7 @@
                         <dd class="ac-placeholder m-0">[prix]</dd>
                     </div>
                 </dl>
-            </shop-card><shop-card heading="Tirages d'art" media-id="73" badge="[Mention à définir]" cta="Commander un tirage" cta-icon print-btn>
+            </shop-card><shop-card heading="Tirages d'art" media-id="73" badge="[Mention à définir]" cta="Commander un tirage" cta-icon shop-modal-btn>
                 <dl class="ac-shop-card__prices gap-3 pt-4 m-0">
                     <div class="ac-shop-card__price-row gap-3">
                         <dt><span class="ac-placeholder">Petit format</span> <span class="ac-shop-card__edition ac-placeholder ml-1">[éd. à définir]</span></dt>
@@ -173,8 +168,10 @@
     <!-- ===== FOOTER NAVIGATION ===== -->
     <div id="site-footer-mount"></div>
 
-    <!-- ===== MODALE — Impression (options à venir) — partagée par les CTA
-         "Imprimer une série" (spotlight) et "Commander un tirage" (boutique) ===== -->
+    <!-- ===== MODALE — Impression (options à venir) — CTA "Imprimer une
+         série" (spotlight) uniquement ; "Commander un tirage" (boutique)
+         renvoie désormais vers la photothèque (voir js/components/shop-card.js
+         attribut shop-modal-btn) ===== -->
     <popup-panel id="printSeriesModal" class="ac-popup p-5" style="display:none;">
         <p class="ac-eyebrow m-0">Impression</p>
         <p class="ac-popup__title m-0 mt-5">Impression grand format</p>
@@ -194,7 +191,6 @@
         <button id="popupSkipBtn" class="ac-popup__skip mt-4">Non merci</button>
     </popup-panel>
 
-    <script src="js/triptyque.js"></script>
     <script type="module" src="js/components/spotlight-saga.js"></script>
     <script type="module" src="js/components/popup-panel.js"></script>
     <script type="module" src="js/components/shop-card.js"></script>

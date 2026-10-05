@@ -7,7 +7,7 @@ function updateOrderBtn(title, imageUrl, photoId) {
     btn.style.display = '';
     btn.onclick = (e) => {
         e.stopPropagation();
-        window.openShopModal({ mode: 'unique', photo: { id: photoId, title, url: imageUrl } });
+        window.orderPrint(title, imageUrl, photoId);
     };
 }
 

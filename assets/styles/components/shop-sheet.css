@@ -1,0 +1,163 @@
+/* ==========================================================================
+   Shop sheet — shell de modale, modèle retenu par le PO le 2026-10-04 pour
+   le panier/shop (.tmodal) et le formulaire de commande (.order-modal) —
+   voir idees.md. Figma vDYe0oWfzs4InGstvpCxBk, node 69:632, instance du
+   composant Sigma "Modal" (QgM6d52yaLh6vkJCnTRsMa, node 1585:16501),
+   On Material=False.
+
+   Coexiste pour l'instant avec .tmodal/.order-modal (triptyque.css,
+   modal.css) pendant la migration progressive des écrans vers ce shell —
+   pas un remplacement en un seul coup.
+
+   Taille/position/voile — alignés sur la maquette "ouverte" fournie le
+   2026-10-04 (même jour, 3e passe) : Figma node 73:674 ("Layout Modale
+   shop ouvert", le hero AVEC la modale par-dessus — pas seulement le shell
+   vide de 69:260 regardé au premier tour). Dans cette maquette, la modale
+   reste une carte "onglet" avec marges (1331/1440 ≈ 92% de large,
+   865/1024 ≈ 84.5% de haut, coins arrondis, ombre) — ni plein écran
+   (2e passe, écartée), ni un voile noir opaque (1re passe, trop fort).
+   L'impression de "recouvrir le hero" vient de deux effets Figma, pas de
+   la taille de la modale :
+   - un voile sur TOUT le cadre (nav comprise), mais très léger :
+     rgba(0,0,0,0.14), pas 0.25 ;
+   - le hero lui-même s'estompe derrière (image à 80% d'opacité + fond
+     blanc à 70%) — reproduit via .shop-sheet-open sur <body>, posé/retiré
+     par openShopSheet()/closeShopSheet() (shop-sheet.js), qui cible
+     .ac-hero (pages/accueil.css) quand la page en a un ; no-op ailleurs.
+
+   Rayon 34px (token Figma --round-m) : différent du 20px vu sur le shell
+   vide de 69:260 — valeur de la maquette "ouverte", plus complète/récente,
+   retenue ici.
+   ========================================================================== */
+
+.shop-sheet-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 3000;
+  background: rgba(0, 0, 0, 0.14);
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  opacity: 0;
+  transition: var(--transition-fast);
+}
+
+.shop-sheet-overlay--visible { opacity: 1; }
+.shop-sheet-overlay--visible .shop-sheet { transform: translateY(0); }
+
+.shop-sheet {
+  background: var(--color-bg-primary);
+  width: min(1331px, 92.4vw);
+  height: min(865px, 84.5vh);
+  border-radius: 34px 34px 0 0;
+  box-shadow: 0px 1px 4px 0px rgba(0, 0, 0, 0.04), 0px 4px 12px 0px rgba(0, 0, 0, 0.06);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  transform: translateY(16px);
+  transition: var(--transition-fast);
+}
+
+@media (max-width: 700px) {
+  .shop-sheet { width: 100%; border-radius: 20px 20px 0 0; }
+}
+
+/* Estompage du hero derrière la modale ouverte — voir note ci-dessus.
+   .ac-hero/.ac-hero__frame définis dans pages/accueil.css (index.html,
+   serie.html) ; sur les pages sans hero, ce sélecteur ne matche rien. */
+body.shop-sheet-open .ac-hero { background: rgba(255, 255, 255, 0.7); }
+body.shop-sheet-open .ac-hero__frame {
+  opacity: 0.8;
+  transition: opacity 0.2s ease;
+}
+
+/* Largeur de lecture confortable pour un écran de contenu (texte, options,
+   formulaire) à l'intérieur du shell, qui lui est beaucoup plus large —
+   évite que le contenu hérité (pensé pour .tmodal, ~420-720px) flotte sur
+   toute la largeur du nouveau panneau. */
+.shop-sheet__content {
+  width: 100%;
+  max-width: 720px;
+  margin: 0 auto;
+}
+
+/* Écrans plus étroits (ex. formulaire de commande, hérité de .order-modal
+   qui faisait max-width: 480px) — même rôle que .shop-sheet__content, juste
+   plus resserré pour ne pas étaler un formulaire sur toute la largeur. */
+.shop-sheet__content--narrow {
+  max-width: 480px;
+}
+
+.shop-sheet__handle-row {
+  display: flex;
+  justify-content: center;
+  padding-top: var(--space-8);
+  flex-shrink: 0;
+}
+
+.shop-sheet__handle {
+  width: 40px;
+  height: 6px;
+  border-radius: var(--radius-circular);
+  background: var(--color-border-secondary);
+}
+
+.shop-sheet__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 56px;
+  padding: var(--space-8);
+  flex-shrink: 0;
+}
+
+.shop-sheet__header-side {
+  flex: 1 1 0;
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  height: 48px;
+}
+
+.shop-sheet__header-side--center {
+  justify-content: center;
+}
+
+.shop-sheet__header-side--right {
+  justify-content: flex-end;
+}
+
+.shop-sheet__title {
+  font-family: var(--font-family-base);
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 18px;
+  letter-spacing: -0.02em;
+  color: var(--color-text-primary);
+  text-align: center;
+  width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.shop-sheet__icon-btn {
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: none;
+  border: none;
+  border-radius: var(--radius-circular);
+  color: var(--color-text-primary);
+  cursor: pointer;
+  transition: var(--transition-fast);
+}
+
+.shop-sheet__icon-btn:hover { background: var(--color-bg-active); }
+
+.shop-sheet__body {
+  flex: 1;
+  overflow-y: auto;
+}

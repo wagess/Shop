@@ -36,10 +36,11 @@ async function init() {
     const sagaId = new URLSearchParams(location.search).get('saga');
 
     try {
-        const [hierarchy, cfg, seriesContent] = await Promise.all([
+        const [hierarchy, cfg, seriesContent, sagaContent] = await Promise.all([
             fetchHierarchy(),
             getSiteConfig(),
             getSeriesContent(),
+            getSagaContent(),
         ]);
 
         const collections = flattenCollections(hierarchy);
@@ -50,7 +51,6 @@ async function init() {
             const descendantIds = new Set(descendants.map(c => String(c.id)));
             seriesIds = seriesIds.filter(id => descendantIds.has(String(id)));
 
-            const sagaContent = await getSagaContent();
             const sagaName = folder?.name || sagaContent[String(sagaId)]?.nom || '';
             updateHeading(sagaName);
         }
@@ -66,7 +66,7 @@ async function init() {
             return;
         }
 
-        const cards = await buildSeriesCards(picks, seriesContent);
+        const cards = await buildSeriesCards(picks, seriesContent, { hierarchy, cfg, sagaContent });
         grid.innerHTML = cards.map(c => seriesCardHTML(c)).join('');
     } catch (err) {
         console.error('Erreur chargement page séries', err);
