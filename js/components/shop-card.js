@@ -84,7 +84,7 @@ class ShopCard extends HTMLElement {
 
         const ctaBtn = document.createElement('button');
         ctaBtn.type = 'button';
-        ctaBtn.className = `${isDisabled ? 'btn-secondary gap-2 py-4 px-8' : 'btn-soft gap-2 py-0 pr-4 pl-6'} ac-shop-card__cta mt-auto`;
+        ctaBtn.className = `${isDisabled ? 'btn-secondary gap-2 py-4 px-8' : 'btn-soft btn-commander gap-2 py-0 pr-4 pl-6'} ac-shop-card__cta mt-auto`;
         if (isDisabled) ctaBtn.disabled = true;
         if (isShopModalBtn) ctaBtn.onclick = () => { window.location.href = '/phototheque.html'; };
         const ctaLabel = document.createElement('span');

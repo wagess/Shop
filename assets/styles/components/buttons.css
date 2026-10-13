@@ -190,6 +190,23 @@
   background: var(--color-bg-active);
 }
 
+/* Soft + noir — variante "commande"/"voir les séries" de .btn-soft : CTA qui
+   doit se démarquer et pousser vers la consultation des séries ou la
+   commande, sur fond clair uniquement (décision PO 2026-10-12). Ne pas
+   l'utiliser sur une photo (le pastille claire fait déjà le contraste voulu
+   contre le scrim) ni sur une bande déjà noire comme .serie-shop. Classes
+   combinées plutôt que nouvelle classe autonome (reuse before reinvent) ;
+   spécificité à deux classes (0,2,0) pour gagner face à .ac-page a { color:
+   inherit } sans dépendre de l'ordre des règles dans le fichier. */
+.btn-soft.btn-commander {
+  background: var(--color-text-primary);
+  color: var(--color-on-accent);
+}
+
+.btn-soft.btn-commander:hover {
+  background: var(--color-text-secondary);
+}
+
 .btn-soft svg {
   width: 20px;
   height: 20px;

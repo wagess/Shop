@@ -114,7 +114,7 @@ function renderGallery(photos) {
             ${galleryItemHTML(p3, 3)}
             <div class="serie-gallery__spotlight-text gap-4">
                 ${title ? `<h3 class="serie-gallery__spotlight-title m-0">${escapeHtml(title)}</h3>` : ''}
-                <button type="button" class="btn-soft gap-2 py-0 pr-4 pl-6" data-order-photo-index="3">
+                <button type="button" class="btn-soft btn-commander gap-2 py-0 pr-4 pl-6" data-order-photo-index="3">
                     Commander
                     ${CIRCLE_ICON}
                 </button>
