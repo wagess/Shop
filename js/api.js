@@ -14,12 +14,38 @@ function apiUrl(path) {
         : `${WP_BASE}${path}`;
 }
 
+// Limite de concurrence vers l'API WordPress distante — hébergement mutualisé
+// qui ne tient qu'un tout petit nombre de workers PHP en même temps (mesuré
+// le 2026-10-12 : 8 appels en parallèle passent de 0,5s à 5s chacun, mis en
+// file d'attente par paquets de ~2 côté serveur). Le code appelant envoie
+// ses requêtes en Promise.all (thumbnails.js, home-sections.js, etc.) sans
+// se soucier de la concurrence réelle du serveur ; cette file d'attente le
+// fait à sa place, au seul point de passage commun (apiFetch), sans toucher
+// aux appelants.
+const MAX_CONCURRENT_REQUESTS = 3;
+let activeRequests = 0;
+const pendingQueue = [];
+
+function runQueued(task) {
+    return new Promise((resolve, reject) => {
+        const run = () => {
+            activeRequests++;
+            task().then(resolve, reject).finally(() => {
+                activeRequests--;
+                pendingQueue.shift()?.();
+            });
+        };
+        if (activeRequests < MAX_CONCURRENT_REQUESTS) run();
+        else pendingQueue.push(run);
+    });
+}
+
 function apiFetch(path, options = {}) {
     const url = apiUrl(path);
     if (!IS_LOCAL) {
         options.headers = { ...options.headers, 'Authorization': `Bearer ${BEARER_TOKEN}` };
     }
-    return fetch(url, options);
+    return runQueued(() => fetch(url, options));
 }
 
 export { API_BASE, IPTC_API, BEARER_TOKEN };
