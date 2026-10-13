@@ -19,6 +19,7 @@ import {
     selectGallery  // Importer selectGallery depuis gallery.js
 } from './gallery.js';
 import { openGallery, closeModal, orderPrint, initModalListeners, displayPhotos, setCurrentPhotos, openLightbox } from './modal.js';
+import { getShopPhoto, clearShopPhoto, updateShopBadge } from './shop-state.js';
 import { createMasonryGrid } from './components/masonry-grid.js';
 import { fetchGalleryPhotos } from './api.js';
 import { initSearchAutocomplete } from './search.js';  // Supprimer selectGallery d'ici
@@ -38,6 +39,16 @@ window.closeModal = function() {
     return closeModal();
 };
 window.orderPrint = orderPrint;
+// Bouton Shop de la nav (une seule photo à la fois — voir js/shop-state.js) :
+// rouvre le même formulaire de commande pour la photo mémorisée ; pas de
+// photo mémorisée → rien à ouvrir (le bouton est désactivé dans ce cas, voir
+// updateShopBadge/mountHeader ci-dessous).
+window.openShopModal = function() {
+    const photo = getShopPhoto();
+    if (!photo) return;
+    orderPrint(photo.title, photo.imageUrl, photo.photoId);
+};
+window.clearShopPhoto = clearShopPhoto;
 window.showFolder = function(id, name) {
     location.hash = `folder-${id}`;
     return showFolder(id, name);
@@ -75,6 +86,7 @@ function mountHeader() {
     if (!mount) return;
 
     mount.replaceWith(createNav());
+    updateShopBadge();
 }
 
 function mountFooter() {

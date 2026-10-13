@@ -3,6 +3,7 @@ import { fetchGalleryPhotos, fetchPhotoKeywords, sendOrderEmail } from './api.js
 import { createButton } from './components/button.js';
 import { createBottomActionBar } from './components/bottom-action-bar.js';
 import { openShopSheet, closeShopSheet } from './components/shop-sheet.js';
+import { setShopPhoto, clearShopPhoto } from './shop-state.js';
 
 export async function openGallery(galleryId, galleryName) {
     const modal = el('photosModal');
@@ -233,120 +234,130 @@ function playShutterSound() {
     } catch (e) {}
 }
 
+// Une seule photo "dans le shop" à la fois (MVP, voir js/shop-state.js) :
+// ouvrir le formulaire pour une photo la fait aussi remplacer celle qui y
+// était déjà — pas d'ajout cumulatif, le bouton Shop de la nav reflète
+// toujours la dernière photo commandée/en cours de commande.
 export function orderPrint(title, imageUrl, photoId) {
+    setShopPhoto({ title, imageUrl, photoId });
     showOrderForm(title, imageUrl, photoId);
 }
 
 // Shell .shop-sheet depuis le 2026-10-04 (demande PO : "utiliser ce layout
 // comme modèle pour toutes les modales", voir idees.md) — remplace l'ancien
-// .order-overlay/.order-modal. Mécaniques internes (étapes, transitions,
-// sélection format/papier, soumission) inchangées ; seul le chrome (overlay,
-// boîte centrée → tiroir ancré en bas, bouton retour/fermer) change. Les
-// pastilles d'étape (.order-steps) restent dans le corps de la modale — le
-// shell n'a qu'un slot de titre texte, pas de place pour un indicateur
-// personnalisé.
+// .order-overlay/.order-modal.
+//
+// Mise en page triptyque desktop depuis le 2026-10-06 (demande PO) : à partir
+// de 960px (DESKTOP_BREAKPOINT, cf. modal.css), photo | format & finition |
+// coordonnées s'affichent ensemble comme trois colonnes au lieu de se
+// succéder en étapes — isTriptych()/goToStep()/mountOrderBar() ci-dessous
+// adaptent la logique JS en miroir de modal.css. Sous ce seuil, flux mobile
+// inchangé : une étape à la fois, pastilles de pagination (.order-steps),
+// confirmation en bout de file.
 function showOrderForm(title, imageUrl, photoId) {
     const { sheet, body } = openShopSheet({ title: 'Commander une impression', leftAction: true });
     const closeForm = closeShopSheet;
 
+    // Déterminé une seule fois à l'ouverture — pas de réaction à un resize
+    // pendant que la modale est ouverte (cas marginal, non géré).
+    const isTriptych = window.matchMedia('(min-width: 960px)').matches;
+
     body.innerHTML = `
-        <div class="shop-sheet__content shop-sheet__content--narrow">
+        <div class="order-layout">
             <div class="order-steps gap-2 px-5 pt-5" id="orderSteps">
                 <span class="order-step order-step--active" id="orderStep1Dot"></span>
                 <span class="order-step" id="orderStep2Dot"></span>
                 <span class="order-step" id="orderStep3Dot"></span>
             </div>
 
-            <div class="order-modal__preview gap-4 p-5">
-                <img src="${escapeHtml(imageUrl)}" alt="${escapeHtml(title)}">
-                <span class="order-modal__preview-title">${escapeHtml(title)}</span>
+            <div class="order-layout__photo gap-4 p-5">
+                <div class="order-layout__frame">
+                    <img src="${escapeHtml(imageUrl)}" alt="${escapeHtml(title)}" id="orderFrameImg" class="order-layout__frame-img--landscape">
+                </div>
+                <span class="order-layout__photo-title">${escapeHtml(title)}</span>
             </div>
 
-            <div class="order-modal__steps-wrapper">
+            <!-- Étape 1 : Format & papier -->
+            <div class="order-step-panel p-5 gap-4" id="orderPanel1">
+                <p class="order-step-label m-0">Format & finition</p>
 
-                <!-- Étape 1 : Format & papier -->
-                <div class="order-step-panel p-5 gap-4" id="orderPanel1">
-                    <p class="order-step-label m-0">Étape 1 — Format & finition</p>
-
-                    <!-- Orientation -->
-                    <div class="order-format-grid order-format-grid--2col gap-2">
-                        <label class="order-format-card order-format-card--selected py-3 px-2">
-                            <input type="radio" name="orientation" value="Paysage" checked>
-                            <span class="order-orient-icon mb-2">
-                                <svg width="40" height="28" viewBox="0 0 40 28" fill="none"><rect x="0.75" y="0.75" width="38.5" height="26.5" rx="2.25" stroke="currentColor" stroke-width="1.5"/></svg>
-                            </span>
-                            <span class="order-format-card__label">Paysage</span>
-                        </label>
-                        <label class="order-format-card py-3 px-2">
-                            <input type="radio" name="orientation" value="Portrait">
-                            <span class="order-orient-icon mb-2">
-                                <svg width="28" height="40" viewBox="0 0 28 40" fill="none"><rect x="0.75" y="0.75" width="26.5" height="38.5" rx="2.25" stroke="currentColor" stroke-width="1.5"/></svg>
-                            </span>
-                            <span class="order-format-card__label">Portrait</span>
-                        </label>
-                    </div>
-
-                    <!-- Taille -->
-                    <div class="order-paper-row gap-2">
-                        ${[
-                            { label: 'Petit',  sub: '20×30 cm' },
-                            { label: 'Moyen',  sub: '40×60 cm' },
-                            { label: 'Grand',  sub: '60×90 cm' },
-                        ].map((s, i) => `
-                        <label class="order-paper-chip${i === 1 ? ' order-paper-chip--selected' : ''} py-2 px-3">
-                            <input type="radio" name="taille" value="${s.label}"${i === 1 ? ' checked' : ''}>
-                            ${s.label}<span class="order-chip-sub mt-1">${s.sub}</span>
-                        </label>`).join('')}
-                    </div>
-
-                    <!-- Finition -->
-                    <div class="order-paper-row gap-2">
-                        ${['Brillant','Mat','Fine Art'].map((p, i) => `
-                        <label class="order-paper-chip${i === 1 ? ' order-paper-chip--selected' : ''} py-2 px-3">
-                            <input type="radio" name="paper" value="${p}"${i === 1 ? ' checked' : ''}>
-                            ${p}
-                        </label>`).join('')}
-                    </div>
+                <!-- Orientation -->
+                <div class="order-format-grid order-format-grid--2col gap-2">
+                    <label class="order-format-card order-format-card--selected py-3 px-2">
+                        <input type="radio" name="orientation" value="Paysage" checked>
+                        <span class="order-orient-icon mb-2">
+                            <svg width="40" height="28" viewBox="0 0 40 28" fill="none"><rect x="0.75" y="0.75" width="38.5" height="26.5" rx="2.25" stroke="currentColor" stroke-width="1.5"/></svg>
+                        </span>
+                        <span class="order-format-card__label">Paysage</span>
+                    </label>
+                    <label class="order-format-card py-3 px-2">
+                        <input type="radio" name="orientation" value="Portrait">
+                        <span class="order-orient-icon mb-2">
+                            <svg width="28" height="40" viewBox="0 0 28 40" fill="none"><rect x="0.75" y="0.75" width="26.5" height="38.5" rx="2.25" stroke="currentColor" stroke-width="1.5"/></svg>
+                        </span>
+                        <span class="order-format-card__label">Portrait</span>
+                    </label>
                 </div>
 
-                <!-- Étape 2 : Coordonnées -->
-                <div class="order-step-panel order-step-panel--hidden p-5 gap-4" id="orderPanel2">
-                    <p class="order-step-label m-0">Étape 2 — Vos coordonnées</p>
-                    <form id="orderForm" novalidate>
-                        <div class="order-field gap-2">
-                            <label for="orderName">Nom complet <span class="order-field__required">*</span></label>
-                            <input type="text" id="orderName" name="name" required placeholder="Votre nom" class="p-3">
-                        </div>
-                        <div class="order-field gap-2">
-                            <label for="orderEmail">Courriel <span class="order-field__required">*</span></label>
-                            <input type="email" id="orderEmail" name="email" required placeholder="votre@courriel.com" class="p-3">
-                        </div>
-                        <div class="order-field gap-2">
-                            <label for="orderPhone">Téléphone</label>
-                            <input type="tel" id="orderPhone" name="phone" placeholder="Optionnel" class="p-3">
-                        </div>
-                        <div class="order-field gap-2">
-                            <label for="orderMessage">Message</label>
-                            <textarea id="orderMessage" name="message" rows="3" placeholder="Précisions, questions..." class="p-3"></textarea>
-                        </div>
-                        <div class="order-feedback p-0" id="orderFeedback"></div>
-                    </form>
+                <!-- Taille -->
+                <div class="order-paper-row gap-2">
+                    ${[
+                        { label: 'Petit',  sub: '20×30 cm' },
+                        { label: 'Moyen',  sub: '40×60 cm' },
+                        { label: 'Grand',  sub: '60×90 cm' },
+                    ].map((s, i) => `
+                    <label class="order-paper-chip${i === 1 ? ' order-paper-chip--selected' : ''} py-2 px-3">
+                        <input type="radio" name="taille" value="${s.label}"${i === 1 ? ' checked' : ''}>
+                        ${s.label}<span class="order-chip-sub mt-1">${s.sub}</span>
+                    </label>`).join('')}
                 </div>
 
-                <!-- Étape 3 : Confirmation -->
-                <div class="order-step-panel order-step-panel--hidden p-5 gap-4" id="orderPanel3">
-                    <div class="py-5 pb-3" style="text-align: center;">
-                        <div class="mx-auto mb-4" style="width: 56px; height: 56px; background: rgba(107,78,61,0.12); border-radius: 50%; display: flex; align-items: center; justify-content: center;">
-                            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#6B4E3D" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                <polyline points="20 6 9 17 4 12"/>
-                            </svg>
-                        </div>
-                        <p class="mb-2" style="color: #6B4E3D; font-size: var(--font-size-large); font-weight: var(--font-weight-medium);">Commande envoyée !</p>
-                        <p class="mb-1" style="color: var(--text-secondary); font-size: var(--font-size-small);" id="orderConfirmName"></p>
-                        <p style="color: var(--text-muted); font-size: var(--font-size-small); margin: 0;">Je vous contacterai sous peu pour finaliser votre tirage.</p>
+                <!-- Finition -->
+                <div class="order-paper-row gap-2">
+                    ${['Brillant','Mat','Fine Art'].map((p, i) => `
+                    <label class="order-paper-chip${i === 1 ? ' order-paper-chip--selected' : ''} py-2 px-3">
+                        <input type="radio" name="paper" value="${p}"${i === 1 ? ' checked' : ''}>
+                        ${p}
+                    </label>`).join('')}
+                </div>
+            </div>
+
+            <!-- Étape 2 : Coordonnées -->
+            <div class="order-step-panel order-step-panel--hidden p-5 gap-4" id="orderPanel2">
+                <p class="order-step-label m-0">Vos coordonnées</p>
+                <form id="orderForm" novalidate>
+                    <div class="order-field gap-2">
+                        <label for="orderName">Nom complet <span class="order-field__required">*</span></label>
+                        <input type="text" id="orderName" name="name" required placeholder="Votre nom" class="p-3">
                     </div>
-                </div>
+                    <div class="order-field gap-2">
+                        <label for="orderEmail">Courriel <span class="order-field__required">*</span></label>
+                        <input type="email" id="orderEmail" name="email" required placeholder="votre@courriel.com" class="p-3">
+                    </div>
+                    <div class="order-field gap-2">
+                        <label for="orderPhone">Téléphone</label>
+                        <input type="tel" id="orderPhone" name="phone" placeholder="Optionnel" class="p-3">
+                    </div>
+                    <div class="order-field gap-2">
+                        <label for="orderMessage">Message</label>
+                        <textarea id="orderMessage" name="message" rows="3" placeholder="Précisions, questions..." class="p-3"></textarea>
+                    </div>
+                    <div class="order-feedback p-0" id="orderFeedback"></div>
+                </form>
+            </div>
 
+            <!-- Étape 3 : Confirmation -->
+            <div class="order-step-panel order-step-panel--hidden p-5 gap-4" id="orderPanel3">
+                <div class="py-5 pb-3" style="text-align: center;">
+                    <div class="mx-auto mb-4" style="width: 56px; height: 56px; background: rgba(107,78,61,0.12); border-radius: 50%; display: flex; align-items: center; justify-content: center;">
+                        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#6B4E3D" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <polyline points="20 6 9 17 4 12"/>
+                        </svg>
+                    </div>
+                    <p class="mb-2" style="color: #6B4E3D; font-size: var(--font-size-large); font-weight: var(--font-weight-medium);">Commande envoyée !</p>
+                    <p class="mb-1" style="color: var(--text-secondary); font-size: var(--font-size-small);" id="orderConfirmName"></p>
+                    <p style="color: var(--text-muted); font-size: var(--font-size-small); margin: 0;">Je vous contacterai sous peu pour finaliser votre tirage.</p>
+                </div>
             </div>
 
             <div id="orderBarMount"></div>
@@ -356,10 +367,24 @@ function showOrderForm(title, imageUrl, photoId) {
     const backBtn = sheet.querySelector('[data-action="back"]');
     if (backBtn) backBtn.style.visibility = 'hidden';
 
+    // Triptyque desktop : format et coordonnées visibles ensemble dès
+    // l'ouverture, pas de notion d'étape avant la confirmation.
+    if (isTriptych) {
+        body.querySelector('#orderPanel2')?.classList.remove('order-step-panel--hidden');
+    }
+
     function mountOrderBar(step) {
         const mount = body.querySelector('#orderBarMount');
         if (!mount) return;
         mount.innerHTML = '';
+
+        if (isTriptych && step !== 3) {
+            mount.appendChild(createBottomActionBar({
+                actionLabel: 'Envoyer la commande',
+                onAction: () => body.querySelector('#orderForm')?.requestSubmit(),
+            }));
+            return;
+        }
 
         const configs = {
             1: {
@@ -381,12 +406,20 @@ function showOrderForm(title, imageUrl, photoId) {
         mount.appendChild(createBottomActionBar(configs[step] || configs[1]));
     }
 
-    // Sélection orientation (format-card)
+    // Sélection orientation (format-card) — met aussi à jour le cadre de
+    // mise en contexte (desktop uniquement, voir .order-layout__frame-img
+    // dans modal.css) pour qu'il adopte les proportions choisies.
     body.querySelectorAll('.order-format-card input').forEach(input => {
         input.addEventListener('change', () => {
             body.querySelectorAll(`.order-format-card input[name="${input.name}"]`)
                 .forEach(r => r.closest('.order-format-card').classList.remove('order-format-card--selected'));
             input.closest('.order-format-card').classList.add('order-format-card--selected');
+
+            if (input.name === 'orientation') {
+                const frameImg = body.querySelector('#orderFrameImg');
+                frameImg?.classList.toggle('order-layout__frame-img--portrait', input.value === 'Portrait');
+                frameImg?.classList.toggle('order-layout__frame-img--landscape', input.value === 'Paysage');
+            }
         });
     });
 
@@ -414,13 +447,25 @@ function showOrderForm(title, imageUrl, photoId) {
             body.querySelector('#orderStep3Dot'),
         ];
 
-        const currentIndex = panels.findIndex(p => !p.classList.contains('order-step-panel--hidden'));
+        // En triptyque, panel1 ET panel2 peuvent être visibles en même temps
+        // (pas d'étape intermédiaire) : on anime seulement le dernier de la
+        // liste (celui conceptuellement "actif"), l'autre disparaît sans
+        // transition — évite de coordonner deux animations simultanées pour
+        // un cas qui ne se produit qu'une fois (passage à la confirmation).
+        const visibleIndexes = panels
+            .map((p, i) => (!p.classList.contains('order-step-panel--hidden') ? i : -1))
+            .filter(i => i !== -1);
         const nextIndex = step - 1;
-        if (currentIndex === nextIndex) return;
+        if (visibleIndexes.length === 1 && visibleIndexes[0] === nextIndex) return;
 
+        const currentIndex = visibleIndexes[visibleIndexes.length - 1];
         const forward = nextIndex > currentIndex;
         const current = panels[currentIndex];
         const next    = panels[nextIndex];
+
+        visibleIndexes
+            .filter(i => i !== currentIndex)
+            .forEach(i => panels[i].classList.add('order-step-panel--hidden'));
 
         current.classList.add(forward ? 'order-step-panel--exit' : 'order-step-panel--exit-reverse');
         current.addEventListener('transitionend', () => {
@@ -472,6 +517,7 @@ function showOrderForm(title, imageUrl, photoId) {
             });
             const confirmName = body.querySelector('#orderConfirmName');
             if (confirmName) confirmName.textContent = `Merci ${name}, votre demande a bien été reçue.`;
+            clearShopPhoto();
             goToStep(3);
         } catch (err) {
             feedback.textContent = `Erreur : ${err.message}`;

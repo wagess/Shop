@@ -64,7 +64,53 @@
    idees.md. .order-overlay, .order-modal (boîte), .order-modal__header et
    .order-modal__back/.order-modal__close ont disparu avec l'ancien shell ;
    les classes ci-dessous ne stylent plus que le CONTENU injecté dans
-   .shop-sheet__body par js/modal.js (showOrderForm). */
+   .shop-sheet__body par js/modal.js (showOrderForm).
+
+   Mise en page triptyque desktop (2026-10-06, demande PO) : photo | format
+   & finition | coordonnées sont des enfants flex directs de .order-layout.
+   Sous DESKTOP_BREAKPOINT (960px, cf. js/modal.js isTriptych), flex-direction
+   column → empilement mobile classique (photo en bandeau, une étape visible
+   à la fois via .order-step-panel--hidden, pastilles de pagination). Au-delà,
+   flex-direction row + wrap : photo/panel1/panel2 forment une rangée de trois
+   colonnes (panel1/panel2 toujours visibles, plus de pastilles — voir
+   js/modal.js) et #orderBarMount passe à la ligne (flex-basis 100%) pour
+   rester une barre pleine largeur sous le triptyque. panel3 (confirmation)
+   suit le même ordre DOM que panel1/panel2 : quand il remplace les deux
+   (hidden posé dessus par goToStep), la rangée ne contient plus que
+   [photo][confirmation]. Pas de wrapper dédié à l'overflow d'animation :
+   .shop-sheet (shop-sheet.css) a déjà overflow:hidden, suffisant pour
+   clipper le léger débord du slide mobile (translateX ±20px). */
+.order-layout {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    max-width: 480px;
+    margin: 0 auto;
+}
+
+@media (min-width: 960px) {
+    .order-layout {
+        flex-direction: row;
+        flex-wrap: wrap;
+        align-items: stretch;
+        max-width: 1100px;
+        gap: var(--space-8);
+    }
+
+    .order-layout > #orderSteps {
+        display: none;
+    }
+
+    .order-layout__photo,
+    .order-layout > .order-step-panel {
+        flex: 1 1 0;
+        min-width: 0;
+    }
+
+    .order-layout #orderBarMount {
+        flex: 1 1 100%;
+    }
+}
 
 /* Spacing (gap-2) posé en classe utilitaire sur le HTML. */
 .order-steps {
@@ -85,31 +131,80 @@
     transform: scale(1.25);
 }
 
-/* Spacing (gap-4 p-5) posé en classe utilitaire sur le HTML. */
-.order-modal__preview {
+/* Spacing (gap-4 p-5) posé en classe utilitaire sur le HTML. Bandeau photo
+   mobile (image + titre côte à côte) ; devient une colonne pleine hauteur
+   en triptyque desktop, voir media query ci-dessus et plus bas. */
+.order-layout__photo {
     display: flex;
     align-items: center;
     border-bottom: 1px solid var(--color-border);
 }
 
-.order-modal__preview img {
+.order-layout__frame {
+    display: flex;
+    flex-shrink: 0;
+}
+
+.order-layout__frame img {
     width: 60px;
     height: 60px;
     object-fit: cover;
     border-radius: var(--radius-firm);
-    flex-shrink: 0;
 }
 
-.order-modal__preview-title {
+.order-layout__photo-title {
     color: var(--color-text-secondary);
     font-size: var(--font-body-caption-size);
     line-height: var(--line-height-normal);
 }
 
-/* Steps wrapper */
-.order-modal__steps-wrapper {
-    overflow: hidden;
-    position: relative;
+/* Mise en contexte desktop (2026-10-06, demande PO) : la vignette 60×60 du
+   mobile devient un cadre sur fond neutre dont les proportions suivent le
+   choix Paysage/Portrait (toggle de classe par js/modal.js, écouteur sur
+   .order-format-card input[name="orientation"]) — simule un tirage encadré
+   plutôt qu'une simple prévisualisation. Mat blanc (padding + fond clair sur
+   l'img elle-même, cf. .order-layout__frame-img) + ombre portée légère pour
+   suggérer le relief d'un cadre réel. Non appliqué en mobile : la vignette y
+   est trop petite (bandeau de liste) pour que l'effet soit lisible — voir
+   CLAUDE.md §5.3 (simple avant complexe). */
+@media (min-width: 960px) {
+    .order-layout__photo {
+        flex-direction: column;
+        align-items: stretch;
+        border-bottom: none;
+    }
+
+    .order-layout__frame {
+        flex: 1;
+        align-items: center;
+        justify-content: center;
+        min-height: 0;
+        background: var(--color-surface-subtle);
+        border-radius: var(--radius-firm);
+        padding: var(--space-20);
+    }
+
+    .order-layout__frame img {
+        width: auto;
+        height: auto;
+        max-width: 100%;
+        max-height: 100%;
+        border-radius: 2px;
+        background: var(--color-bg-primary);
+        padding: var(--space-8);
+        box-shadow: 0px 1px 4px 0px rgba(0, 0, 0, 0.06), 0px 8px 20px 0px rgba(0, 0, 0, 0.08);
+        transition: width 0.3s ease, aspect-ratio 0.3s ease;
+    }
+
+    .order-layout__frame-img--landscape {
+        width: 100%;
+        aspect-ratio: 4 / 3;
+    }
+
+    .order-layout__frame-img--portrait {
+        width: 65%;
+        aspect-ratio: 3 / 4;
+    }
 }
 
 /* Spacing (p-5 gap-4) posé en classe utilitaire sur le HTML. */

@@ -255,3 +255,43 @@ Migration effectuée :
 - CTA génériques sans photo précise restants (aucun après ce changement — même les cartes `#shop`, qui affichent une vraie photo de collection via `home-sections.js:renderShopMedia`, sont maintenant contextualisées).
 - `.shop-sheet` (shell de modale, voir section précédente) ne sert plus que le formulaire de commande.
 - Testé en direct dans le navigateur avec données réelles (photothèque, hero accueil, cartes boutique) : flux complet jusqu'à soumission réelle validée (courriel reçu via l'endpoint WordPress de production).
+
+---
+
+## Bouton Shop remis en nav, une seule photo à la fois (2026-10-06)
+
+**Decision :** le bouton Shop de la nav (retiré le 2026-10-05 avec le panier triptyque, section précédente) est remis en place, mais adapté au MVP simplifié — pas de panier multi-photos. `js/shop-state.js` (nouveau) mémorise une seule photo à la fois, persistée en `localStorage` pour survivre à la navigation entre pages (site multi-pages, pas de SPA). Le badge affiche 0 ou 1 (pas un compteur de panier) ; le bouton est désactivé/atténué à 0, et rouvre le même formulaire de commande (`showOrderForm`) pour la photo mémorisée quand il vaut 1.
+
+**Comportement :** `window.orderPrint()` mémorise la photo à chaque ouverture du formulaire (remplace, n'accumule pas) ; la pastille se vide après un envoi réussi (comme un checkout), mais reste à 1 si la modale est fermée sans soumettre — l'utilisateur peut la rouvrir via le bouton Shop pour reprendre sa commande.
+
+**Clarification du PO sur le cœur :** l'icône cœur (prévue dans la photothèque, pas encore implémentée) ne sert pas à "ajouter au shop" — elle est réservée à un futur système de vote/like sur les photos (rétention éditoriale, déjà noté comme piste dans la mémoire `project_value_propositions`). Le mécanisme d'ajout au shop actuel passe uniquement par les CTA "Commander une impression" existants.
+
+### Note — système de vote à ajouter (future, non cadrée)
+
+Demandé par le PO le 2026-10-06, pas encore cadré. À reprendre comme n'importe quelle fonctionnalité importante (Problem → Evidence → Hypothesis → UX → Design → Build, CLAUDE.md §11) le moment venu — questions ouvertes en attendant :
+- Qui peut voter ? (visiteur anonyme vs identifié — implications anti-spam/doublons)
+- Vote = like simple, ou système de classement (upvote limité, favoris) ?
+- Où s'affiche le résultat : compteur public sur la photo, classement "les plus votées", ou usage interne seulement (aide à la sélection éditoriale) ?
+- Backend : interaction immédiate (optimistic UI côté cœur) + persistance — quel stockage (endpoint WordPress custom ? autre) ?
+
+---
+
+## Stories devient "Escapades" — piste, pas une décision (2026-10-06)
+
+**Intention (PO), explicitement pas une décision à exécuter :** « on ne change rien des Stories — juste une idée, une intention. » Renommer *Stories* en **Escapades**, dans la même veine que la piste "renommer Stories en Sagas" notée le 2026-09-13 (`idees.md`, section fusion WordPress) — une autre direction possible pour le même nom en suspens, aucune des deux tranchée. Sagas (composition manuelle de collections photo) reste un concept distinct, non concerné. L'intention : le contenu reprendrait, **simplifié**, les articles déjà publiés sur `https://www.photographie.stephanewagner.com/escapades/` (blog de voyage existant sur l'ancien WordPress public), dans un format "story" **étendu** — inspiré du modèle **Courrier International** (lecture longue éditoriale, pas un diaporama Instagram à onglets).
+
+**Rien à construire pour l'instant** — aucun fichier du prototype Stories actuel (`stories/`) n'a été touché. Le reste de cette section reste une analyse de faisabilité à date, pas un plan de travail.
+
+**Contenu source vérifié (fetch du 2026-10-06) :** `/escapades/` est une liste chronologique d'articles (ex. "La mère et la fille", "La chaise buissonnière"). Chaque article est un post WordPress standard (`wp-content/uploads/...`, pas de custom post type apparent) : texte narratif long (≈800-900 mots, plusieurs paragraphes), 4 images intégrées (une d'ouverture, un bloc galerie de 4, une de fermeture), pas de légende par image.
+
+**Écart avec le format Stories actuel :** `stories/stories.js` (prototype actuel, données hardcodées, voir analyse du 2026-10-06 ci-avant) attend des diapositives discrètes — une image + une courte légende + un template visuel par diapositive, navigation par tap gauche/droite. Le contenu réel d'Escapades est un texte en flux continu avec images groupées, pas des paires image/légende. Un pur "pull" du contenu WP dans le format diapositive actuel ne fonctionnerait pas sans découpage artificiel.
+
+**Pourquoi l'extension au format Courrier International résout ça :** plutôt que de forcer le contenu dans le format diapositive rigide, le format s'étend vers une lecture longue (image pleine largeur + typographie éditoriale + texte en paragraphes) — plus proche de ce que le contenu WP produit déjà. "Contenus simplifiés" implique qu'un travail de condensation éditoriale reste nécessaire, mais le format n'exige plus un découpage artificiel en diapositives courtes.
+
+**Opérabilité (confirmée le 2026-10-06, voir analyse précédente) :** réseau/CORS déjà résolu — pattern existant (`js/api.js`, `scripts/build-preview.js` appellent déjà `wp-json/wp/v2/media` sans auth, en cross-origin) ; `wp/v2/posts` serait public de la même façon. Le point de convergence de domaine (Shop vs WordPress, actuellement deux sous-domaines distincts) reste une décision séparée et non bloquante, voir mémoire `project_wordpress_merge`.
+
+**Questions qui resteront à clarifier si cette piste est reprise un jour** (non urgentes, personne n'est bloqué dessus) :
+- Le format reste-t-il "plein écran avec navigation" (tap gauche/droite, barre de progression comme aujourd'hui) mais avec des diapositives "longues" (texte + image), ou devient-il un défilement vertical continu (scroll, pas de tap) — plus proche d'un vrai article Courrier International ?
+- Combien d'escapades migrer au lancement — tout l'historique du blog, ou une sélection ?
+- Qui fait la simplification éditoriale du texte (condensation manuelle par le PO, ou traitement automatisé à définir) ?
+- Backend : interaction immédiate (optimistic UI côté cœur) + persistance — quel stockage (endpoint WordPress custom ? autre) ?

@@ -80,11 +80,80 @@
 }
 
 /* Même garde de spécificité que .ac-nav__link ci-dessus. */
+.ac-nav .ac-nav__shop,
 .ac-nav .ac-nav__newsletter {
   color: var(--color-text-primary);
 }
 
+/* Position relative pour ancrer .ac-nav__shop-badge. */
+.ac-nav__shop {
+  position: relative;
+}
+
+.ac-nav__shop-group {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+/* Bouton "vider le shop" — masqué tant qu'aucune photo n'est mémorisée
+   (.ac-nav__shop-clear--visible posée par updateShopBadge, js/shop-state.js).
+   Élément séparé du bouton Shop (pas imbriqué dedans) : un <button> ne peut
+   pas contenir un autre élément interactif. */
+.ac-nav__shop-clear {
+  display: none;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  border-radius: var(--radius-circular);
+  border: none;
+  background: var(--color-bg-secondary);
+  color: var(--color-text-tertiary);
+  cursor: pointer;
+  transition: background 0.15s ease, color 0.15s ease;
+}
+
+.ac-nav__shop-clear:hover {
+  background: var(--color-bg-active);
+  color: var(--color-text-primary);
+}
+
+.ac-nav__shop-clear--visible {
+  display: flex;
+}
+
+/* Pastille 0/1 — un seul "emplacement" shop pour l'instant (MVP, voir
+   js/shop-state.js), pas un compteur de panier classique. Remplace
+   .triptyque-cart__badge (triptyque.css, retiré le 2026-10-05 avec le
+   panier) — même apparence. */
+.ac-nav__shop-badge {
+  position: absolute;
+  top: -4px;
+  right: -6px;
+  min-width: 18px;
+  height: 18px;
+  border-radius: 9px;
+  background: var(--color-accent);
+  color: var(--color-on-accent);
+  font-size: 11px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
+}
+
 .ac-nav .ac-nav__newsletter:hover { color: var(--color-text-secondary); }
+
+/* État "rien à commander" (aucune photo mémorisée, voir js/shop-state.js) —
+   bouton visible pour garder l'affordance "intention de commercialisation"
+   mais non actionnable tant qu'aucune photo n'a été choisie. */
+.ac-nav__shop--empty {
+  opacity: 0.5;
+  cursor: default;
+  pointer-events: none;
+}
 
 @media (max-width: 900px) {
   .ac-nav__links { display: none; }
