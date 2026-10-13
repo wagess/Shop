@@ -4,4 +4,4 @@ Skill actif — implémenté dans `~/.claude/skills/design-critique/SKILL.md` (n
 
 Lancement : `/design-critique`
 
-Objectif : vérifier la cohérence du design et de l'UX avec le design system Sigma (Desktop/Mobile, priorité light mode et responsive), sans proposer de solution avant le diagnostic.
+Procédure détaillée documentée dans `.bmad-core/tasks/design-critique.md` (migrée le 2026-10-12, architecture BMAD).
