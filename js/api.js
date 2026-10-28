@@ -6,7 +6,7 @@ const PROXY     = '/proxy.php?path=';
 
 const API_BASE   = IS_LOCAL ? null : `${WP_BASE}/wp-json/wplr/v1`;
 const IPTC_API   = IS_LOCAL ? null : `${WP_BASE}/wp-json/wplr-iptc/v1`;
-const BEARER_TOKEN = 'EDNusnA0Q8TW';
+const BEARER_TOKEN = 'D7gJxSFCVSEq';
 
 function apiUrl(path) {
     return IS_LOCAL

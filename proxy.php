@@ -5,7 +5,7 @@
  */
 
 const WP_BASE    = 'https://www.photographie.stephanewagner.com';
-const BEARER     = 'EDNusnA0Q8TW';
+const BEARER     = 'D7gJxSFCVSEq';
 
 // Chemin WP demandé : ?path=/wp-json/wplr/v1/hierarchy
 $path = $_GET['path'] ?? '';
