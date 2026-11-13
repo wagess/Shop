@@ -53,7 +53,6 @@ export function createNav() {
         </button>
         <button type="button" id="shop-clear" class="ac-nav__shop-clear" onclick="window.clearShopPhoto()" title="Vider le shop" aria-label="Vider le shop">${ICONS.close}</button>
       </div>
-      <a href="/rejoindre/" class="ac-nav__newsletter">Infolettre</a>
     </div>
   `;
 

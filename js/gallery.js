@@ -9,6 +9,13 @@ let currentPage = 1;
 const ITEMS_PER_PAGE = 8;
 let currentDisplayedGalleries = [];
 
+// Config admin (collections-visibility.json) — allGalleries/displayGalleries
+// au niveau racine sont déjà filtrés en amont (voir app.js/applyVisibility),
+// mais showFolder() reconstruit sa liste directement depuis hierarchyData
+// (brut, non filtré) : sans cette config, une collection désactivée dans
+// l'admin redevenait visible dès qu'on ouvrait son dossier parent.
+let visibilityConfig = {};
+
 export function setHierarchyData(data) {
     hierarchyData = data;
 }
@@ -19,6 +26,14 @@ export function setAllGalleries(galleries) {
 
 export function setAllSearchableItems(items) {
     allSearchableItems = items;
+}
+
+export function setVisibilityConfig(cfg) {
+    visibilityConfig = cfg || {};
+}
+
+function isCollectionVisible(id) {
+    return (visibilityConfig.collections || {})[String(id)] !== false;
 }
 
 export function extractGalleryIds(node, result = []) {
@@ -362,7 +377,7 @@ export async function showFolder(folderId, folderName) {
     // Si c'est un dossier avec des enfants
     let descendants = [];
     if (node.children && Array.isArray(node.children)) {
-        descendants = extractGalleryIds(node).filter(n => n.id != null && n.type !== 'folder');
+        descendants = extractGalleryIds(node).filter(n => n.id != null && n.type !== 'folder' && isCollectionVisible(n.id));
     } else if (node.type === 'folder') {
         // Chercher tous les éléments qui ont ce dossier comme parent
         descendants = allGalleries.filter(g => g.parentId === node.id || g.parent === node.id);

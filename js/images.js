@@ -9,6 +9,18 @@ function updateOrderBtn(title, imageUrl, photoId) {
         e.stopPropagation();
         window.orderPrint(title, imageUrl, photoId);
     };
+
+    // V0 achat rapide 5$ — même photo que "Commander", livraison manuelle
+    // par courriel (pas d'automatisation de paiement, voir
+    // js/components/quick-buy-popup.js).
+    const quickBuyBtn = document.getElementById('quickBuyBtn');
+    if (quickBuyBtn) {
+        quickBuyBtn.style.display = '';
+        quickBuyBtn.onclick = (e) => {
+            e.stopPropagation();
+            window.openQuickBuy(title);
+        };
+    }
 }
 
 /**
@@ -72,7 +84,7 @@ async function loadRandomImageFromCollection(collectionId) {
     console.log(`🔄 Chargement d'une image aléatoire de la collection ${collectionId}...`);
 
     try {
-        const photos = await fetchGalleryPhotos(collectionId);
+        const photos = await fetchGalleryPhotos(collectionId, { priority: true });
         
         if (!photos || !Array.isArray(photos) || photos.length === 0) {
             console.error('❌ Aucune photo trouvée dans cette collection');
@@ -147,7 +159,7 @@ async function loadRandomImageFromCollectionByName(collectionName, collections) 
     console.log(`✅ Collection trouvée: "${collection.name}" (ID: ${collection.id})`);
     
     try {
-        const photos = await fetchGalleryPhotos(collection.id);
+        const photos = await fetchGalleryPhotos(collection.id, { priority: true });
         
         if (!photos || !Array.isArray(photos) || photos.length === 0) {
             console.error('❌ Aucune photo trouvée dans cette collection');

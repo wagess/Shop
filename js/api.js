@@ -26,7 +26,14 @@ const MAX_CONCURRENT_REQUESTS = 3;
 let activeRequests = 0;
 const pendingQueue = [];
 
-function runQueued(task) {
+// `priority` saute par-dessus la file d'attente (unshift) au lieu de s'y
+// ajouter à la suite (push) — utilisé par la photo du hero (le seul appel
+// réseau visible immédiatement au chargement de la page) pour ne pas
+// attendre derrière la rafale de requêtes des sections de l'accueil
+// (séries, spotlights, boutique — voir home-sections.js) qui démarrent en
+// même temps. Ne peut pas préempter une requête déjà en vol (seulement
+// celles encore en file), d'où l'intérêt de rester à 3 slots concurrents.
+function runQueued(task, priority = false) {
     return new Promise((resolve, reject) => {
         const run = () => {
             activeRequests++;
@@ -36,16 +43,17 @@ function runQueued(task) {
             });
         };
         if (activeRequests < MAX_CONCURRENT_REQUESTS) run();
+        else if (priority) pendingQueue.unshift(run);
         else pendingQueue.push(run);
     });
 }
 
-function apiFetch(path, options = {}) {
+function apiFetch(path, options = {}, priority = false) {
     const url = apiUrl(path);
     if (!IS_LOCAL) {
         options.headers = { ...options.headers, 'Authorization': `Bearer ${BEARER_TOKEN}` };
     }
-    return runQueued(() => fetch(url, options));
+    return runQueued(() => fetch(url, options), priority);
 }
 
 export { API_BASE, IPTC_API, BEARER_TOKEN };
@@ -68,11 +76,11 @@ export function fetchHierarchy() {
     return _hierarchyPromise;
 }
 
-export function fetchGalleryPhotos(galleryId) {
+export function fetchGalleryPhotos(galleryId, { priority = false } = {}) {
     const key = String(galleryId);
     if (!_galleryPhotosCache.has(key)) {
         const promise = (async () => {
-            const resp = await apiFetch(`/wp-json/wplr/v1/gallery/${galleryId}`);
+            const resp = await apiFetch(`/wp-json/wplr/v1/gallery/${galleryId}`, {}, priority);
             if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
             return await resp.json();
         })().catch(err => { _galleryPhotosCache.delete(key); throw err; });

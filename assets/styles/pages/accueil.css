@@ -638,7 +638,11 @@
 .ac-popup {
   position: fixed;
   inset: 0;
-  z-index: 9000;
+  /* Doit rester au-dessus de la lightbox (#lightbox, z-index 10000/10001 —
+     voir lightbox.css) : le bouton "Achat rapide" de la lightbox ouvre
+     cette même popup, qui serait sinon rendue mais masquée derrière le
+     fond opaque de la lightbox. */
+  z-index: 10100;
   align-items: center;
   justify-content: center;
 }

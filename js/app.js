@@ -3,6 +3,7 @@ import { fetchHierarchy, fetchVisibilityConfig } from './api.js';
 import { createNav } from './components/nav.js';
 import { createFooter } from './components/footer.js';
 import { createPhotosModal } from './components/photos-modal.js';
+import { createQuickBuyPopup, openQuickBuy } from './components/quick-buy-popup.js';
 import { createBottomActionBar } from './components/bottom-action-bar.js';
 import { createButton } from './components/button.js';
 import { createActivityRing } from './components/activity-ring.js';
@@ -13,6 +14,7 @@ import {
     setHierarchyData,
     setAllGalleries,
     setAllSearchableItems,
+    setVisibilityConfig,
     showFolder,
     displayCollectionsView,
     findNodeById,
@@ -49,6 +51,7 @@ window.openShopModal = function() {
     orderPrint(photo.title, photo.imageUrl, photo.photoId);
 };
 window.clearShopPhoto = clearShopPhoto;
+window.openQuickBuy = openQuickBuy;
 window.showFolder = function(id, name) {
     location.hash = `folder-${id}`;
     return showFolder(id, name);
@@ -69,6 +72,7 @@ window.onload = () => {
     mountHeader();
     mountFooter();
     mountPhotosModal();
+    mountQuickBuyPopup();
     loadHierarchy();
 };
 
@@ -116,6 +120,15 @@ function mountPhotosModal() {
     if (!mount) return;
 
     mount.replaceWith(createPhotosModal());
+}
+
+// Montée sur toutes les pages avec le mount point (accueil + photothèque) —
+// une seule popup partagée, voir js/components/quick-buy-popup.js.
+function mountQuickBuyPopup() {
+    const mount = el('quick-buy-popup-mount');
+    if (!mount) return;
+
+    mount.replaceWith(createQuickBuyPopup());
 }
 
 async function loadVisibilityConfig() {
@@ -169,6 +182,7 @@ async function loadHierarchy() {
         setHierarchyData(hierarchyData);
         setAllGalleries(shuffledCollections);
         setAllSearchableItems([...shuffledCollections, ...folders]);
+        setVisibilityConfig(visibilityConfig);
 
         const statsEl = el('stats');
         if (statsEl) statsEl.textContent = `${shuffledCollections.length} collection${shuffledCollections.length > 1 ? 's' : ''}`;

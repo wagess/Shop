@@ -26,14 +26,21 @@
                     <div>
                         <p id="imageInfo" class="ac-hero__collection m-0 mb-4" style="display:none;"><span id="collectionName"></span></p>
                         <h1 class="ac-hero__title m-0">Explorez mon<br><em>univers photographique</em></h1>
-                        <!-- Câblé par js/images.js (updateOrderBtn) — masqué tant que la
-                             photo aléatoire n'est pas chargée, affiché ensuite avec son
-                             onclick. Ouvre directement le formulaire de commande par
-                             courriel pour cette photo précise (window.orderPrint). -->
-                        <button type="button" id="randomImageOrderBtn" class="btn-soft gap-2 py-0 pr-4 pl-6 mt-6" style="display:none;">
-                            Commander cette photo
-                            <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg"><circle cx="10" cy="10" r="7.5" stroke="currentColor" stroke-width="1.5"/></svg>
-                        </button>
+                        <!-- Câblé par js/images.js (updateOrderBtn) — masqués tant que la
+                             photo aléatoire n'est pas chargée, affichés ensuite avec leur
+                             onclick respectif pour cette photo précise. -->
+                        <div class="ac-hero__links-row gap-2 mt-6">
+                            <button type="button" id="randomImageOrderBtn" class="btn-soft gap-2 py-0 pr-4 pl-6" style="display:none;">
+                                Commander cette photo
+                                <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg"><circle cx="10" cy="10" r="7.5" stroke="currentColor" stroke-width="1.5"/></svg>
+                            </button>
+                            <!-- V0 achat rapide : livraison manuelle par courriel, pas de
+                                 génération automatique de fichier watermarké (voir popup). -->
+                            <button type="button" id="quickBuyBtn" class="btn-soft btn-commander gap-2 py-0 pr-4 pl-6" style="display:none;">
+                                Achat rapide pour 5$
+                                <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M11.25 1.875L4.0625 11.5625H9.6875L8.75 18.125L15.9375 8.4375H10.3125L11.25 1.875Z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round" stroke-linecap="round"/></svg>
+                            </button>
+                        </div>
                     </div>
                     <div class="ac-hero__links-row gap-2">
                         <a href="/phototheque.html" class="btn-soft gap-2 py-0 pr-4 pl-6">
@@ -177,6 +184,9 @@
         <p class="ac-popup__title m-0 mt-5">Impression grand format</p>
         <p class="ac-popup__text m-0 mt-3">Les formats, papiers et tarifs d'impression sont en cours de définition. Options à venir.</p>
     </popup-panel>
+
+    <!-- Popup "Achat rapide 5$" — composant js/components/quick-buy-popup.js -->
+    <div id="quick-buy-popup-mount"></div>
 
     <!-- ===== POP-UP INSCRIPTION ===== -->
     <popup-panel id="signupPopup" class="ac-popup p-5" style="display:none;">

@@ -5,6 +5,21 @@ import { createBottomActionBar } from './components/bottom-action-bar.js';
 import { openShopSheet, closeShopSheet } from './components/shop-sheet.js';
 import { setShopPhoto, clearShopPhoto } from './shop-state.js';
 
+// Même icône "flash" que le bouton "Achat rapide" du hero (index.html).
+const QUICK_BUY_ICON = '<svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M11.25 1.875L4.0625 11.5625H9.6875L8.75 18.125L15.9375 8.4375H10.3125L11.25 1.875Z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round" stroke-linecap="round"/></svg>';
+
+// Rebranche le bouton "Achat rapide" fixe de la lightbox sur la photo
+// actuellement affichée — appelé à l'ouverture et à chaque navigation
+// prev/next (voir openLightbox / navigateToPhoto).
+function bindLightboxQuickBuy(title) {
+    const btn = document.querySelector('.lightbox-quick-buy');
+    if (!btn) return;
+    btn.onclick = (e) => {
+        e.stopPropagation();
+        window.openQuickBuy(title);
+    };
+}
+
 export async function openGallery(galleryId, galleryName) {
     const modal = el('photosModal');
     const title = el('modalTitle');
@@ -99,6 +114,23 @@ export async function displayPhotos(photos, gridEl = null) {
             },
         });
         actionsEl.appendChild(orderBtn);
+
+        // V0 achat rapide 5$ — même photo, livraison manuelle par courriel
+        // (voir js/components/quick-buy-popup.js). Icon-only ici, la carte
+        // n'a pas la largeur du hero pour un libellé complet.
+        const quickBuyBtn = createButton({
+            label: 'Achat rapide pour 5$',
+            labelType: 'icon-only',
+            icon: QUICK_BUY_ICON,
+            variant: 'secondary',
+            size: 'md',
+            onClick: (e) => {
+                e.stopPropagation();
+                window.openQuickBuy(title);
+            },
+        });
+        quickBuyBtn.title = 'Achat rapide pour 5$';
+        actionsEl.appendChild(quickBuyBtn);
     });
 
     await Promise.allSettled(photos.map(async photo => {
@@ -675,7 +707,8 @@ function navigateToPhoto(direction) {
         const title = photo.title || photo.post_title || photo.name || `Photo ${photo.id}`;
         
         currentPhotoIndex = newIndex;
-        
+        bindLightboxQuickBuy(title);
+
         // Mettre à jour l'image dans la lightbox
         const img = document.querySelector('.lightbox-image');
         if (img) {
@@ -764,7 +797,7 @@ export function openLightbox(imageUrl, title, photoIndex = 0) {
             </div>
         `;
         document.body.appendChild(lightbox);
-        
+
         // Charger le CSS lightbox si pas déjà présent - CORRECTION DU CHEMIN
         if (!document.querySelector('link[href*="lightbox.css"]')) {
             const link = document.createElement('link');
@@ -773,7 +806,26 @@ export function openLightbox(imageUrl, title, photoIndex = 0) {
             document.head.appendChild(link);
         }
     }
-    
+
+    // Bouton "Achat rapide" — fixe (pas de suivi de souris comme le close
+    // desktop). Enfant de body comme .lightbox-close/.mobile-nav-btn, PAS de
+    // #lightbox : #lightbox est lui-même un enfant de body avec z-index
+    // propre (10000), ce qui crée son propre contexte d'empilement — un
+    // z-index élevé posé sur un descendant ne peut jamais dépasser un
+    // *sibling* de son ancêtre (.lightbox-close, z-index 10001) si le
+    // bouton reste empilé à l'intérieur de #lightbox (bug constaté : le
+    // bouton qui suit la souris passait quand même au-dessus en desktop).
+    let quickBuyBtn = document.querySelector('.lightbox-quick-buy');
+    if (!quickBuyBtn) {
+        quickBuyBtn = document.createElement('button');
+        quickBuyBtn.type = 'button';
+        quickBuyBtn.className = 'lightbox-quick-buy btn-soft btn-commander gap-2 py-0 pr-4 pl-6';
+        quickBuyBtn.innerHTML = `Achat rapide pour 5$ ${QUICK_BUY_ICON}`;
+        document.body.appendChild(quickBuyBtn);
+    }
+    quickBuyBtn.style.display = 'inline-flex';
+    bindLightboxQuickBuy(title);
+
     // Créer ou récupérer le bouton close
     let closeBtn = document.querySelector('.lightbox-close');
     if (!closeBtn) {
@@ -871,7 +923,10 @@ export function closeLightbox() {
         lightbox.classList.remove('active');
         document.body.style.overflow = '';
     }
-    
+
+    const quickBuyBtn = document.querySelector('.lightbox-quick-buy');
+    if (quickBuyBtn) quickBuyBtn.style.display = 'none';
+
     if (closeBtn && !isMobile) {
         closeBtn.style.opacity = '0';
         setTimeout(() => {

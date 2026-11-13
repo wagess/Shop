@@ -68,6 +68,20 @@
     display: none;
 }
 
+/* Fixe (pas de suivi de souris comme .lightbox-close) — même position sur
+   mobile et desktop, aucun autre contrôle de la lightbox n'occupe ce coin.
+   z-index au-dessus de .lightbox-close (10001) : en desktop ce bouton suit
+   la souris sur tout l'écran (voir updateButtonPosition) et peut dériver
+   jusque dans ce coin — à égalité de z-index, le dernier ajouté au DOM
+   (.lightbox-close, créé après) gagnerait le clic à la place du nôtre. */
+.lightbox-quick-buy {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    z-index: 10002;
+    pointer-events: auto;
+}
+
 .mobile-nav-btn {
     position: fixed;
     width: 40px;
